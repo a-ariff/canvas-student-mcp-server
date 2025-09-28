@@ -1,7 +1,28 @@
-fastapi==0.104.1
-uvicorn[standard]==0.24.0
-pydantic==2.5.0
-httpx==0.25.2
-structlog==23.2.0
-python-multipart==0.0.6
-python-dotenv==1.0.0
+# Core FastAPI
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+pydantic>=2.5.0
+httpx>=0.25.0
+structlog>=23.1.0
+python-multipart>=0.0.6
+python-dotenv>=1.0.0
+
+# MCP Protocol Support (fix version compatibility)
+mcp>=1.0.0
+anyio>=3.7.1,<4.0.0
+
+# Canvas Integration 
+selenium>=4.15.0
+beautifulsoup4>=4.12.0
+
+# Session & Security
+redis>=5.0.0
+cryptography>=41.0.0
+python-jose[cryptography]>=3.3.0
+
+# Development & Monitoring
+prometheus-client>=0.18.0
+
+# Additional utilities
+aiofiles>=23.0.0
+jinja2>=3.1.0
