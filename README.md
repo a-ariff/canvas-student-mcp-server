@@ -1,6 +1,7 @@
 # Canvas Student MCP Server - Complete Toolkit
 
-Complete Canvas LMS integration monorepo with Python MCP server and TypeScript remote server implementations for Model Context Protocol.
+Complete Canvas LMS integration monorepo with Python MCP server and
+TypeScript remote server implementations for Model Context Protocol.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
@@ -10,27 +11,29 @@ Complete Canvas LMS integration monorepo with Python MCP server and TypeScript r
 ## 📦 Packages
 
 ### 🐍 Python MCP Server
+
 - **Location**: `packages/canvas-student-mcp-server/`
 - **Description**: Flask-based MCP server for Canvas LMS integration
 - **Language**: Python 3.8+
 - **Features**: Student data access, course management, assignment handling
 - **Main File**: `packages/canvas-student-mcp-server/app.py`
-
 ### 🔧 Remote MCP Server (Authless)
+
 - **Location**: `packages/remote-mcp-server-authless/`  
 - **Description**: TypeScript MCP server for remote operations
 - **Language**: TypeScript/Node.js
 - **Features**: Cloudflare Worker deployment, authentication-free operations
 - **Main File**: `packages/remote-mcp-server-authless/src/index.ts`
-
 ## 🚀 Quick Start
 
 ### Install All Dependencies
+
 ```bash
 npm run install:all
 ```
 
 ### Python MCP Server
+
 ```bash
 cd packages/canvas-student-mcp-server
 pip install -r requirements.txt
@@ -38,6 +41,7 @@ python app.py
 ```
 
 ### TypeScript Remote Server
+
 ```bash
 cd packages/remote-mcp-server-authless
 npm install
@@ -46,7 +50,7 @@ npm start
 
 ## 📁 Monorepo Structure
 
-```
+```text
 canvas-student-mcp-server/
 ├── README.md                           # This file  
 ├── package.json                        # Root package.json for workspace
@@ -84,7 +88,6 @@ This monorepo contains all Canvas MCP implementations in one place for easier de
 - **Security Scans**: Weekly security audits for both Python and TypeScript packages
 - **Integration Tests**: Full monorepo testing when both packages change
 - **Smart Change Detection**: Only tests what changed to optimize CI time
-
 ### 📝 Available Scripts
 
 ```bash
@@ -120,18 +123,18 @@ git clone https://github.com/a-ariff/canvas-student-mcp-server.git
 cd canvas-student-mcp-server
 ```
 
-2. Install dependencies for both packages:
+1. Install dependencies for both packages:
 ```bash
 npm run install:all
 ```
 
-3. Configure your Canvas API credentials:
+1. Configure your Canvas API credentials:
 ```bash
 cp packages/canvas-student-mcp-server/.env.example packages/canvas-student-mcp-server/.env
 # Edit the .env file with your Canvas API details
 ```
 
-4. Run the servers:
+1. Run the servers:
 ```bash
 # Python MCP Server
 npm run start:python
@@ -145,17 +148,18 @@ npm run start:remote
 - **Automated Security Scanning**: Weekly scans for both Python and TypeScript dependencies
 - **Code Quality**: Enforced through CI/CD with linting and formatting checks
 - **Dependency Management**: Regular updates and vulnerability monitoring
-
 ## 📚 Documentation
 
 - **Python MCP Server**: See `packages/canvas-student-mcp-server/README.md`
 - **TypeScript Remote Server**: See `packages/remote-mcp-server-authless/README.md`
 - **API Documentation**: Available in `packages/canvas-student-mcp-server/docs/`
 - **Integration Guide**: See `packages/canvas-student-mcp-server/MCP_INTEGRATION.md`
-
 ## ⚠️ Important Notice
 
-This project is designed for educational purposes and personal academic management. Users are responsible for complying with their institution's terms of service and applicable policies. Always respect rate limits and use responsibly.
+This project is designed for educational purposes and personal academic
+management. Users are responsible for complying with their institution's
+terms of service and applicable policies. Always respect rate limits and
+use responsibly.
 
 ## 📄 License
 
@@ -164,9 +168,9 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ## 🤝 Contributing
 
 1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
+1. Create a feature branch (`git checkout -b feature/amazing-feature`)
+1. Commit your changes (`git commit -m 'Add some amazing feature'`)
+1. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
-
-The CI/CD pipeline will automatically test your changes across multiple Python and Node.js versions!
+The CI/CD pipeline will automatically test your changes across multiple Python
+and Node.js versions!

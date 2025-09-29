@@ -1,6 +1,7 @@
 # 🔧 Troubleshooting Guide
 
-This guide helps you resolve common issues when setting up and using the Canvas Student MCP Server.
+This comprehensive guide covers common issues, debugging techniques, and
+solutions for the Canvas Student MCP Server.
 
 ## Table of Contents
 
@@ -12,7 +13,6 @@ This guide helps you resolve common issues when setting up and using the Canvas 
 - [Performance Problems](#performance-problems)
 - [Common Error Messages](#common-error-messages)
 - [Getting Help](#getting-help)
-
 ## Installation Issues
 
 ### Python Version Problems
@@ -20,6 +20,7 @@ This guide helps you resolve common issues when setting up and using the Canvas 
 **Problem**: `SyntaxError` or `ModuleNotFoundError` during installation
 
 **Solution**:
+
 ```bash
 # Check Python version (must be 3.9+)
 python --version
@@ -41,6 +42,7 @@ python3.11 -m pip install -r requirements.txt
 **Problem**: Import errors when starting the server
 
 **Solution**:
+
 ```bash
 # Reinstall all dependencies
 pip install --upgrade -r requirements.txt
@@ -56,6 +58,7 @@ pip install -r requirements.txt
 **Problem**: Permission denied when installing packages
 
 **Solution**:
+
 ```bash
 # Use user installation
 pip install --user -r requirements.txt
@@ -73,12 +76,13 @@ pip install -r requirements.txt
 **Problem**: `HTTP 401 Unauthorized` or login failures
 
 **Common Causes**:
+
 1. **Two-Factor Authentication (2FA)**: Canvas 2FA is not supported by this tool
 2. **Incorrect username/password**: Double-check credentials
 3. **Special characters**: URL-encode special characters in credentials
 4. **Institution-specific login**: Some schools use SSO/SAML
-
 **Solutions**:
+
 ```bash
 # Test credentials manually by logging into Canvas web interface
 
@@ -94,15 +98,16 @@ CANVAS_PASSWORD=mypass%40123
 ```
 
 **2FA Workaround**:
+
 1. Temporarily disable 2FA if possible
 2. Use app-specific password if your institution supports it
 3. Contact IT department for API access token
-
 ### Session Timeouts
 
 **Problem**: `Session expired` errors during operation
 
 **Solution**:
+
 ```python
 # Add to .env file
 SESSION_TIMEOUT=3600  # 1 hour
@@ -116,6 +121,7 @@ AUTO_REFRESH=true
 **Problem**: `Connection refused` or `Timeout` errors
 
 **Diagnostic Steps**:
+
 ```bash
 # Test Canvas URL accessibility
 curl -I https://your-school.instructure.com
@@ -129,6 +135,7 @@ nslookup your-school.instructure.com
 ```
 
 **Solutions**:
+
 ```bash
 # For proxy environments, add to .env:
 HTTP_PROXY=http://proxy.company.com:8080
@@ -144,6 +151,7 @@ HTTPS_PROXY=https://proxy.company.com:8080
 **Problem**: `SSL: CERTIFICATE_VERIFY_FAILED`
 
 **Solutions**:
+
 ```bash
 # Update certificates
 # On macOS:
@@ -164,6 +172,7 @@ SSL_VERIFY=false
 **Problem**: API endpoints return `404` or unexpected responses
 
 **Solution**:
+
 ```bash
 # Check Canvas version
 curl https://your-school.instructure.com/api/v1/
@@ -177,6 +186,7 @@ curl https://your-school.instructure.com/api/v1/
 **Problem**: `HTTP 429 Too Many Requests`
 
 **Solution**:
+
 ```bash
 # Reduce request rate in .env:
 RATE_LIMIT=30  # Requests per minute (default: 60)
@@ -188,12 +198,13 @@ REQUEST_DELAY=2  # Seconds between requests
 **Problem**: Cannot access specific courses or get empty course lists
 
 **Common Causes**:
+
 1. Student not enrolled in course
 2. Course is unpublished
 3. Course access is restricted
 4. Wrong semester/term
-
 **Diagnostic**:
+
 ```bash
 # Test API endpoint directly
 curl -H "Authorization: Bearer YOUR_TOKEN" \
@@ -207,13 +218,16 @@ curl -H "Authorization: Bearer YOUR_TOKEN" \
 **Problem**: Claude Desktop doesn't recognize the MCP server
 
 **Solution**:
+
 1. **Check server status**:
+
    ```bash
    # Ensure server is running
    curl http://localhost:8000/health
    ```
 
 2. **Verify Claude Desktop config**:
+
    ```json
    {
      "mcpServers": {
@@ -231,12 +245,12 @@ curl -H "Authorization: Bearer YOUR_TOKEN" \
    ```
 
 3. **Restart Claude Desktop** after config changes
-
 ### Port Conflicts
 
 **Problem**: `Address already in use` error
 
 **Solution**:
+
 ```bash
 # Find process using port 8000
 lsof -i :8000  # On macOS/Linux
@@ -251,16 +265,18 @@ PORT=8001
 **Problem**: `Invalid MCP message` or protocol errors
 
 **Solution**:
+
 1. **Update MCP dependencies**:
+
    ```bash
    pip install --upgrade mcp anthropic-sdk
    ```
 
 2. **Check MCP server logs**:
+
    ```bash
    python app.py --debug
    ```
-
 ## Performance Problems
 
 ### Slow Response Times
@@ -268,13 +284,16 @@ PORT=8001
 **Problem**: Server takes too long to respond
 
 **Solutions**:
+
 1. **Enable caching** in .env:
+
    ```bash
    ENABLE_CACHE=true
    CACHE_TTL=3600  # 1 hour
    ```
 
 2. **Optimize requests**:
+
    ```bash
    # Reduce concurrent requests
    MAX_CONCURRENT_REQUESTS=5
@@ -282,35 +301,50 @@ PORT=8001
    # Use compression
    ENABLE_COMPRESSION=true
    ```
-
 ### Memory Usage
 
 **Problem**: High memory consumption
 
 **Solution**:
+
 ```bash
+**Solution**:
+
+```bash
+
 # Limit cache size in .env:
+
 MAX_CACHE_SIZE=100  # MB
 
 # Reduce batch size for large operations:
+
 BATCH_SIZE=10
+
+```
+
+## Common Error Messages
 ```
 
 ## Common Error Messages
 
 ### `ModuleNotFoundError: No module named 'fastapi'`
+
 **Solution**: `pip install fastapi uvicorn`
 
 ### `requests.exceptions.ConnectionError`
+
 **Solution**: Check internet connection and Canvas URL
 
 ### `TypeError: 'NoneType' object is not subscriptable`
+
 **Solution**: Check .env file configuration and Canvas credentials
 
 ### `JSON decode error`
+
 **Solution**: Canvas may be returning HTML error page - check credentials and URL
 
 ### `AttributeError: 'str' object has no attribute 'json'`
+
 **Solution**: Update requests library: `pip install --upgrade requests`
 
 ## Getting Help
@@ -318,6 +352,7 @@ BATCH_SIZE=10
 ### Debug Mode
 
 Enable debug mode for detailed error information:
+
 ```bash
 # Add to .env file:
 DEBUG=true
@@ -330,6 +365,7 @@ python app.py --verbose
 ### Log Files
 
 Check log files for error details:
+
 ```bash
 # Default log location
 tail -f logs/canvas_mcp.log
@@ -343,6 +379,7 @@ LOG_TO_CONSOLE=true
 When creating a GitHub issue, please include:
 
 1. **System Information**:
+
    ```bash
    python --version
    pip list | grep -E "(fastapi|requests|beautifulsoup4)"
@@ -354,6 +391,7 @@ When creating a GitHub issue, please include:
    - Steps to reproduce
 
 3. **Configuration** (remove sensitive data):
+
    ```bash
    # .env file contents (anonymized)
    CANVAS_URL=https://SCHOOL.instructure.com
@@ -365,36 +403,37 @@ When creating a GitHub issue, please include:
    - Institution name (if comfortable sharing)
    - Canvas version (if known)
    - Any special authentication requirements
-
 ### Community Support
 
 - **GitHub Issues**: [Report bugs and feature requests](https://github.com/a-ariff/canvas-student-mcp-server/issues)
 - **Discussions**: [Ask questions and share tips](https://github.com/a-ariff/canvas-student-mcp-server/discussions)
 - **Discord**: [Join the MCP community](https://discord.gg/modelcontextprotocol)
-
 ### Professional Support
 
 For institutional deployments or enterprise support:
+
 - Contact your IT department first
 - Consider Canvas-provided API solutions
 - Ensure compliance with institutional policies
-
 ## Prevention Tips
 
 ### Best Practices
 
 1. **Use Virtual Environments**:
+
    ```bash
    python -m venv canvas_mcp_env
    source canvas_mcp_env/bin/activate
    ```
 
 2. **Keep Dependencies Updated**:
+
    ```bash
    pip install --upgrade -r requirements.txt
    ```
 
 3. **Monitor Rate Limits**:
+
    ```bash
    # Check Canvas API usage
    curl -H "Authorization: Bearer TOKEN" \
@@ -402,20 +441,22 @@ For institutional deployments or enterprise support:
    ```
 
 4. **Regular Testing**:
+
    ```bash
    # Test basic functionality
    python -c "import requests; print(requests.get('https://your-school.instructure.com').status_code)"
    ```
 
 5. **Backup Configuration**:
+
    ```bash
    # Keep a copy of working .env file
    cp .env .env.backup
    ```
-
 ### Monitoring Health
 
 Set up basic monitoring:
+
 ```bash
 # Add to crontab for health checks
 */5 * * * * curl -f http://localhost:8000/health || echo "Canvas MCP Server down" | mail -s "Alert" admin@example.com
@@ -437,7 +478,6 @@ When something goes wrong, try these in order:
 8. ☐ Check logs: `tail -f logs/canvas_mcp.log`
 9. ☐ Try debug mode: Set `DEBUG=true` in .env
 10. ☐ Clear cache: Delete `cache/` directory if it exists
-
 If none of these work, create a GitHub issue with details!
 
 ---
