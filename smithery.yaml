@@ -1,0 +1,23 @@
+name: canvas-student-mcp-server
+id: a-ariff.canvas-student-mcp-server
+version: 0.1.0
+description: MCP server for Canvas LMS (student-focused)
+homepage: https://github.com/a-ariff/canvas-student-mcp-server
+license: MIT
+
+server:
+  type: process
+  command: python3
+  args:
+    - packages/canvas-student-mcp-server/app.py
+  env:
+    - key: PYTHONUNBUFFERED
+      value: "1"
+
+tags:
+  - mcp
+  - canvas
+  - education
+  - python
+
+readme: README.md
