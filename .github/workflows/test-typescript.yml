@@ -46,27 +46,27 @@ jobs:
         # Create eslint config if it doesn't exist
         if [ ! -f .eslintrc.json ]; then
           cat > .eslintrc.json << 'EOF'
-{
-  "parser": "@typescript-eslint/parser",
-  "plugins": ["@typescript-eslint"],
-  "extends": [
-    "eslint:recommended",
-    "@typescript-eslint/recommended"
-  ],
-  "env": {
-    "node": true,
-    "es2021": true
-  },
-  "parserOptions": {
-    "ecmaVersion": 12,
-    "sourceType": "module"
-  },
-  "rules": {
-    "@typescript-eslint/no-unused-vars": "error",
-    "@typescript-eslint/no-explicit-any": "warn"
-  }
-}
-EOF
+        {
+          "parser": "@typescript-eslint/parser",
+          "plugins": ["@typescript-eslint"],
+          "extends": [
+            "eslint:recommended",
+            "@typescript-eslint/recommended"
+          ],
+          "env": {
+            "node": true,
+            "es2021": true
+          },
+          "parserOptions": {
+            "ecmaVersion": 12,
+            "sourceType": "module"
+          },
+          "rules": {
+            "@typescript-eslint/no-unused-vars": "error",
+            "@typescript-eslint/no-explicit-any": "warn"
+          }
+        }
+        EOF
         fi
         npx eslint src/ --ext .ts
 
@@ -81,35 +81,35 @@ EOF
         # Create jest config if it doesn't exist
         if [ ! -f jest.config.js ]; then
           cat > jest.config.js << 'EOF'
-module.exports = {
-  preset: 'ts-jest',
-  testEnvironment: 'node',
-  roots: ['<rootDir>/src', '<rootDir>/tests'],
-  testMatch: ['**/__tests__/**/*.ts', '**/?(*.)+(spec|test).ts'],
-  collectCoverageFrom: [
-    'src/**/*.ts',
-    '!src/**/*.d.ts',
-  ],
-};
-EOF
+        module.exports = {
+          preset: 'ts-jest',
+          testEnvironment: 'node',
+          roots: ['<rootDir>/src', '<rootDir>/tests'],
+          testMatch: ['**/__tests__/**/*.ts', '**/?(*.)+(spec|test).ts'],
+          collectCoverageFrom: [
+            'src/**/*.ts',
+            '!src/**/*.d.ts',
+          ],
+        };
+        EOF
         fi
         
         # Create basic tests if they don't exist
         mkdir -p tests
         if [ ! -f tests/index.test.ts ]; then
           cat > tests/index.test.ts << 'EOF'
-describe('Remote MCP Server', () => {
-  test('should import main module', () => {
-    expect(() => {
-      require('../src/index');
-    }).not.toThrow();
-  });
+        describe('Remote MCP Server', () => {
+          test('should import main module', () => {
+            expect(() => {
+              require('../src/index');
+            }).not.toThrow();
+          });
 
-  test('basic functionality', () => {
-    expect(true).toBe(true);
-  });
-});
-EOF
+          test('basic functionality', () => {
+            expect(true).toBe(true);
+          });
+        });
+        EOF
         fi
         
         npm test
