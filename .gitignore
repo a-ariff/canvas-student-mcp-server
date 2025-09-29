@@ -36,6 +36,27 @@ ENV/
 .venv/
 .ENV/
 
+# Node.js and TypeScript
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Build artifacts
+dist/
+build/
+out/
+*.tsbuildinfo
+
+# Cloudflare Workers
+.wrangler/
+wrangler.toml.local
+
+# Package-lock and yarn
+package-lock.json
+yarn.lock
+
 # IDEs
 .vscode/
 .idea/
@@ -82,3 +103,9 @@ htmlcov/
 *.key
 *.crt
 *.p12
+
+# Large binaries (Git LFS recommended)
+# Cloudflare workerd binaries
+node_modules/@cloudflare/workerd-*/bin/*
+node_modules/**/*.node
+node_modules/**/bin/*
