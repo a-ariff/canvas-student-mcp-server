@@ -1,0 +1,12 @@
+# Smithery remote MCP server configuration
+name: remote-mcp-server-authless
+description: A remote MCP server without authentication deployed on Cloudflare Workers
+version: "0.0.0"
+remote:
+  transport:
+    type: sse
+    url: https://remote-mcp-server-authless.your-account.workers.dev/sse
+tools:
+  - calculator
+  - weather
+  - web_search
