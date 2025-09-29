@@ -1,163 +1,172 @@
-# 🎓 Canvas Student MCP
+# Canvas Student MCP Server - Complete Toolkit
 
-**A Model Context Protocol (MCP) server for Canvas LMS - designed for educational access and research purposes.**
+Complete Canvas LMS integration monorepo with Python MCP server and TypeScript remote server implementations for Model Context Protocol.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-00a393.svg)](https://fastapi.tiangolo.com)
+[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![Node.js 16+](https://img.shields.io/badge/node.js-16+-green.svg)](https://nodejs.org/)
 [![MCP Compatible](https://img.shields.io/badge/MCP-Compatible-purple.svg)](https://modelcontextprotocol.io/)
 
-> ⚠️ **Important Notice**: This project is designed for educational purposes and personal academic management. Users are responsible for complying with their institution's terms of service and applicable policies. Always respect rate limits and use responsibly.
+## 📦 Packages
 
-## ✨ Features
+### 🐍 Python MCP Server
+- **Location**: `packages/canvas-student-mcp-server/`
+- **Description**: Flask-based MCP server for Canvas LMS integration
+- **Language**: Python 3.8+
+- **Features**: Student data access, course management, assignment handling
+- **Main File**: `packages/canvas-student-mcp-server/app.py`
 
-### 🎓 Student-Focused Design
-- 📚 Access your course information programmatically
-- 📝 Retrieve assignments and due dates
-- 🔍 Search through course materials
-- 🤖 Compatible with AI tools for academic assistance
-- 🛡️ Local-first approach for privacy
+### 🔧 Remote MCP Server (Authless)
+- **Location**: `packages/remote-mcp-server-authless/`  
+- **Description**: TypeScript MCP server for remote operations
+- **Language**: TypeScript/Node.js
+- **Features**: Cloudflare Worker deployment, authentication-free operations
+- **Main File**: `packages/remote-mcp-server-authless/src/index.ts`
 
-### 🌐 Universal Compatibility
-- Works with standard Canvas LMS installations
-- Institution-agnostic design
-- No special API tokens required
-- Simple credential-based authentication
+## 🚀 Quick Start
 
-## ⚡ Quick Start
-
+### Install All Dependencies
 ```bash
-# 1. Clone and setup
-git clone https://github.com/a-ariff/canvas-student-mcp-server.git
-cd canvas-student-mcp-server
+npm run install:all
+```
+
+### Python MCP Server
+```bash
+cd packages/canvas-student-mcp-server
 pip install -r requirements.txt
-
-# 2. Configure your credentials
-cp .env.example .env
-# Edit .env with your Canvas URL and credentials
-
-# 3. Start the server
 python app.py
 ```
 
-**Your Canvas MCP server will be running on `http://localhost:8000` 🎉**
-
-## 🔧 Configuration
-
-Edit your `.env` file with your Canvas information:
-
-```env
-# Your Canvas instance URL (without trailing slash)
-CANVAS_URL=https://your-school.instructure.com
-
-# Your Canvas login credentials
-CANVAS_USERNAME=your_username
-CANVAS_PASSWORD=your_password
-
-# Optional: Rate limiting (requests per minute)
-RATE_LIMIT=60
+### TypeScript Remote Server
+```bash
+cd packages/remote-mcp-server-authless
+npm install
+npm start
 ```
 
-## 🛠️ API Endpoints
+## 📁 Monorepo Structure
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/authenticate` | Authenticate with Canvas |
-| GET | `/courses` | List enrolled courses |
-| GET | `/courses/{id}/modules` | Get course modules |
-| GET | `/courses/{id}/assignments` | Get course assignments |
-| GET | `/courses/{id}/modules/{module_id}/items` | Get module content |
-| POST | `/courses/{id}/corpus/build` | Build searchable course content |
-
-## 🤖 AI Integration Examples
-
-### With Claude Desktop
-
-```json
-{
-  "mcpServers": {
-    "student-canvas": {
-      "command": "curl",
-      "args": ["-X", "GET", "http://localhost:8000/courses"]
-    }
-  }
-}
+```
+canvas-student-mcp-server/
+├── README.md                           # This file  
+├── package.json                        # Root package.json for workspace
+├── .gitignore                         # Combined gitignore
+├── .github/workflows/                  # CI/CD workflows
+│   ├── test-python.yml                # Python testing workflow
+│   ├── test-typescript.yml            # TypeScript testing workflow
+│   ├── ci.yml                         # Full monorepo CI/CD
+│   └── security.yml                   # Security scanning
+└── packages/
+    ├── canvas-student-mcp-server/     # Python MCP Server
+    │   ├── app.py                     # Main Flask application
+    │   ├── src/                       # Python source code
+    │   ├── docs/                      # Documentation
+    │   ├── examples/                  # Usage examples
+    │   ├── requirements.txt           # Python dependencies
+    │   ├── Dockerfile                 # Docker configuration
+    │   └── README.md                  # Python server docs
+    └── remote-mcp-server-authless/    # TypeScript Remote Server
+        ├── src/                       # TypeScript source
+        ├── package.json               # Node.js dependencies
+        ├── tsconfig.json              # TypeScript config
+        ├── wrangler.jsonc             # Cloudflare Worker config
+        └── README.md                  # TypeScript server docs
 ```
 
-### With ChatGPT (via Actions)
+## 🛠 Development
 
-```yaml
-openapi: 3.0.0
-info:
-  title: Student Canvas MCP
-  version: 1.0.0
-servers:
-  - url: http://localhost:8000
+This monorepo contains all Canvas MCP implementations in one place for easier development and maintenance.
+
+### 🔄 CI/CD Workflows
+
+- **Python Tests**: Runs on Python 3.8-3.11 with linting, formatting, and test coverage
+- **TypeScript Tests**: Runs on Node.js 16-20 with ESLint, type checking, and Jest tests  
+- **Security Scans**: Weekly security audits for both Python and TypeScript packages
+- **Integration Tests**: Full monorepo testing when both packages change
+- **Smart Change Detection**: Only tests what changed to optimize CI time
+
+### 📝 Available Scripts
+
+```bash
+# Install dependencies for all packages
+npm run install:all
+
+# Start servers
+npm run start:python        # Start Python MCP server
+npm run start:remote        # Start TypeScript remote server
+
+# Testing
+npm run test               # Run all tests
+npm run test:python        # Test Python package only
+npm run test:typescript    # Test TypeScript package only
+
+# Linting
+npm run lint              # Lint all packages
+npm run lint:python       # Lint Python code only
+npm run lint:typescript   # Lint TypeScript code only
+
+# Building
+npm run build             # Build TypeScript package
+
+# Cleanup
+npm run clean             # Remove all node_modules
 ```
 
-## 🔐 Security & Privacy
+### 🚀 Getting Started
 
-- 🛡️ **Local-first**: Credentials stay on your machine
-- 🔒 **No data collection**: No tracking or data storage
-- 🚫 **Privacy-focused**: Built with student privacy in mind
-- ⚖️ **Responsible use**: Always comply with institutional policies
+1. Clone the repository:
+```bash
+git clone https://github.com/a-ariff/canvas-student-mcp-server.git
+cd canvas-student-mcp-server
+```
 
-## ⚠️ Important Disclaimers
+2. Install dependencies for both packages:
+```bash
+npm run install:all
+```
 
-### Educational Use Only
-This tool is designed for educational purposes and personal academic management. Users must:
-- Comply with their institution's Terms of Service
-- Respect Canvas API rate limits
-- Use the tool responsibly and ethically
-- Not use it for unauthorized access or data scraping
+3. Configure your Canvas API credentials:
+```bash
+cp packages/canvas-student-mcp-server/.env.example packages/canvas-student-mcp-server/.env
+# Edit the .env file with your Canvas API details
+```
 
-### Institution Compliance
-- Check your school's policies before use
-- Some institutions may have restrictions on automated access
-- When in doubt, consult with your IT department
-- Respect intellectual property and privacy rights
+4. Run the servers:
+```bash
+# Python MCP Server
+npm run start:python
 
-### Technical Considerations
-- This tool simulates browser interactions with Canvas
-- Performance may vary across different Canvas installations
-- Some features may not work with all Canvas configurations
-- Always test in a safe environment first
+# TypeScript Remote Server  
+npm run start:remote
+```
+
+## 🔒 Security & Compliance
+
+- **Automated Security Scanning**: Weekly scans for both Python and TypeScript dependencies
+- **Code Quality**: Enforced through CI/CD with linting and formatting checks
+- **Dependency Management**: Regular updates and vulnerability monitoring
 
 ## 📚 Documentation
 
-- 📖 [Complete API Documentation](docs/API.md)
-- 🎓 [Student Setup Guide](docs/STUDENT_GUIDE.md)
-- 🤖 [AI Integration Guide](docs/INTEGRATION.md)
-- 🚀 [Deployment Options](docs/DEPLOYMENT.md)
+- **Python MCP Server**: See `packages/canvas-student-mcp-server/README.md`
+- **TypeScript Remote Server**: See `packages/remote-mcp-server-authless/README.md`
+- **API Documentation**: Available in `packages/canvas-student-mcp-server/docs/`
+- **Integration Guide**: See `packages/canvas-student-mcp-server/MCP_INTEGRATION.md`
 
-## 🌟 Roadmap
+## ⚠️ Important Notice
 
-- [ ] Enhanced security features
-- [ ] Support for more Canvas features
-- [ ] Integration with additional AI platforms
-- [ ] Performance optimizations
-- [ ] Multi-LMS support exploration
-
-## 🤝 Contributing
-
-Contributions are welcome! Please:
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+This project is designed for educational purposes and personal academic management. Users are responsible for complying with their institution's terms of service and applicable policies. Always respect rate limits and use responsibly.
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the LICENSE file for details.
 
-## 🎓 Academic Use Statement
+## 🤝 Contributing
 
-"This tool is designed to help students better organize and interact with their academic content. It should be used in compliance with institutional policies and with respect for the educational environment."
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-⭐ If this helps your academic workflow, please star the repo!
-
----
-
-**Made with 💙 for students everywhere**
+The CI/CD pipeline will automatically test your changes across multiple Python and Node.js versions!

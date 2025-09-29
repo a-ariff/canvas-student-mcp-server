@@ -1,0 +1,43 @@
+{
+  "name": "canvas-student-mcp-server",
+  "version": "1.0.0",
+  "description": "Complete Canvas LMS integration toolkit with Python MCP server and TypeScript implementations",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "install:all": "npm install && cd packages/remote-mcp-server-authless && npm install",
+    "start:python": "cd packages/canvas-student-mcp-server && python app.py",
+    "start:remote": "cd packages/remote-mcp-server-authless && npm start",
+    "test": "npm run test:python && npm run test:typescript",
+    "test:python": "cd packages/canvas-student-mcp-server && python -m pytest tests/ -v",
+    "test:typescript": "cd packages/remote-mcp-server-authless && npm test",
+    "lint": "npm run lint:python && npm run lint:typescript",
+    "lint:python": "cd packages/canvas-student-mcp-server && flake8 . && black --check .",
+    "lint:typescript": "cd packages/remote-mcp-server-authless && npx eslint src/ --ext .ts",
+    "clean": "rm -rf node_modules packages/*/node_modules",
+    "build": "cd packages/remote-mcp-server-authless && npx tsc"
+  },
+  "keywords": [
+    "canvas",
+    "mcp", 
+    "model-context-protocol",
+    "python",
+    "typescript",
+    "canvas-lms",
+    "education",
+    "student-api"
+  ],
+  "author": "a-ariff",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/a-ariff/canvas-student-mcp-server.git"
+  },
+  "devDependencies": {
+    "jest": "^29.0.0",
+    "@types/jest": "^29.0.0",
+    "ts-jest": "^29.0.0"
+  }
+}

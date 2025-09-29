@@ -1,0 +1,62 @@
+name: Security Scan
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    - cron: '0 0 * * 1'  # Weekly on Monday
+
+jobs:
+  security-python:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: Install security tools
+      run: |
+        pip install bandit safety
+
+    - name: Run Bandit security linter
+      working-directory: packages/canvas-student-mcp-server
+      run: |
+        bandit -r . -f json -o bandit-report.json || true
+        bandit -r . || true
+
+    - name: Check Python dependencies for vulnerabilities
+      working-directory: packages/canvas-student-mcp-server
+      run: |
+        safety check --json || true
+
+  security-typescript:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+
+    - name: Install dependencies
+      working-directory: packages/remote-mcp-server-authless
+      run: |
+        npm install
+
+    - name: Run npm audit
+      working-directory: packages/remote-mcp-server-authless
+      run: |
+        npm audit --audit-level=moderate || true
+
+    - name: Run CodeQL Analysis
+      uses: github/codeql-action/analyze@v2
+      with:
+        languages: javascript

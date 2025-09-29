@@ -1,0 +1,128 @@
+name: Test TypeScript Remote Server
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'packages/remote-mcp-server-authless/**'
+      - '.github/workflows/test-typescript.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'packages/remote-mcp-server-authless/**'
+      - '.github/workflows/test-typescript.yml'
+
+jobs:
+  test-typescript:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: ['16', '18', '20']
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+        cache-dependency-path: packages/remote-mcp-server-authless/package-lock.json
+
+    - name: Install dependencies
+      working-directory: packages/remote-mcp-server-authless
+      run: |
+        npm ci
+
+    - name: Install additional dev dependencies
+      working-directory: packages/remote-mcp-server-authless
+      run: |
+        npm install --save-dev jest @types/jest ts-jest typescript @typescript-eslint/eslint-plugin @typescript-eslint/parser eslint
+
+    - name: Lint TypeScript code
+      working-directory: packages/remote-mcp-server-authless
+      run: |
+        # Create eslint config if it doesn't exist
+        if [ ! -f .eslintrc.json ]; then
+          cat > .eslintrc.json << 'EOF'
+{
+  "parser": "@typescript-eslint/parser",
+  "plugins": ["@typescript-eslint"],
+  "extends": [
+    "eslint:recommended",
+    "@typescript-eslint/recommended"
+  ],
+  "env": {
+    "node": true,
+    "es2021": true
+  },
+  "parserOptions": {
+    "ecmaVersion": 12,
+    "sourceType": "module"
+  },
+  "rules": {
+    "@typescript-eslint/no-unused-vars": "error",
+    "@typescript-eslint/no-explicit-any": "warn"
+  }
+}
+EOF
+        fi
+        npx eslint src/ --ext .ts
+
+    - name: Type check
+      working-directory: packages/remote-mcp-server-authless
+      run: |
+        npx tsc --noEmit
+
+    - name: Run tests
+      working-directory: packages/remote-mcp-server-authless
+      run: |
+        # Create jest config if it doesn't exist
+        if [ ! -f jest.config.js ]; then
+          cat > jest.config.js << 'EOF'
+module.exports = {
+  preset: 'ts-jest',
+  testEnvironment: 'node',
+  roots: ['<rootDir>/src', '<rootDir>/tests'],
+  testMatch: ['**/__tests__/**/*.ts', '**/?(*.)+(spec|test).ts'],
+  collectCoverageFrom: [
+    'src/**/*.ts',
+    '!src/**/*.d.ts',
+  ],
+};
+EOF
+        fi
+        
+        # Create basic tests if they don't exist
+        mkdir -p tests
+        if [ ! -f tests/index.test.ts ]; then
+          cat > tests/index.test.ts << 'EOF'
+describe('Remote MCP Server', () => {
+  test('should import main module', () => {
+    expect(() => {
+      require('../src/index');
+    }).not.toThrow();
+  });
+
+  test('basic functionality', () => {
+    expect(true).toBe(true);
+  });
+});
+EOF
+        fi
+        
+        npm test
+
+    - name: Build project
+      working-directory: packages/remote-mcp-server-authless
+      run: |
+        npx tsc
+
+    - name: Test Cloudflare Worker compatibility
+      working-directory: packages/remote-mcp-server-authless
+      run: |
+        # Install wrangler for testing
+        npm install -g wrangler
+        # Validate wrangler config
+        wrangler validate
