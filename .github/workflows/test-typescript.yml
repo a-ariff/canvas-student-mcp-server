@@ -1,16 +1,18 @@
 name: Test TypeScript Remote Server
 
 on:
-  push:
-    branches: [ main, develop ]
-    paths:
-      - 'packages/remote-mcp-server-authless/**'
-      - '.github/workflows/test-typescript.yml'
-  pull_request:
-    branches: [ main ]
-    paths:
-      - 'packages/remote-mcp-server-authless/**'
-      - '.github/workflows/test-typescript.yml'
+  workflow_dispatch: # Manual trigger only
+  # Disabled automatic triggers - old package structure removed
+  # push:
+  #   branches: [ main, develop ]
+  #   paths:
+  #     - 'packages/remote-mcp-server-authless/**'
+  #     - '.github/workflows/test-typescript.yml'
+  # pull_request:
+  #   branches: [ main ]
+  #   paths:
+  #     - 'packages/remote-mcp-server-authless/**'
+  #     - '.github/workflows/test-typescript.yml'
 
 jobs:
   test-typescript:

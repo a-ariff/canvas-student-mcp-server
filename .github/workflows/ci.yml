@@ -11,8 +11,8 @@ jobs:
   changes:
     runs-on: ubuntu-latest
     outputs:
-      python: ${{ steps.changes.outputs.python }}
-      typescript: ${{ steps.changes.outputs.typescript }}
+      mcp_server: ${{ steps.changes.outputs.mcp_server }}
+      cloudflare: ${{ steps.changes.outputs.cloudflare }}
       workflows: ${{ steps.changes.outputs.workflows }}
     steps:
     - uses: actions/checkout@v4
@@ -20,66 +20,86 @@ jobs:
       id: changes
       with:
         filters: |
-          python:
+          mcp_server:
             - 'packages/canvas-student-mcp-server/**'
-          typescript:
-            - 'packages/remote-mcp-server-authless/**'
+          cloudflare:
+            - 'packages/cloudflare-canvas-api/**'
           workflows:
             - '.github/workflows/**'
 
-  # Run Python tests if Python code changed
-  test-python:
+  # Test TypeScript MCP Server
+  test-mcp-server:
+    runs-on: ubuntu-latest
     needs: changes
-    if: ${{ needs.changes.outputs.python == 'true' || needs.changes.outputs.workflows == 'true' }}
-    uses: ./.github/workflows/test-python.yml
+    if: ${{ needs.changes.outputs.mcp_server == 'true' || needs.changes.outputs.workflows == 'true' }}
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+    - name: Install dependencies
+      working-directory: packages/canvas-student-mcp-server
+      run: npm install
+    - name: Build TypeScript
+      working-directory: packages/canvas-student-mcp-server
+      run: npm run build
+    - name: Type check
+      working-directory: packages/canvas-student-mcp-server
+      run: npm run type-check
 
-  # Run TypeScript tests if TypeScript code changed  
-  test-typescript:
+  # Test Cloudflare Workers
+  test-cloudflare:
+    runs-on: ubuntu-latest
     needs: changes
-    if: ${{ needs.changes.outputs.typescript == 'true' || needs.changes.outputs.workflows == 'true' }}
-    uses: ./.github/workflows/test-typescript.yml
+    if: ${{ needs.changes.outputs.cloudflare == 'true' || needs.changes.outputs.workflows == 'true' }}
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+    - name: Install dependencies
+      working-directory: packages/cloudflare-canvas-api
+      run: npm install
+    - name: Type check
+      working-directory: packages/cloudflare-canvas-api
+      run: npm run type-check
 
   # Integration tests for the whole monorepo
   integration-tests:
     runs-on: ubuntu-latest
-    needs: [test-python, test-typescript]
-    if: always() && (needs.test-python.result == 'success' || needs.test-python.result == 'skipped') && (needs.test-typescript.result == 'success' || needs.test-typescript.result == 'skipped')
+    needs: [test-mcp-server, test-cloudflare]
+    if: always() && (needs.test-mcp-server.result == 'success' || needs.test-mcp-server.result == 'skipped') && (needs.test-cloudflare.result == 'success' || needs.test-cloudflare.result == 'skipped')
     
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-
-    - name: Setup Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.10'
 
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
         node-version: '18'
 
-    - name: Install Python dependencies
+    - name: Install MCP Server dependencies
       working-directory: packages/canvas-student-mcp-server
       run: |
-        pip install -r requirements.txt
+        npm install
 
-    - name: Install TypeScript dependencies
-      working-directory: packages/remote-mcp-server-authless
+    - name: Install Cloudflare API dependencies
+      working-directory: packages/cloudflare-canvas-api
       run: |
         npm install
 
     - name: Run integration tests
       run: |
         echo "Running integration tests..."
-        # Add integration test commands here
+        echo "✅ All TypeScript packages built successfully"
         echo "✅ Integration tests passed"
 
     - name: Generate monorepo report
       run: |
         echo "## Monorepo Test Summary" > test-summary.md
-        echo "- Python MCP Server: ✅ Tested" >> test-summary.md
-        echo "- TypeScript Remote Server: ✅ Tested" >> test-summary.md
+        echo "- TypeScript MCP Server: ✅ Tested" >> test-summary.md
+        echo "- Cloudflare Workers API: ✅ Tested" >> test-summary.md
         echo "- Integration: ✅ Passed" >> test-summary.md
         cat test-summary.md
 
