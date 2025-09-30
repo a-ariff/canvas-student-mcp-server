@@ -213,18 +213,12 @@ export class CanvasProxy {
     try {
       if (!this.env.ANALYTICS) return;
 
-      const event: AnalyticsEvent = {
-        timestamp: new Date().toISOString(),
-        userId,
-        endpoint: request.endpoint,
-        method: request.method,
-        responseTime,
-        statusCode,
-        cached,
-      };
-
-      // Write to Analytics Engine
-      this.env.ANALYTICS.writeDataPoint(event);
+      // Write to Analytics Engine (Cloudflare Analytics Engine format)
+      this.env.ANALYTICS.writeDataPoint({
+        blobs: [userId, request.endpoint, request.method],
+        doubles: [responseTime, statusCode],
+        indexes: [cached ? 'cached' : 'fresh'],
+      });
     } catch (error) {
       console.warn('Analytics logging failed:', error);
     }

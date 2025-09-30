@@ -20,7 +20,7 @@ app.use('*', logger());
 app.use('*', prettyJSON());
 app.use('*', cors({
   origin: (origin, c) => {
-    const allowedOrigins = c.env.CORS_ORIGINS.split(',').map(o => o.trim());
+    const allowedOrigins = c.env.CORS_ORIGINS.split(',').map((o: string) => o.trim());
     return allowedOrigins.includes('*') || allowedOrigins.includes(origin) ? origin : null;
   },
   allowHeaders: ['Content-Type', 'Authorization', 'X-User-ID', 'X-Canvas-URL', 'X-Canvas-API-Key'],
