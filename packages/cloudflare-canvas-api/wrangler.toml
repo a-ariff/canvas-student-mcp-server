@@ -1,12 +1,31 @@
 #:schema node_modules/wrangler/config-schema.json
 name = "canvas-api-proxy"
-main = "dist/index.js"
+main = "src/index.ts"
 compatibility_date = "2024-01-15"
 compatibility_flags = ["nodejs_compat"]
 
 [env.production]
 name = "canvas-api-proxy"
-route = { pattern = "canvas-api.yourdomain.com/*", zone_name = "yourdomain.com" }
+route = { pattern = "canvas-api.ariff.dev/*", zone_name = "ariff.dev" }
+
+[env.production.vars]
+ENVIRONMENT = "production"
+API_VERSION = "v1"
+MAX_REQUESTS_PER_MINUTE = "100"
+CACHE_TTL_SECONDS = "300"
+CORS_ORIGINS = "*"
+
+[[env.production.kv_namespaces]]
+binding = "CACHE_KV"
+id = "5d8e432d63fe4a7eb2dcdbe9914ed4c6"
+
+[[env.production.kv_namespaces]]
+binding = "RATE_LIMIT_KV"
+id = "2750d79db84441d3a8fd7431ed85344b"
+
+[[env.production.analytics_engine_datasets]]
+binding = "ANALYTICS"
+dataset = "canvas_api_usage"
 
 [env.development]
 name = "canvas-api-proxy-dev"
@@ -22,16 +41,14 @@ CORS_ORIGINS = "*"
 # KV Namespaces for caching and rate limiting
 [[kv_namespaces]]
 binding = "CACHE_KV"
-id = "your-kv-namespace-id"
-preview_id = "your-preview-kv-namespace-id"
+id = "5d8e432d63fe4a7eb2dcdbe9914ed4c6"
 
 [[kv_namespaces]]
 binding = "RATE_LIMIT_KV"
-id = "your-rate-limit-kv-namespace-id"
-preview_id = "your-preview-rate-limit-kv-namespace-id"
+id = "2750d79db84441d3a8fd7431ed85344b"
 
 # Analytics for monitoring usage
-[analytics_engine_datasets]
+[[analytics_engine_datasets]]
 binding = "ANALYTICS"
 dataset = "canvas_api_usage"
 
