@@ -5,6 +5,68 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Canvas API Proxy - Multi-User Canvas Integration</title>
     <style>
+        :root {
+            --bg-primary: #f5f7fa;
+            --bg-secondary: #ffffff;
+            --bg-hero: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --text-primary: #333;
+            --text-secondary: #555;
+            --text-muted: #6c757d;
+            --border-color: #e1e5e9;
+            --code-bg: #f8f9fa;
+            --shadow: rgba(0, 0, 0, 0.1);
+            --accent-color: #667eea;
+            --accent-hover: #5a6fd8;
+            --success-bg: #d4edda;
+            --success-text: #155724;
+            --success-border: #c3e6cb;
+            --error-bg: #f8d7da;
+            --error-text: #721c24;
+            --error-border: #f5c6cb;
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #1a1d23;
+            --bg-secondary: #25282e;
+            --bg-hero: linear-gradient(135deg, #4c5fd5 0%, #5d3a8f 100%);
+            --text-primary: #e4e6eb;
+            --text-secondary: #b8bdc8;
+            --text-muted: #8b92a3;
+            --border-color: #3a3f4b;
+            --code-bg: #2d3139;
+            --shadow: rgba(0, 0, 0, 0.3);
+            --accent-color: #7b8ff7;
+            --accent-hover: #6a7fe6;
+            --success-bg: #1e3a28;
+            --success-text: #7dd87d;
+            --success-border: #2d5a3d;
+            --error-bg: #3a1e22;
+            --error-text: #ff8e9a;
+            --error-border: #5a2d31;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root:not([data-theme="light"]) {
+                --bg-primary: #1a1d23;
+                --bg-secondary: #25282e;
+                --bg-hero: linear-gradient(135deg, #4c5fd5 0%, #5d3a8f 100%);
+                --text-primary: #e4e6eb;
+                --text-secondary: #b8bdc8;
+                --text-muted: #8b92a3;
+                --border-color: #3a3f4b;
+                --code-bg: #2d3139;
+                --shadow: rgba(0, 0, 0, 0.3);
+                --accent-color: #7b8ff7;
+                --accent-hover: #6a7fe6;
+                --success-bg: #1e3a28;
+                --success-text: #7dd87d;
+                --success-border: #2d5a3d;
+                --error-bg: #3a1e22;
+                --error-text: #ff8e9a;
+                --error-border: #5a2d31;
+            }
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -14,8 +76,9 @@
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             line-height: 1.6;
-            color: #333;
-            background: #f5f7fa;
+            color: var(--text-primary);
+            background: var(--bg-primary);
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
         .container {
@@ -25,7 +88,7 @@
         }
 
         .hero {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--bg-hero);
             color: white;
             padding: 60px 40px;
             border-radius: 15px;
@@ -54,11 +117,11 @@
         }
 
         .card {
-            background: white;
+            background: var(--bg-secondary);
             padding: 30px;
             border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: transform 0.2s;
+            box-shadow: 0 4px 6px var(--shadow);
+            transition: transform 0.2s, background-color 0.3s ease;
         }
 
         .card:hover {
@@ -66,16 +129,16 @@
         }
 
         .card h3 {
-            color: #667eea;
+            color: var(--accent-color);
             margin-bottom: 15px;
             font-size: 1.5rem;
         }
 
         .auth-form {
-            background: white;
+            background: var(--bg-secondary);
             padding: 40px;
             border-radius: 15px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 8px 25px var(--shadow);
             margin-bottom: 40px;
         }
 
@@ -87,25 +150,27 @@
             display: block;
             margin-bottom: 8px;
             font-weight: 600;
-            color: #555;
+            color: var(--text-secondary);
         }
 
         input, textarea, select {
             width: 100%;
             padding: 12px;
-            border: 2px solid #e1e5e9;
+            border: 2px solid var(--border-color);
             border-radius: 8px;
             font-size: 16px;
-            transition: border-color 0.2s;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            transition: border-color 0.2s, background-color 0.3s ease;
         }
 
         input:focus, textarea:focus, select:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: var(--accent-color);
         }
 
         .btn {
-            background: #667eea;
+            background: var(--accent-color);
             color: white;
             padding: 12px 24px;
             border: none;
@@ -117,7 +182,7 @@
         }
 
         .btn:hover {
-            background: #5a6fd8;
+            background: var(--accent-hover);
         }
 
         .btn:disabled {
@@ -126,11 +191,11 @@
         }
 
         .endpoint {
-            background: #f8f9fa;
+            background: var(--code-bg);
             padding: 20px;
             border-radius: 8px;
             margin: 15px 0;
-            border-left: 4px solid #667eea;
+            border-left: 4px solid var(--accent-color);
         }
 
         .method {
@@ -148,15 +213,16 @@
         .delete { background: #dc3545; color: white; }
 
         code {
-            background: #e9ecef;
+            background: var(--code-bg);
             padding: 2px 6px;
             border-radius: 4px;
             font-family: 'Monaco', 'Menlo', monospace;
             font-size: 14px;
+            color: var(--text-primary);
         }
 
         pre {
-            background: #f8f9fa;
+            background: var(--code-bg);
             padding: 15px;
             border-radius: 8px;
             overflow-x: auto;
@@ -170,15 +236,15 @@
         }
 
         .alert-success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
+            background: var(--success-bg);
+            color: var(--success-text);
+            border: 1px solid var(--success-border);
         }
 
         .alert-error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
+            background: var(--error-bg);
+            color: var(--error-text);
+            border: 1px solid var(--error-border);
         }
 
         .hidden {
@@ -186,7 +252,7 @@
         }
 
         .copy-btn {
-            background: #6c757d;
+            background: var(--text-muted);
             color: white;
             border: none;
             padding: 4px 8px;
@@ -194,6 +260,40 @@
             font-size: 12px;
             cursor: pointer;
             margin-left: 10px;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            border-radius: 50px;
+            padding: 8px 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 2px 8px var(--shadow);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px var(--shadow);
+        }
+
+        .theme-icon {
+            font-size: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .theme-toggle {
+                top: 10px;
+                right: 10px;
+                padding: 6px 12px;
+            }
         }
 
         @media (max-width: 768px) {
@@ -216,6 +316,11 @@
     </style>
 </head>
 <body>
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+        <span class="theme-icon" id="themeIcon">🌙</span>
+        <span id="themeText">Dark</span>
+    </button>
+
     <div class="container">
         <div class="hero">
             <h1>🎓 Canvas API Proxy</h1>
@@ -510,6 +615,55 @@ curl -X POST https://canvas-api.yourdomain.com/canvas/YOUR_USER_ID \
                 institutionField.value = subdomain.charAt(0).toUpperCase() + subdomain.slice(1);
             }
         });
+
+        // Theme switching functionality
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = document.getElementById('themeIcon');
+        const themeText = document.getElementById('themeText');
+        const html = document.documentElement;
+
+        // Initialize theme from localStorage or system preference
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+            if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+                setTheme('dark');
+            } else if (savedTheme === 'light') {
+                setTheme('light');
+            }
+        }
+
+        // Set theme and update UI
+        function setTheme(theme) {
+            html.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+
+            if (theme === 'dark') {
+                themeIcon.textContent = '☀️';
+                themeText.textContent = 'Light';
+            } else {
+                themeIcon.textContent = '🌙';
+                themeText.textContent = 'Dark';
+            }
+        }
+
+        // Toggle theme
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            setTheme(newTheme);
+        });
+
+        // Listen for system theme changes
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+            if (!localStorage.getItem('theme')) {
+                setTheme(e.matches ? 'dark' : 'light');
+            }
+        });
+
+        // Initialize theme on page load
+        initTheme();
     </script>
 </body>
 </html>

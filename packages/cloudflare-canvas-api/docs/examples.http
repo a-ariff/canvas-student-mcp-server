@@ -1,0 +1,272 @@
+###
+# Canvas API Proxy - REST Client Examples
+# Use with VSCode REST Client extension or IntelliJ HTTP Client
+###
+
+# Configuration Variables
+@apiBaseUrl = https://canvas-mcp.ariff.dev
+@canvasUrl = https://learn.mywhitecliffe.com
+@canvasApiKey = your_canvas_api_token_here
+@institutionName = Whitecliffe College
+
+# These will be set after authentication
+@userId = your_user_id_here
+@courseId = your_course_id_here
+
+###############################################
+# 1. Health Check
+###############################################
+
+### Check API Health
+GET {{apiBaseUrl}}/health
+Accept: application/json
+
+###############################################
+# 2. Authentication
+###############################################
+
+### Authenticate with Canvas
+# @name authenticate
+POST {{apiBaseUrl}}/auth
+Content-Type: application/json
+
+{
+  "canvasUrl": "{{canvasUrl}}",
+  "apiKey": "{{canvasApiKey}}",
+  "institutionName": "{{institutionName}}"
+}
+
+# After successful auth, copy userId from response and update @userId variable above
+
+###############################################
+# 3. Get User Courses
+###############################################
+
+### Get all active courses
+GET {{apiBaseUrl}}/courses/{{userId}}
+Accept: application/json
+
+### Get courses with pagination
+GET {{apiBaseUrl}}/courses/{{userId}}?per_page=10&page=1
+Accept: application/json
+
+### Get completed courses
+GET {{apiBaseUrl}}/courses/{{userId}}?enrollment_state=completed
+Accept: application/json
+
+###############################################
+# 4. Get Course Assignments
+###############################################
+
+### Get assignments for a course
+GET {{apiBaseUrl}}/assignments/{{userId}}?course_id={{courseId}}
+Accept: application/json
+
+### Get assignments with rubric and submission
+GET {{apiBaseUrl}}/assignments/{{userId}}?course_id={{courseId}}&include[]=rubric&include[]=submission
+Accept: application/json
+
+### Get assignments with pagination
+GET {{apiBaseUrl}}/assignments/{{userId}}?course_id={{courseId}}&per_page=5&page=1
+Accept: application/json
+
+###############################################
+# 5. Get Upcoming Events
+###############################################
+
+### Get upcoming assignments and events
+GET {{apiBaseUrl}}/upcoming/{{userId}}
+Accept: application/json
+
+###############################################
+# 6. Generic Canvas API Proxy
+###############################################
+
+### Proxy: Get all courses
+POST {{apiBaseUrl}}/canvas/{{userId}}
+Content-Type: application/json
+
+{
+  "endpoint": "/api/v1/courses",
+  "method": "GET",
+  "params": {
+    "enrollment_state": "active",
+    "per_page": 10
+  }
+}
+
+### Proxy: Get course modules
+POST {{apiBaseUrl}}/canvas/{{userId}}
+Content-Type: application/json
+
+{
+  "endpoint": "/api/v1/courses/{{courseId}}/modules",
+  "method": "GET"
+}
+
+### Proxy: Get user profile
+POST {{apiBaseUrl}}/canvas/{{userId}}
+Content-Type: application/json
+
+{
+  "endpoint": "/api/v1/users/self",
+  "method": "GET"
+}
+
+### Proxy: Get course announcements
+POST {{apiBaseUrl}}/canvas/{{userId}}
+Content-Type: application/json
+
+{
+  "endpoint": "/api/v1/courses/{{courseId}}/discussion_topics",
+  "method": "GET",
+  "params": {
+    "only_announcements": true
+  }
+}
+
+### Proxy: Get assignment submissions
+POST {{apiBaseUrl}}/canvas/{{userId}}
+Content-Type: application/json
+
+{
+  "endpoint": "/api/v1/courses/{{courseId}}/students/submissions",
+  "method": "GET",
+  "params": {
+    "student_ids[]": "self",
+    "per_page": 20
+  }
+}
+
+### Proxy: Get calendar events
+POST {{apiBaseUrl}}/canvas/{{userId}}
+Content-Type: application/json
+
+{
+  "endpoint": "/api/v1/calendar_events",
+  "method": "GET",
+  "params": {
+    "type": "assignment",
+    "start_date": "2025-01-01",
+    "end_date": "2025-12-31"
+  }
+}
+
+### Proxy: Get course files
+POST {{apiBaseUrl}}/canvas/{{userId}}
+Content-Type: application/json
+
+{
+  "endpoint": "/api/v1/courses/{{courseId}}/files",
+  "method": "GET"
+}
+
+### Proxy: Get grades
+POST {{apiBaseUrl}}/canvas/{{userId}}
+Content-Type: application/json
+
+{
+  "endpoint": "/api/v1/courses/{{courseId}}/assignments",
+  "method": "GET",
+  "params": {
+    "include[]": "submission"
+  }
+}
+
+###############################################
+# 7. Test Cache Headers
+###############################################
+
+### First request (should be MISS)
+GET {{apiBaseUrl}}/courses/{{userId}}
+Accept: application/json
+
+### Second request within 5 minutes (should be HIT)
+GET {{apiBaseUrl}}/courses/{{userId}}
+Accept: application/json
+
+###############################################
+# 8. Test Rate Limiting
+###############################################
+
+### Check rate limit headers
+GET {{apiBaseUrl}}/courses/{{userId}}
+Accept: application/json
+
+# Look for these headers in response:
+# X-RateLimit-Limit: 100
+# X-RateLimit-Remaining: 99
+# X-RateLimit-Reset: 1696161600
+
+###############################################
+# 9. Error Handling Examples
+###############################################
+
+### Test with invalid user ID (should return 404)
+GET {{apiBaseUrl}}/courses/invalid_user_id
+Accept: application/json
+
+### Test with missing course ID (should return 400)
+GET {{apiBaseUrl}}/assignments/{{userId}}
+Accept: application/json
+
+### Test with non-existent endpoint (should return 404)
+GET {{apiBaseUrl}}/nonexistent
+Accept: application/json
+
+###############################################
+# 10. Complete Workflow Example
+###############################################
+
+### Step 1: Authenticate
+# @name auth
+POST {{apiBaseUrl}}/auth
+Content-Type: application/json
+
+{
+  "canvasUrl": "https://learn.mywhitecliffe.com",
+  "apiKey": "your_canvas_api_token",
+  "institutionName": "Whitecliffe College"
+}
+
+### Step 2: Extract userId from auth response
+@authUserId = {{auth.response.body.userId}}
+
+### Step 3: Get courses with extracted userId
+GET {{apiBaseUrl}}/courses/{{authUserId}}
+Accept: application/json
+
+### Step 4: Get assignments for first course
+# (Update courseId manually after getting courses)
+GET {{apiBaseUrl}}/assignments/{{authUserId}}?course_id=123456
+Accept: application/json
+
+### Step 5: Get upcoming events
+GET {{apiBaseUrl}}/upcoming/{{authUserId}}
+Accept: application/json
+
+###############################################
+# Advanced Usage Notes
+###############################################
+
+# 1. Using environment-specific configurations:
+#    Create .env.dev and .env.prod files with different values
+#
+# 2. Chaining requests:
+#    Use @name to save responses and reference them in later requests
+#    Example: @userId = {{authenticate.response.body.userId}}
+#
+# 3. Response inspection:
+#    Click on response to view:
+#    - Headers (cache status, rate limits)
+#    - Body (JSON response)
+#    - Timing information
+#
+# 4. VSCode REST Client Features:
+#    - Ctrl+Alt+R: Send request
+#    - Ctrl+Alt+E: Send all requests
+#    - Ctrl+Alt+H: View request history
+#
+# 5. Testing pagination:
+#    Loop through pages by incrementing page parameter
+#    Check Link header for next/prev URLs
