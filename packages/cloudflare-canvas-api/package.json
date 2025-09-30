@@ -25,16 +25,16 @@
   "author": "A. Ariff",
   "license": "MIT",
   "dependencies": {
-    "hono": "^4.0.0",
-    "zod": "^3.22.4",
+    "@cloudflare/workers-types": "^4.20240208.0",
     "date-fns": "^3.6.0",
-    "@cloudflare/workers-types": "^4.20240208.0"
+    "hono": "^4.0.0",
+    "zod": "^3.22.4"
   },
   "devDependencies": {
+    "@types/node": "^20.10.0",
     "typescript": "^5.3.0",
-    "wrangler": "^3.28.0",
-    "vitest": "^1.2.0",
-    "@types/node": "^20.10.0"
+    "vitest": "^3.2.4",
+    "wrangler": "^4.40.3"
   },
   "engines": {
     "node": ">=18.0.0"
