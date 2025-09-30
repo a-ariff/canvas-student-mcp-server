@@ -4,56 +4,26 @@ services:
   canvas-student-mcp:
     build: .
     container_name: canvas-student-mcp-server
-    ports:
-      - "8000:8000"
     environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - CANVAS_API_KEY=${CANVAS_API_KEY}
       - CANVAS_BASE_URL=${CANVAS_BASE_URL:-https://learn.mywhitecliffe.com}
-      - ENV=${ENV:-development}
-      - DEBUG=${DEBUG:-true}
+      - DEBUG=${DEBUG:-false}
+      - ENABLE_CACHE=${ENABLE_CACHE:-true}
+      - CACHE_EXPIRATION_MINUTES=${CACHE_EXPIRATION_MINUTES:-60}
+      - MAX_REQUESTS_PER_MINUTE=${MAX_REQUESTS_PER_MINUTE:-100}
+      - ENABLE_SMART_SEARCH=${ENABLE_SMART_SEARCH:-true}
     volumes:
       - ./logs:/app/logs
-      - ./.env:/app/.env:ro
     restart: unless-stopped
     networks:
       - canvas-mcp-network
     labels:
       - "com.docker.compose.project=canvas-student-mcp"
-      - "description=Revolutionary Canvas MCP Server for Students"
-
-  # Optional: Add Redis for session storage (future use)
-  redis:
-    image: redis:7-alpine
-    container_name: canvas-mcp-redis
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis_data:/data
-    restart: unless-stopped
-    networks:
-      - canvas-mcp-network
-    profiles:
-      - with-redis
-
-  # Optional: Add Nginx reverse proxy
-  nginx:
-    image: nginx:alpine
-    container_name: canvas-mcp-nginx
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./ssl:/etc/nginx/ssl:ro
-    depends_on:
-      - canvas-student-mcp
-    restart: unless-stopped
-    networks:
-      - canvas-mcp-network
-    profiles:
-      - with-proxy
-
-volumes:
-  redis_data:
+      - "description=Canvas MCP Server v2.0 with Workflow Automation"
+    # For stdio-based MCP, use docker exec to interact
+    stdin_open: true
+    tty: true
 
 networks:
   canvas-mcp-network:

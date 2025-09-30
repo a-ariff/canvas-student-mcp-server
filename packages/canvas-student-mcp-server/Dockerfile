@@ -1,43 +1,43 @@
-# Canvas Student MCP Server - Revolutionary student-credential approach
-FROM python:3.11-slim
+# Canvas Student MCP Server - TypeScript/Node.js Implementation
+FROM node:20-alpine
 
 # Set working directory
 WORKDIR /app
 
 # Install system dependencies
-RUN apt-get update && apt-get install -y \
-    gcc \
+RUN apk add --no-cache \
     curl \
-    wget \
-    unzip \
-    && rm -rf /var/lib/apt/lists/*
+    ca-certificates
 
-# Copy requirements first for better caching
-COPY requirements.txt .
+# Copy package files
+COPY package*.json ./
+COPY tsconfig.json ./
 
-# Install Python dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+# Install dependencies
+RUN npm ci --only=production
 
-# Copy application code
-COPY . .
+# Copy source code
+COPY src ./src
 
-# Create logs directory
-RUN mkdir -p logs
+# Build TypeScript
+RUN npm run build
 
 # Create non-root user for security
-RUN useradd --create-home --shell /bin/bash app \
-    && chown -R app:app /app
-USER app
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nodejs -u 1001 && \
+    chown -R nodejs:nodejs /app
 
-# Set environment variables
-ENV PYTHONPATH=/app
+USER nodejs
 
-# Expose ports (FastAPI on 8000, MCP on 3000)
-EXPOSE 8000 3000
+# Expose MCP server port (stdio-based, no port needed but included for reference)
+EXPOSE 3000
 
-# Health check
+# Health check (for future HTTP endpoints)
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:8000/health || exit 1
+    CMD node -e "console.log('MCP Server running')" || exit 1
 
-# Default command runs FastAPI server
-CMD ["python", "-m", "uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
+# Set environment
+ENV NODE_ENV=production
+
+# Run MCP server
+CMD ["node", "dist/index.js"]

@@ -97,29 +97,37 @@ Restart Claude Desktop and ask:
 
 ```text
 canvas-student-mcp-server/
-├── README.md                           # This file  
+├── README.md                           # This file
 ├── package.json                        # Root package.json for workspace
 ├── .gitignore                         # Combined gitignore
-├── .github/workflows/                  # CI/CD workflows
-│   ├── test-python.yml                # Python testing workflow
-│   ├── test-typescript.yml            # TypeScript testing workflow
-│   ├── ci.yml                         # Full monorepo CI/CD
+├── .github/workflows/                  # CI/CD workflows (disabled during restructure)
+│   ├── markdown-lint.yml              # Markdown linting workflow
 │   └── security.yml                   # Security scanning
 └── packages/
-    ├── canvas-student-mcp-server/     # Python MCP Server
-    │   ├── app.py                     # Main Flask application
-    │   ├── src/                       # Python source code
+    ├── canvas-student-mcp-server/     # TypeScript MCP Server (Main)
+    │   ├── src/                       # TypeScript source code
+    │   │   ├── index.ts               # MCP server entry point
+    │   │   ├── canvas-api.ts          # Canvas API client
+    │   │   ├── workflow-engine.ts     # Academic workflow automation
+    │   │   ├── config.ts              # Configuration management
+    │   │   ├── cache.ts               # Caching system
+    │   │   └── types.ts               # TypeScript definitions
+    │   ├── dist/                      # Built JavaScript
     │   ├── docs/                      # Documentation
     │   ├── examples/                  # Usage examples
-    │   ├── requirements.txt           # Python dependencies
+    │   ├── package.json               # Node.js dependencies
+    │   ├── tsconfig.json              # TypeScript config
     │   ├── Dockerfile                 # Docker configuration
-    │   └── README.md                  # Python server docs
-    └── remote-mcp-server-authless/    # TypeScript Remote Server
+    │   ├── docker-compose.yml         # Docker Compose setup
+    │   └── README.md                  # MCP server docs
+    ├── cloudflare-canvas-api/         # Cloudflare Workers Proxy
+    │   ├── src/                       # TypeScript source
+    │   ├── package.json               # Dependencies
+    │   └── README.md                  # Proxy docs
+    └── remote-mcp-server-authless/    # Legacy Remote Server
         ├── src/                       # TypeScript source
         ├── package.json               # Node.js dependencies
-        ├── tsconfig.json              # TypeScript config
-        ├── wrangler.jsonc             # Cloudflare Worker config
-        └── README.md                  # TypeScript server docs
+        └── README.md                  # Remote server docs
 ```
 
 ## 🛠 Development
@@ -128,36 +136,32 @@ This monorepo contains all Canvas MCP implementations in one place for easier de
 
 ### 🔄 CI/CD Workflows
 
-- **Python Tests**: Runs on Python 3.8-3.11 with linting, formatting, and test coverage
-- **TypeScript Tests**: Runs on Node.js 16-20 with ESLint, type checking, and Jest tests  
-- **Security Scans**: Weekly security audits for both Python and TypeScript packages
-- **Integration Tests**: Full monorepo testing when both packages change
-- **Smart Change Detection**: Only tests what changed to optimize CI time
+- **Markdown Linting**: Ensures documentation quality
+- **Security Scans**: Weekly security audits for TypeScript packages
+- **Manual Testing**: Type checking and builds validated locally
+
+*Note: Full CI/CD workflows temporarily disabled during monorepo restructuring.*
 ### 📝 Available Scripts
 
 ```bash
-# Install dependencies for all packages
-npm run install:all
+# Install dependencies
+cd packages/canvas-student-mcp-server
+npm install
 
-# Start servers
-npm run start:python        # Start Python MCP server
-npm run start:remote        # Start TypeScript remote server
+# Build TypeScript
+npm run build
 
-# Testing
-npm run test               # Run all tests
-npm run test:python        # Test Python package only
-npm run test:typescript    # Test TypeScript package only
+# Development mode (watch for changes)
+npm run dev
 
-# Linting
-npm run lint              # Lint all packages
-npm run lint:python       # Lint Python code only
-npm run lint:typescript   # Lint TypeScript code only
+# Type checking
+npm run type-check
 
-# Building
-npm run build             # Build TypeScript package
+# Start MCP server (for testing)
+npm start
 
 # Cleanup
-npm run clean             # Remove all node_modules
+npm run clean
 ```
 
 ### 🚀 Getting Started
@@ -168,25 +172,37 @@ git clone https://github.com/a-ariff/canvas-student-mcp-server.git
 cd canvas-student-mcp-server
 ```
 
-1. Install dependencies for both packages:
+2. Install dependencies and build:
 ```bash
-npm run install:all
+cd packages/canvas-student-mcp-server
+npm install
+npm run build
 ```
 
-1. Configure your Canvas API credentials:
+3. Configure your Canvas API credentials:
 ```bash
-cp packages/canvas-student-mcp-server/.env.example packages/canvas-student-mcp-server/.env
-# Edit the .env file with your Canvas API details
+cp .env.example .env
+# Edit .env with your Canvas API token and URL
 ```
 
-1. Run the servers:
-```bash
-# Python MCP Server
-npm run start:python
-
-# TypeScript Remote Server  
-npm run start:remote
+4. Configure Claude Desktop:
+Edit `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) or `~/.config/claude/claude_desktop_config.json` (Linux):
+```json
+{
+  "mcpServers": {
+    "canvas-student": {
+      "command": "node",
+      "args": ["/absolute/path/to/canvas-student-mcp-server/packages/canvas-student-mcp-server/dist/index.js"],
+      "env": {
+        "CANVAS_API_KEY": "your_token_here",
+        "CANVAS_BASE_URL": "https://your-school.instructure.com"
+      }
+    }
+  }
+}
 ```
+
+5. Restart Claude Desktop to load the MCP server
 
 ## 🔒 Security & Compliance
 
@@ -195,10 +211,12 @@ npm run start:remote
 - **Dependency Management**: Regular updates and vulnerability monitoring
 ## 📚 Documentation
 
-- **Python MCP Server**: See `packages/canvas-student-mcp-server/README.md`
-- **TypeScript Remote Server**: See `packages/remote-mcp-server-authless/README.md`
+- **MCP Server Setup**: See `packages/canvas-student-mcp-server/README.md`
+- **Workflow Automation**: Built-in academic workflow processing tools
 - **API Documentation**: Available in `packages/canvas-student-mcp-server/docs/`
 - **Integration Guide**: See `packages/canvas-student-mcp-server/MCP_INTEGRATION.md`
+- **Docker Guide**: See `packages/canvas-student-mcp-server/DOCKER_TESTING.md`
+- **Troubleshooting**: See `packages/canvas-student-mcp-server/TROUBLESHOOTING.md`
 ## 🔧 Recent Fixes & Improvements
 
 **✅ Security Issues Fixed:**
@@ -225,27 +243,63 @@ npm run start:remote
    npm run install:all
    ```
 
-2. **Configure environment:**
+2. **Build the project:**
    ```bash
-   cp packages/canvas-student-mcp-server/.env.example packages/canvas-student-mcp-server/.env
-   # Edit .env with your Canvas credentials
+   cd packages/canvas-student-mcp-server
+   npm install
+   npm run build
    ```
 
-3. **Setup Claude Desktop:**
+3. **Configure environment:**
    ```bash
-   cp claude-desktop-config.json ~/.config/claude-desktop/config.json
-   # Edit paths in config.json to match your installation
+   cp .env.example .env
+   # Edit .env with your Canvas API token
    ```
 
-4. **Restart Claude Desktop** - Your Canvas MCP server is ready!
+4. **Setup Claude Desktop:**
+   Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
+   ```json
+   {
+     "mcpServers": {
+       "canvas-student": {
+         "command": "node",
+         "args": ["/path/to/packages/canvas-student-mcp-server/dist/index.js"],
+         "env": {
+           "CANVAS_API_KEY": "your_api_token",
+           "CANVAS_BASE_URL": "https://your-school.instructure.com"
+         }
+       }
+     }
+   }
+   ```
+
+5. **Restart Claude Desktop** - Your Canvas MCP server is ready!
+
+## 🐳 Docker Support
+
+Run the MCP server in a container:
+
+```bash
+cd packages/canvas-student-mcp-server
+
+# Build image
+docker build -t canvas-mcp-server .
+
+# Run with environment variables
+docker run -e CANVAS_API_KEY=your_token \
+           -e CANVAS_BASE_URL=https://your-school.instructure.com \
+           canvas-mcp-server
+
+# Or use Docker Compose
+docker-compose up -d
+```
 
 ## ⚠️ Important Notice
 
 This project is designed for educational purposes and personal academic
-management. **Python 3.10+ is required** for full MCP compatibility.
-Users are responsible for complying with their institution's
-terms of service and applicable policies. Always respect rate limits and
-use responsibly.
+management. **Node.js 18+ is required**. Users are responsible for complying
+with their institution's terms of service and applicable policies. Always
+respect rate limits and use responsibly.
 
 ## 📄 License
 
