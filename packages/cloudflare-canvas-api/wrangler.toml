@@ -1,12 +1,15 @@
 #:schema node_modules/wrangler/config-schema.json
-name = "canvas-api-proxy"
+name = "canvas-mcp"
 main = "src/index.ts"
 compatibility_date = "2024-01-15"
 compatibility_flags = ["nodejs_compat"]
 
+# Custom domain route
+route = { pattern = "canvas-mcp.ariff.dev/*", zone_name = "ariff.dev" }
+
 [env.production]
-name = "canvas-api-proxy"
-route = { pattern = "canvas-api.ariff.dev/*", zone_name = "ariff.dev" }
+name = "canvas-mcp"
+route = { pattern = "canvas-mcp.ariff.dev/*", zone_name = "ariff.dev" }
 
 [env.production.vars]
 ENVIRONMENT = "production"
@@ -28,7 +31,7 @@ binding = "ANALYTICS"
 dataset = "canvas_api_usage"
 
 [env.development]
-name = "canvas-api-proxy-dev"
+name = "canvas-mcp-dev"
 
 # Variables for configuration
 [vars]
