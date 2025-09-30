@@ -20,7 +20,7 @@ logger = structlog.get_logger(__name__)
 
 class CanvasClient:
     """Canvas client that uses student credentials for authentication"""
-    
+
     def __init__(self, canvas_url: str = None):
         self.canvas_url = canvas_url or os.getenv("CANVAS_BASE_URL", "https://learn.mywhitecliffe.com")
         self.session_cookies: Dict[str, str] = {}
@@ -41,30 +41,61 @@ class CanvasClient:
             chrome_options.add_argument("--no-sandbox")
             chrome_options.add_argument("--disable-dev-shm-usage")
             chrome_options.add_argument("--disable-gpu")
-            
+
+            # Set Chrome binary location for macOS
+            chrome_options.binary_location = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+
             # Initialize Chrome driver
             driver = webdriver.Chrome(options=chrome_options)
             
             try:
                 # Navigate to Canvas login page
                 login_url = f"{self.canvas_url}/login/canvas"
+                logger.info(f"Navigating to {login_url}")
                 driver.get(login_url)
-                
+
+                # Take a screenshot for debugging
+                logger.info(f"Page title: {driver.title}")
+                logger.info(f"Current URL: {driver.current_url}")
+
                 # Wait for and fill in username
+                logger.info("Looking for username field...")
                 username_field = WebDriverWait(driver, 10).until(
                     EC.presence_of_element_located((By.ID, "pseudonym_session_unique_id"))
                 )
+                logger.info("Found username field, entering username")
                 username_field.send_keys(username)
-                
+
                 # Fill in password
+                logger.info("Looking for password field...")
                 password_field = driver.find_element(By.ID, "pseudonym_session_password")
+                logger.info("Found password field, entering password")
                 password_field.send_keys(password)
-                
+
                 # Submit login form
+                logger.info("Looking for login button...")
                 login_button = driver.find_element(By.XPATH, "//button[@type='submit']")
+                logger.info("Clicking login button")
                 login_button.click()
-                
+
+                # Wait a moment after clicking
+                import time
+                time.sleep(2)
+
+                logger.info(f"After login attempt - URL: {driver.current_url}")
+                logger.info(f"Page title: {driver.title}")
+
+                # Check for login errors
+                try:
+                    error_elements = driver.find_elements(By.CLASS_NAME, "error_text")
+                    if error_elements:
+                        for error in error_elements:
+                            logger.error(f"Login error found: {error.text}")
+                except:
+                    pass
+
                 # Wait for successful login (check for dashboard or profile)
+                logger.info("Waiting for successful login...")
                 WebDriverWait(driver, 10).until(
                     EC.any_of(
                         EC.url_contains("/dashboard"),
@@ -72,14 +103,15 @@ class CanvasClient:
                         EC.presence_of_element_located((By.ID, "global_nav_dashboard_link"))
                     )
                 )
-                
+
                 # Extract cookies for API calls
+                logger.info("Login successful, extracting cookies")
                 cookies = driver.get_cookies()
                 self.session_cookies = {cookie['name']: cookie['value'] for cookie in cookies}
-                
+
                 self.authenticated = True
                 self.username = username
-                
+
                 logger.info("Canvas authentication successful", username=username)
                 return True
                 

@@ -7,9 +7,9 @@ structlog>=23.1.0
 python-multipart>=0.0.6
 python-dotenv>=1.0.0
 
-# MCP Protocol Support (fixed version compatibility)
-mcp>=1.0.0
-anyio>=4.5.0
+# MCP Protocol Support - alternative implementation for Python 3.9
+fastmcp>=0.1.0
+anyio>=3.7.0
 
 # Canvas Integration 
 selenium>=4.15.0

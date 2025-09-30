@@ -1,0 +1,40 @@
+#:schema node_modules/wrangler/config-schema.json
+name = "canvas-api-proxy"
+main = "dist/index.js"
+compatibility_date = "2024-01-15"
+compatibility_flags = ["nodejs_compat"]
+
+[env.production]
+name = "canvas-api-proxy"
+route = { pattern = "canvas-api.yourdomain.com/*", zone_name = "yourdomain.com" }
+
+[env.development]
+name = "canvas-api-proxy-dev"
+
+# Variables for configuration
+[vars]
+ENVIRONMENT = "production"
+API_VERSION = "v1"
+MAX_REQUESTS_PER_MINUTE = "100"
+CACHE_TTL_SECONDS = "300"
+CORS_ORIGINS = "*"
+
+# KV Namespaces for caching and rate limiting
+[[kv_namespaces]]
+binding = "CACHE_KV"
+id = "your-kv-namespace-id"
+preview_id = "your-preview-kv-namespace-id"
+
+[[kv_namespaces]]
+binding = "RATE_LIMIT_KV"
+id = "your-rate-limit-kv-namespace-id"
+preview_id = "your-preview-rate-limit-kv-namespace-id"
+
+# Analytics for monitoring usage
+[analytics_engine_datasets]
+binding = "ANALYTICS"
+dataset = "canvas_api_usage"
+
+# Secrets (set via wrangler secret put)
+# ADMIN_API_KEY - for admin operations
+# ENCRYPTION_KEY - for securing sensitive data

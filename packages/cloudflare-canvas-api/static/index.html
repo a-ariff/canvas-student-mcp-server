@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canvas API Proxy - Multi-User Canvas Integration</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f7fa;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 60px 40px;
+            border-radius: 15px;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+
+        .auth-form {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            margin-bottom: 40px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.2s;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            background: #667eea;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn:hover {
+            background: #5a6fd8;
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .endpoint {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid #667eea;
+        }
+
+        .method {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .get { background: #28a745; color: white; }
+        .post { background: #007bff; color: white; }
+        .put { background: #ffc107; color: black; }
+        .delete { background: #dc3545; color: white; }
+
+        code {
+            background: #e9ecef;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 14px;
+        }
+
+        pre {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .copy-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .hero {
+                padding: 40px 20px;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .auth-form {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="hero">
+            <h1>🎓 Canvas API Proxy</h1>
+            <p>Multi-user Canvas LMS integration with caching, rate limiting, and global edge deployment</p>
+        </div>
+
+        <div class="auth-form">
+            <h2>🚀 Get Started</h2>
+            <p>Connect your Canvas account to start using the API proxy. Your credentials are encrypted and never stored in plain text.</p>
+
+            <form id="authForm">
+                <div class="form-group">
+                    <label for="canvasUrl">Canvas URL</label>
+                    <input
+                        type="url"
+                        id="canvasUrl"
+                        placeholder="https://your-school.instructure.com"
+                        required
+                    >
+                    <small>Your institution's Canvas URL (e.g., https://learn.mywhitecliffe.com)</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="apiKey">Canvas API Token</label>
+                    <input
+                        type="password"
+                        id="apiKey"
+                        placeholder="Your Canvas API token"
+                        required
+                    >
+                    <small>Get this from Canvas → Account → Settings → Approved Integrations → New Access Token</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="institutionName">Institution Name (Optional)</label>
+                    <input
+                        type="text"
+                        id="institutionName"
+                        placeholder="Your School Name"
+                    >
+                </div>
+
+                <button type="submit" class="btn" id="authBtn">
+                    🔑 Authenticate & Get User ID
+                </button>
+            </form>
+
+            <div id="authResult" class="hidden"></div>
+        </div>
+
+        <div class="grid">
+            <div class="card">
+                <h3>⚡ Features</h3>
+                <ul>
+                    <li><strong>Global Edge Deployment:</strong> Sub-100ms response times</li>
+                    <li><strong>Smart Caching:</strong> Intelligent Canvas API response caching</li>
+                    <li><strong>Rate Limiting:</strong> 100 requests/minute per user</li>
+                    <li><strong>Secure:</strong> Encrypted API key storage</li>
+                    <li><strong>Multi-User:</strong> Support unlimited Canvas accounts</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h3>🔒 Security</h3>
+                <ul>
+                    <li>API keys are encrypted using XOR encryption</li>
+                    <li>Sessions expire automatically in 24 hours</li>
+                    <li>Rate limiting prevents API abuse</li>
+                    <li>All requests are logged for monitoring</li>
+                    <li>CORS protection for web security</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h3>🌍 Use Cases</h3>
+                <ul>
+                    <li><strong>Students:</strong> Build personal Canvas dashboards</li>
+                    <li><strong>Educators:</strong> Create custom grading tools</li>
+                    <li><strong>Developers:</strong> Integrate Canvas with other apps</li>
+                    <li><strong>Institutions:</strong> Build Canvas extensions</li>
+                    <li><strong>Researchers:</strong> Analyze learning data</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>📚 API Endpoints</h3>
+
+            <div class="endpoint">
+                <span class="method post">POST</span> <strong>/auth</strong>
+                <p>Authenticate with Canvas and get your unique user ID</p>
+                <pre><code>{
+  "canvasUrl": "https://your-school.instructure.com",
+  "apiKey": "your_canvas_api_token",
+  "institutionName": "Your School (optional)"
+}</code></pre>
+            </div>
+
+            <div class="endpoint">
+                <span class="method post">POST</span> <strong>/canvas/{userId}</strong>
+                <p>Proxy any Canvas API request with caching and rate limiting</p>
+                <pre><code>{
+  "endpoint": "/courses",
+  "method": "GET"
+}</code></pre>
+            </div>
+
+            <div class="endpoint">
+                <span class="method get">GET</span> <strong>/courses/{userId}</strong>
+                <p>Get all courses for the authenticated user</p>
+            </div>
+
+            <div class="endpoint">
+                <span class="method get">GET</span> <strong>/assignments/{userId}?course_id=123</strong>
+                <p>Get assignments for a specific course</p>
+            </div>
+
+            <div class="endpoint">
+                <span class="method get">GET</span> <strong>/profile/{userId}</strong>
+                <p>Get user profile information</p>
+            </div>
+
+            <div class="endpoint">
+                <span class="method get">GET</span> <strong>/health</strong>
+                <p>Health check endpoint for monitoring</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>💻 Example Usage</h3>
+            <p>Once you have your user ID, you can make requests like this:</p>
+
+            <h4>JavaScript (Fetch API)</h4>
+            <pre><code>// Get your courses
+const response = await fetch('https://canvas-api.yourdomain.com/courses/YOUR_USER_ID');
+const courses = await response.json();
+
+// Get assignments for a course
+const assignments = await fetch('https://canvas-api.yourdomain.com/assignments/YOUR_USER_ID?course_id=123');
+
+// Custom Canvas API request
+const customRequest = await fetch('https://canvas-api.yourdomain.com/canvas/YOUR_USER_ID', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    endpoint: '/courses/123/modules',
+    method: 'GET'
+  })
+});</code></pre>
+
+            <h4>Python (requests)</h4>
+            <pre><code>import requests
+
+# Get your courses
+response = requests.get('https://canvas-api.yourdomain.com/courses/YOUR_USER_ID')
+courses = response.json()
+
+# Custom Canvas API request
+custom_response = requests.post('https://canvas-api.yourdomain.com/canvas/YOUR_USER_ID',
+    json={
+        'endpoint': '/courses/123/assignments',
+        'method': 'GET'
+    }
+)</code></pre>
+
+            <h4>curl</h4>
+            <pre><code># Get your courses
+curl https://canvas-api.yourdomain.com/courses/YOUR_USER_ID
+
+# Custom Canvas API request
+curl -X POST https://canvas-api.yourdomain.com/canvas/YOUR_USER_ID \
+  -H "Content-Type: application/json" \
+  -d '{"endpoint": "/courses", "method": "GET"}'</code></pre>
+        </div>
+
+        <div class="card">
+            <h3>🔧 Integration with Claude Desktop (MCP)</h3>
+            <p>You can also use this proxy with Claude Desktop via Model Context Protocol:</p>
+
+            <pre><code>// claude_desktop_config.json
+{
+  "mcpServers": {
+    "canvas-proxy": {
+      "command": "npx",
+      "args": ["@a-ariff/canvas-proxy-mcp-client"],
+      "env": {
+        "CANVAS_PROXY_URL": "https://canvas-api.yourdomain.com",
+        "CANVAS_USER_ID": "your_user_id_here"
+      }
+    }
+  }
+}</code></pre>
+        </div>
+
+        <div class="card">
+            <h3>📊 Performance & Limits</h3>
+            <ul>
+                <li><strong>Rate Limit:</strong> 100 requests per minute per user</li>
+                <li><strong>Cache TTL:</strong> 5 minutes for most endpoints</li>
+                <li><strong>Session Duration:</strong> 24 hours</li>
+                <li><strong>Global Latency:</strong> Sub-100ms response times</li>
+                <li><strong>Uptime:</strong> 99.9% SLA via Cloudflare</li>
+                <li><strong>Concurrent Users:</strong> Unlimited</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('authForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const btn = document.getElementById('authBtn');
+            const result = document.getElementById('authResult');
+
+            btn.disabled = true;
+            btn.textContent = '🔄 Authenticating...';
+
+            try {
+                const response = await fetch('/auth', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        canvasUrl: document.getElementById('canvasUrl').value,
+                        apiKey: document.getElementById('apiKey').value,
+                        institutionName: document.getElementById('institutionName').value || undefined,
+                    }),
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    result.className = 'alert alert-success';
+                    result.innerHTML = `
+                        <h4>✅ Authentication Successful!</h4>
+                        <p><strong>Your User ID:</strong> <code>${data.userId}</code>
+                        <button class="copy-btn" onclick="copyToClipboard('${data.userId}')">Copy</button></p>
+                        <p><strong>Institution:</strong> ${data.institution}</p>
+                        <p>Save your User ID - you'll need it for all API requests!</p>
+
+                        <h5>Test your connection:</h5>
+                        <pre><code>curl https://canvas-api.yourdomain.com/courses/${data.userId}</code></pre>
+                    `;
+                } else {
+                    result.className = 'alert alert-error';
+                    result.innerHTML = `
+                        <h4>❌ Authentication Failed</h4>
+                        <p>${data.error}</p>
+                        <p>Please check your Canvas URL and API token.</p>
+                    `;
+                }
+
+                result.classList.remove('hidden');
+
+            } catch (error) {
+                result.className = 'alert alert-error';
+                result.innerHTML = `
+                    <h4>❌ Request Failed</h4>
+                    <p>Network error: ${error.message}</p>
+                `;
+                result.classList.remove('hidden');
+
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '🔑 Authenticate & Get User ID';
+            }
+        });
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                // Show temporary feedback
+                const btn = event.target;
+                const originalText = btn.textContent;
+                btn.textContent = 'Copied!';
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                }, 1000);
+            });
+        }
+
+        // Auto-fill common Canvas URLs
+        document.getElementById('canvasUrl').addEventListener('input', (e) => {
+            const value = e.target.value.toLowerCase();
+
+            // Auto-suggest institution name based on URL
+            const institutionField = document.getElementById('institutionName');
+            if (value.includes('mywhitecliffe.com')) {
+                institutionField.value = 'Whitecliffe College';
+            } else if (value.includes('.instructure.com')) {
+                const subdomain = value.split('.')[0].replace('https://', '');
+                institutionField.value = subdomain.charAt(0).toUpperCase() + subdomain.slice(1);
+            }
+        });
+    </script>
+</body>
+</html>

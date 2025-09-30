@@ -6,28 +6,8 @@ Simplified MCP implementation for Python 3.9 compatibility
 import asyncio
 import json
 import sys
-from typing import Any, Dict, List, Optional, Sequence
+from typing import Any, Dict, List, Optional
 import structlog
-
-# FastMCP imports
-from fastmcp import FastMCP
-from fastmcp.tools import Tool
-from fastmcp.resources import Resource
-
-
-# FastMCP imports
-from fastmcp import FastMCP
-from fastmcp.tools import Tool
-from fastmcp.resources import Resource
-
-
-
-from dataclasses import dataclass
-
-@dataclass
-class TextContent:
-    type: str = "text"
-    text: str = ""
 
 # Import our Canvas client
 import sys
@@ -49,57 +29,6 @@ class CanvasStudentMCP:
         # Define available tools
         self.tools = self._get_tools_list()
         
-
-
-        # Initialize FastMCP server
-        self.server = FastMCP(self.name)
-        self._register_tools()
-        self._register_resources()
-
-        # Initialize FastMCP server
-        self.server = FastMCP(self.name)
-        self._register_tools()
-        self._register_resources()
-    def _get_tools_list(self):
-        """Define available MCP tools"""
-        return [
-            {
-                "name": "authenticate_student",
-                "description": "Authenticate with Canvas using student credentials",
-                "inputSchema": {
-                    "type": "object",
-                    "properties": {
-                        "username": {"type": "string", "description": "Canvas username"},
-                        "password": {"type": "string", "description": "Canvas password"}
-                    },
-                    "required": ["username", "password"]
-                }
-            },
-            {
-                "name": "get_student_courses",
-                "description": "Get all courses for authenticated student",
-                "inputSchema": {"type": "object", "properties": {}}
-            },
-            {
-                "name": "get_course_modules",
-                "description": "Get modules for a specific course",
-                "inputSchema": {
-                    "type": "object",
-                    "properties": {"course_id": {"type": "integer"}},
-                    "required": ["course_id"]
-                }
-            },
-            {
-                "name": "get_course_assignments",
-                "description": "Get assignments for a specific course",
-                "inputSchema": {
-                    "type": "object",
-                    "properties": {"course_id": {"type": "integer"}},
-                    "required": ["course_id"]
-                }
-            }
-        ]
-
     def _register_tools(self):
         """Register MCP tools for Canvas operations"""
         

@@ -20,7 +20,7 @@ load_dotenv()
 # Add src to path for imports
 sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
 
-from mcp_server.canvas_mcp import CanvasStudentMCP
+from mcp_server.stdio_mcp import StdioMCPServer
 
 def main():
     """Main entry point for the MCP server"""

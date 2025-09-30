@@ -1,0 +1,42 @@
+{
+  "name": "@a-ariff/cloudflare-canvas-api",
+  "version": "1.0.0",
+  "description": "Cloudflare Workers Canvas API Proxy - Multi-user Canvas LMS integration",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "build": "tsc",
+    "type-check": "tsc --noEmit",
+    "test": "vitest",
+    "preview": "wrangler dev --local",
+    "cf-typegen": "wrangler types"
+  },
+  "keywords": [
+    "canvas",
+    "lms",
+    "cloudflare",
+    "workers",
+    "api",
+    "education",
+    "proxy"
+  ],
+  "author": "A. Ariff",
+  "license": "MIT",
+  "dependencies": {
+    "hono": "^4.0.0",
+    "zod": "^3.22.4",
+    "date-fns": "^3.6.0",
+    "@cloudflare/workers-types": "^4.20240208.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.0",
+    "wrangler": "^3.28.0",
+    "vitest": "^1.2.0",
+    "@types/node": "^20.10.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
