@@ -18,6 +18,13 @@
 - 🤖 Compatible with AI tools for academic assistance
 - 🛡️ Local-first approach for privacy
 
+### 📋 Academic Workflow Automation
+- 📑 **Assignment Workflow Processing** - Extract requirements, analyze rubrics, create research plans
+- 🎥 **Seminar/Video Analysis** - Extract concepts, generate notes, create reflection questions
+- ✍️ **Writing Scaffolds** - Automatic structure generation with word count allocation
+- 📚 **Research Planning** - Evidence table templates and citation management
+- 📊 **Rubric Alignment** - Automatic mapping of assignment structure to assessment criteria
+
 ### 🌐 Universal Compatibility
 - Works with standard Canvas LMS installations
 - Institution-agnostic design

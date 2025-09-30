@@ -99,6 +99,8 @@ export interface CanvasAssignment {
   assignment_visibility?: number[];
   overrides?: any[];
   omit_from_final_grade: boolean;
+  rubric?: CanvasRubric[];
+  rubric_settings?: any;
   hide_in_gradebook: boolean;
   lock_info?: any;
   quiz_id?: number;
@@ -431,4 +433,22 @@ export interface ValidationError {
   field: string;
   message: string;
   value?: any;
+}
+
+// Rubric Types
+export interface CanvasRubric {
+  id: string;
+  points: number;
+  description: string;
+  long_description?: string;
+  criterion_use_range?: boolean;
+  ratings?: CanvasRubricRating[];
+}
+
+export interface CanvasRubricRating {
+  id: string;
+  criterion_id: string;
+  description: string;
+  long_description?: string;
+  points: number;
 }

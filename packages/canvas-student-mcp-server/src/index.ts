@@ -25,11 +25,13 @@ import {
 import { z } from 'zod';
 import { getConfig } from './config.js';
 import { CanvasAPI } from './canvas-api.js';
+import { WorkflowEngine, WorkflowTemplateSchema } from './workflow-engine.js';
 import { formatDistanceToNow, parseISO, format, isAfter, isBefore } from 'date-fns';
 
 // Load configuration
 const config = getConfig();
 const canvasAPI = new CanvasAPI(config);
+const workflowEngine = new WorkflowEngine();
 
 // Initialize MCP Server
 const server = new Server(
@@ -301,6 +303,51 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
       inputSchema: {
         type: 'object',
         properties: {},
+      },
+    },
+    {
+      name: 'process_assignment_workflow',
+      description: 'Process assignment using academic workflow template (requirements extraction, rubric analysis, research plan, scaffold)',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          course_name: { type: 'string', description: 'Course name' },
+          module_title: { type: 'string', description: 'Module title' },
+          assignment_title: { type: 'string', description: 'Assignment title' },
+          word_count: { type: 'number', description: 'Required word count' },
+          citation_style: { type: 'string', description: 'Citation style (APA, Harvard, MLA, etc.)' },
+          due_date: { type: 'string', description: 'Due date' },
+          tools_allowed: { type: 'string', description: 'Tools allowed for assignment' },
+          assignment_text: { type: 'string', description: 'Full assignment text from Canvas' },
+          rubric_text: { type: 'string', description: 'Rubric text from Canvas' },
+          notes_from_student: { type: 'string', description: 'Student notes or questions' },
+        },
+      },
+    },
+    {
+      name: 'process_seminar_analysis',
+      description: 'Analyze seminar or video content (extract concepts, create notes, generate reflection questions)',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          seminar_title: { type: 'string', description: 'Seminar or video title' },
+          seminar_content: { type: 'string', description: 'Transcript or content text' },
+          analysis_focus: { type: 'string', description: 'Specific focus areas (comma-separated)' },
+          seminar_deliverables: { type: 'string', description: 'Required deliverables (summary, reflection, etc.)' },
+        },
+        required: ['seminar_content'],
+      },
+    },
+    {
+      name: 'get_assignment_with_rubric',
+      description: 'Get assignment details from Canvas including rubric for workflow processing',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          course_id: { type: 'number', description: 'Canvas course ID' },
+          assignment_id: { type: 'number', description: 'Canvas assignment ID' },
+        },
+        required: ['course_id', 'assignment_id'],
       },
     },
   ];
@@ -588,6 +635,107 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         canvasAPI.clearCache();
         return {
           content: [{ type: 'text', text: '🧹 Cache cleared successfully!' }],
+        };
+      }
+
+      case 'process_assignment_workflow': {
+        const template = WorkflowTemplateSchema.parse(args);
+        const sections = workflowEngine.processAssignmentWorkflow(template);
+
+        let result = `📚 **Assignment Workflow Processing**\n\n`;
+
+        if (template.assignment_title) {
+          result += `**Assignment:** ${template.assignment_title}\n`;
+        }
+        if (template.course_name) {
+          result += `**Course:** ${template.course_name}\n`;
+        }
+        if (template.due_date) {
+          result += `**Due:** ${template.due_date}\n`;
+        }
+
+        result += `\n${'='.repeat(70)}\n\n`;
+
+        sections.forEach((section, idx) => {
+          result += `## ${section.title}\n\n`;
+          result += `${section.content}\n\n`;
+          result += `${'-'.repeat(70)}\n\n`;
+        });
+
+        return {
+          content: [{ type: 'text', text: result }],
+        };
+      }
+
+      case 'process_seminar_analysis': {
+        const template = WorkflowTemplateSchema.parse(args);
+        const sections = workflowEngine.processSeminarWorkflow(template);
+
+        let result = `🎥 **Seminar/Video Analysis**\n\n`;
+
+        if (template.seminar_title) {
+          result += `**Title:** ${template.seminar_title}\n`;
+        }
+        if (template.analysis_focus) {
+          result += `**Focus Areas:** ${template.analysis_focus}\n`;
+        }
+
+        result += `\n${'='.repeat(70)}\n\n`;
+
+        sections.forEach((section, idx) => {
+          result += `## ${section.title}\n\n`;
+          result += `${section.content}\n\n`;
+          result += `${'-'.repeat(70)}\n\n`;
+        });
+
+        return {
+          content: [{ type: 'text', text: result }],
+        };
+      }
+
+      case 'get_assignment_with_rubric': {
+        const { course_id, assignment_id } = z.object({
+          course_id: z.number(),
+          assignment_id: z.number(),
+        }).parse(args);
+
+        // Get assignment details with rubric
+        const assignment = await canvasAPI.getAssignment(course_id, assignment_id);
+        const course = await canvasAPI.getCourse(course_id);
+
+        let result = `📝 **Assignment Details with Rubric**\n\n`;
+        result += `**Course:** ${course.name}\n`;
+        result += `**Assignment:** ${assignment.name}\n`;
+        result += `**Points:** ${assignment.points_possible || 'Not specified'}\n`;
+
+        if (assignment.due_at) {
+          result += `**Due:** ${format(parseISO(assignment.due_at), 'MMM dd, yyyy HH:mm')}\n`;
+        }
+
+        result += `\n**Description:**\n${assignment.description || 'No description provided'}\n\n`;
+
+        if (assignment.rubric) {
+          result += `**Rubric:**\n\n`;
+          assignment.rubric.forEach((criterion: any) => {
+            result += `### ${criterion.description}\n`;
+            result += `Points: ${criterion.points}\n\n`;
+
+            if (criterion.ratings) {
+              criterion.ratings.forEach((rating: any) => {
+                result += `- **${rating.description}** (${rating.points} pts): ${rating.long_description || ''}\n`;
+              });
+            }
+            result += `\n`;
+          });
+        } else {
+          result += `**Rubric:** No rubric available\n\n`;
+        }
+
+        result += `\n**Ready for workflow processing!**\n`;
+        result += `Use process_assignment_workflow tool with this data.\n`;
+
+        return {
+          content: [{ type: 'text', text: result }],
         };
       }
 

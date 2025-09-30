@@ -231,6 +231,22 @@ export class CanvasAPI {
   }
 
   /**
+   * Get a single assignment with full details including rubric
+   */
+  async getAssignment(courseId: number, assignmentId: number): Promise<CanvasAssignment> {
+    const params = {
+      include: ['rubric', 'submission'],
+    };
+
+    const response = await this.get<CanvasAssignment>(
+      `/courses/${courseId}/assignments/${assignmentId}`,
+      params,
+      15 // 15 min cache
+    );
+    return response.data;
+  }
+
+  /**
    * Get modules for a course
    */
   async getModules(courseId: number, includeItems: boolean = true): Promise<CanvasModule[]> {
