@@ -12,6 +12,7 @@ import { z } from 'zod';
 import type { Env, ApiRequest } from './types.js';
 import { CanvasProxy } from './canvas-proxy.js';
 import { AuthManager } from './auth.js';
+import { landingPageHTML } from './landing-page.js';
 
 const app = new Hono<{ Bindings: Env }>();
 
@@ -56,94 +57,10 @@ app.get('/health', async (c) => {
  * API documentation landing page
  */
 app.get('/', async (c) => {
-  const html = `
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <title>Canvas API Proxy</title>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <style>
-            body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
-            .hero { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 40px; border-radius: 10px; margin-bottom: 30px; }
-            .endpoint { background: #f8f9fa; padding: 15px; border-radius: 5px; margin: 10px 0; }
-            .method { display: inline-block; padding: 2px 8px; border-radius: 3px; font-size: 12px; font-weight: bold; }
-            .get { background: #28a745; color: white; }
-            .post { background: #007bff; color: white; }
-            .put { background: #ffc107; color: black; }
-            .delete { background: #dc3545; color: white; }
-            code { background: #e9ecef; padding: 2px 4px; border-radius: 3px; }
-        </style>
-    </head>
-    <body>
-        <div class="hero">
-            <h1>🎓 Canvas API Proxy</h1>
-            <p>Multi-user Canvas LMS integration with caching and rate limiting</p>
-        </div>
-
-        <h2>🚀 Quick Start</h2>
-        <ol>
-            <li>Get your Canvas API token from your institution's Canvas account settings</li>
-            <li>Authenticate with <code>POST /auth</code> to get your user ID</li>
-            <li>Use your user ID with Canvas API endpoints</li>
-        </ol>
-
-        <h2>📚 API Endpoints</h2>
-
-        <div class="endpoint">
-            <span class="method post">POST</span> <strong>/auth</strong>
-            <p>Authenticate with Canvas credentials and get a user ID</p>
-            <pre><code>{
-  "canvasUrl": "https://your-school.instructure.com",
-  "apiKey": "your_canvas_api_token",
-  "institutionName": "Your School (optional)"
-}</code></pre>
-        </div>
-
-        <div class="endpoint">
-            <span class="method post">POST</span> <strong>/canvas/{userId}</strong>
-            <p>Proxy any Canvas API request with caching and rate limiting</p>
-            <pre><code>{
-  "endpoint": "/courses",
-  "method": "GET"
-}</code></pre>
-        </div>
-
-        <div class="endpoint">
-            <span class="method get">GET</span> <strong>/courses/{userId}</strong>
-            <p>Get all courses for the user</p>
-        </div>
-
-        <div class="endpoint">
-            <span class="method get">GET</span> <strong>/assignments/{userId}?course_id=123</strong>
-            <p>Get assignments for a specific course</p>
-        </div>
-
-        <div class="endpoint">
-            <span class="method get">GET</span> <strong>/upcoming/{userId}?days=14</strong>
-            <p>Get upcoming assignments across all courses</p>
-        </div>
-
-        <h2>🔒 Security</h2>
-        <ul>
-            <li>API keys are encrypted and stored securely</li>
-            <li>Rate limiting: ${c.env.MAX_REQUESTS_PER_MINUTE} requests per minute per user</li>
-            <li>Sessions expire in 24 hours</li>
-            <li>All requests are logged for monitoring</li>
-        </ul>
-
-        <h2>⚡ Performance</h2>
-        <ul>
-            <li>Intelligent caching with ${c.env.CACHE_TTL_SECONDS} second TTL</li>
-            <li>Global edge deployment via Cloudflare</li>
-            <li>Sub-100ms response times</li>
-        </ul>
-
-        <p><em>Built with ❤️ for students and educators worldwide</em></p>
-    </body>
-    </html>
-  `;
-
+  const html = landingPageHTML(
+    c.env.MAX_REQUESTS_PER_MINUTE || '100',
+    c.env.CACHE_TTL_SECONDS || '300'
+  );
   return c.html(html);
 });
 
