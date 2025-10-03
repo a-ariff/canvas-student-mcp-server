@@ -1,13 +1,13 @@
-/**
- * For more details on how to configure Wrangler, refer to:
- * https://developers.cloudflare.com/workers/wrangler/configuration/
- */
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
-	"name": "remote-mcp-server-authless",
+	"name": "canvas-mcp-sse",
 	"main": "src/index.ts",
 	"compatibility_date": "2025-03-10",
 	"compatibility_flags": ["nodejs_compat"],
+	"route": {
+		"pattern": "canvas-mcp-sse.ariff.dev/*",
+		"zone_name": "ariff.dev"
+	},
 	"migrations": [
 		{
 			"new_sqlite_classes": ["MyMCP"],
@@ -21,6 +21,20 @@
 				"name": "MCP_OBJECT"
 			}
 		]
+	},
+	"kv_namespaces": [
+		{
+			"binding": "OAUTH_KV",
+			"id": "placeholder_create_with_wrangler"
+		},
+		{
+			"binding": "API_KEYS_KV",
+			"id": "placeholder_create_with_wrangler"
+		}
+	],
+	"vars": {
+		"OAUTH_CLIENT_ID": "canvas-mcp-client",
+		"OAUTH_ISSUER": "https://canvas-mcp-sse.ariff.dev"
 	},
 	"observability": {
 		"enabled": true
