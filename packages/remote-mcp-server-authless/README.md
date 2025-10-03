@@ -1,50 +1,170 @@
-# Building a Remote MCP Server on Cloudflare (Without Auth)
+# Canvas MCP SSE Server
 
-This example allows you to deploy a remote MCP server that doesn't require authentication on Cloudflare Workers. 
+A secure **Model Context Protocol (MCP) server** deployed on Cloudflare Workers with OAuth 2.1 and API Key authentication.
 
-## Get started: 
+🌐 **Live Server**: https://canvas-mcp-sse.ariff.dev/sse
 
-[![Deploy to Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/cloudflare/ai/tree/main/demos/remote-mcp-authless)
+## Features
 
-This will deploy your MCP server to a URL like: `remote-mcp-server-authless.<your-account>.workers.dev/sse`
+- ✅ **OAuth 2.1 Authentication** with PKCE support (RFC 7636)
+- ✅ **API Key Authentication** for simple integrations
+- ✅ **Server-Sent Events (SSE)** transport for real-time communication
+- ✅ **Cloudflare Workers** for global edge deployment
+- ✅ **Durable Objects** for stateful MCP sessions
+- ✅ **KV Storage** for secure token and API key management
 
-Alternatively, you can use the command line below to get the remote MCP Server created on your local machine:
+## Quick Start
+
+### For Claude Code Users
+
 ```bash
-npm create cloudflare@latest -- my-mcp-server --template=cloudflare/ai/demos/remote-mcp-authless
+# Add the MCP server
+claude mcp add --transport sse canvas https://canvas-mcp-sse.ariff.dev/sse
+
+# Authenticate via OAuth (opens browser)
+# In Claude Code, run:
+/mcp
+# Select "canvas" and authenticate
 ```
 
-## Customizing your MCP Server
+### For Other MCP Clients
 
-To add your own [tools](https://developers.cloudflare.com/agents/model-context-protocol/tools/) to the MCP server, define each tool inside the `init()` method of `src/index.ts` using `this.server.tool(...)`. 
+With API key authentication:
 
-## Connect to Cloudflare AI Playground
+```bash
+# Add with custom header
+claude mcp add --transport sse --header "X-API-Key: YOUR_KEY" canvas https://canvas-mcp-sse.ariff.dev/sse
+```
 
-You can connect to your MCP server from the Cloudflare AI Playground, which is a remote MCP client:
+See [AUTHENTICATION.md](./AUTHENTICATION.md) for detailed setup instructions.
 
-1. Go to https://playground.ai.cloudflare.com/
-2. Enter your deployed MCP server URL (`remote-mcp-server-authless.<your-account>.workers.dev/sse`)
-3. You can now use your MCP tools directly from the playground!
+## Architecture
 
-## Connect Claude Desktop to your MCP server
+```mermaid
+graph TB
+    User[Claude Code Client]
+    Browser[User Browser]
 
-You can also connect to your remote MCP server from local MCP clients, by using the [mcp-remote proxy](https://www.npmjs.com/package/mcp-remote). 
+    subgraph "Cloudflare Edge"
+        Worker[Cloudflare Worker<br/>canvas-mcp-sse.ariff.dev/sse]
+        OAuth[OAuth Provider<br/>/.well-known/oauth-authorization-server]
+        KV[(KV Store<br/>Tokens & API Keys)]
+        DO[Durable Objects<br/>SSE Sessions]
+    end
 
-To connect to your MCP server from Claude Desktop, follow [Anthropic's Quickstart](https://modelcontextprotocol.io/quickstart/user) and within Claude Desktop go to Settings > Developer > Edit Config.
+    CanvasMCP[Canvas Student MCP Server]
 
-Update with this configuration:
+    User -->|1. Connect to SSE| Worker
+    Worker -->|2. Return 401 + WWW-Authenticate| User
+    User -->|3. Discover OAuth| OAuth
+    User -->|4. Open browser| Browser
+    Browser -->|5. Authorize| OAuth
+    OAuth -->|6. Return token| User
+    User -->|7. Connect with Bearer token| Worker
+    Worker -->|Validate token| KV
+    Worker -->|Store session| DO
+    Worker -->|Invoke MCP tools| CanvasMCP
 
-```json
-{
-  "mcpServers": {
-    "calculator": {
-      "command": "npx",
-      "args": [
-        "mcp-remote",
-        "http://localhost:8787/sse"  // or remote-mcp-server-authless.your-account.workers.dev/sse
-      ]
-    }
-  }
+    User2[Other Clients]
+    User2 -->|Header: X-API-Key| Worker
+
+    style OAuth fill:#f9f,stroke:#333
+    style KV fill:#bbf,stroke:#333
+    style DO fill:#bfb,stroke:#333
+```
+
+*Paste this diagram into [https://mermaid.live](https://mermaid.live) to visualize*
+
+## Development
+
+### Prerequisites
+
+- Node.js 18+
+- Wrangler CLI (`npm install -g wrangler`)
+- Cloudflare account
+
+### Setup
+
+```bash
+# Install dependencies
+npm install
+
+# Create KV namespaces
+wrangler kv:namespace create "OAUTH_KV"
+wrangler kv:namespace create "API_KEYS_KV"
+
+# Update wrangler.jsonc with the KV namespace IDs
+
+# Run locally
+npm run dev
+
+# Deploy to Cloudflare
+npm run deploy
+```
+
+### Testing
+
+```bash
+# Type check
+npm run type-check
+
+# Run tests
+npm test
+
+# Test OAuth discovery endpoint
+curl https://canvas-mcp-sse.ariff.dev/.well-known/oauth-authorization-server
+
+# Test authenticated SSE connection
+curl -H "Authorization: Bearer your-token" \
+  https://canvas-mcp-sse.ariff.dev/sse
+```
+
+## Customization
+
+Add custom MCP tools in `src/index.ts`:
+
+```typescript
+async init() {
+  this.server.tool("my-tool", { param: z.string() }, async ({ param }) => ({
+    content: [{ type: "text", text: `Result: ${param}` }],
+  }));
 }
 ```
 
-Restart Claude and you should see the tools become available. 
+## Authentication Methods
+
+### OAuth 2.1 (Recommended)
+- Browser-based authentication
+- Automatic token refresh
+- Secure PKCE flow (RFC 7636)
+- Best for end users
+
+### API Keys
+- Simple header-based auth
+- `X-API-Key: your-key` header
+- Best for server-to-server integrations
+
+Complete authentication documentation: [AUTHENTICATION.md](./AUTHENTICATION.md)
+
+## Deployment
+
+This server is configured for deployment at `canvas-mcp-sse.ariff.dev` on Cloudflare Workers.
+
+```bash
+# Deploy to production
+npm run deploy
+
+# Deploy to staging
+wrangler deploy --env development
+```
+
+## Documentation
+
+- [Authentication Guide](./AUTHENTICATION.md) - Complete auth setup
+- [MCP Specification](https://modelcontextprotocol.io) - MCP protocol docs
+- [Cloudflare Workers](https://developers.cloudflare.com/workers/) - Platform docs
+- [OAuth 2.1](https://datatracker.ietf.org/doc/html/draft-ietf-oauth-v2-1-11) - OAuth spec
+
+## License
+
+MIT
