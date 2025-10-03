@@ -25,11 +25,11 @@
 	"kv_namespaces": [
 		{
 			"binding": "OAUTH_KV",
-			"id": "placeholder_create_with_wrangler"
+			"id": "274766504e584434b6d32de34357de8a"
 		},
 		{
 			"binding": "API_KEYS_KV",
-			"id": "placeholder_create_with_wrangler"
+			"id": "c297508f4ae54d72827eb17dc2ceffac"
 		}
 	],
 	"vars": {
