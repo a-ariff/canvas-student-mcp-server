@@ -1,1 +1,14 @@
-{\n  \"mcpServers\": {\n    \"canvas-student-mcp\": {\n      \"command\": \"python3\",\n      \"args\": [\n        \"packages/canvas-student-mcp-server/app.py\"\n      ],\n      \"env\": {\n        \"PYTHONUNBUFFERED\": \"1\",\n        \"PYTHONPATH\": \"packages/canvas-student-mcp-server/src\"\n      }\n    }\n  }\n}
+{
+  "mcpServers": {
+    "canvas-student-mcp": {
+      "command": "python3",
+      "args": [
+        "packages/canvas-student-mcp-server/app.py"
+      ],
+      "env": {
+        "PYTHONUNBUFFERED": "1",
+        "PYTHONPATH": "packages/canvas-student-mcp-server/src"
+      }
+    }
+  }
+}
