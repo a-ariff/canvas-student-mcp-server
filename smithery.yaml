@@ -1,21 +1,10 @@
-# Smithery MCP server configuration
-name: canvas-student-mcp
-description: Canvas LMS integration MCP server with OAuth 2.1 and API Key authentication
-version: "2.0.0"
-author: a-ariff
-homepage: https://github.com/a-ariff/canvas-student-mcp-server
-
-# This is a remote server (already deployed on Cloudflare Workers)
-remote:
-  transport:
-    type: sse
-    url: https://canvas-mcp-sse.ariff.dev/sse
-  authentication:
-    type: oauth2
-    discovery_url: https://canvas-mcp-sse.ariff.dev/.well-known/oauth-authorization-server
-
-tools:
-  - name: add
-    description: Add two numbers
-  - name: calculate
-    description: Perform basic arithmetic operations (add, subtract, multiply, divide)
+# Remote MCP server (already deployed on Cloudflare Workers)
+# Smithery will register this server without building it
+startCommand:
+  remote:
+    transport:
+      type: sse
+      url: https://canvas-mcp-sse.ariff.dev/sse
+    authentication:
+      type: oauth2
+      discoveryUrl: https://canvas-mcp-sse.ariff.dev/.well-known/oauth-authorization-server
