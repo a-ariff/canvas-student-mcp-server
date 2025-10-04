@@ -12,6 +12,8 @@ interface Env {
 	OAUTH_CLIENT_SECRET: string;
 	OAUTH_ISSUER: string;
 	MCP_OBJECT: DurableObjectNamespace;
+	CANVAS_API_KEY?: string;
+	CANVAS_BASE_URL?: string;
 }
 
 async function authenticate(request: Request, env: Env): Promise<AuthContext | Response> {
@@ -71,20 +73,18 @@ async function authenticate(request: Request, env: Env): Promise<AuthContext | R
 	);
 }
 
-export class MyMCP extends McpAgent {
+export class MyMCP extends McpAgent<Env> {
 	server = new McpServer({
 		name: "Canvas Student MCP Server",
 		version: "2.0.0",
 	});
 
 	async init() {
-		// Helper to get Canvas config from environment or default values
+		// Helper to get Canvas config from environment
 		const getCanvasConfig = () => {
-			// In production, these would come from the request URL query params
-			// For now, return empty strings - tools will check and error gracefully
 			return {
-				canvasApiKey: "",
-				canvasBaseUrl: ""
+				canvasApiKey: this.env?.CANVAS_API_KEY || "",
+				canvasBaseUrl: this.env?.CANVAS_BASE_URL || ""
 			};
 		};
 
@@ -302,6 +302,14 @@ export default {
 		// Public demo endpoint for ChatGPT/Smithery (no authentication)
 		// Smithery expects /mcp endpoint with Streamable HTTP
 		if (url.pathname === "/demo" || url.pathname === "/demo/mcp") {
+			// Parse Canvas config from query parameters
+			const canvasApiKey = url.searchParams.get("canvasApiKey") || "";
+			const canvasBaseUrl = url.searchParams.get("canvasBaseUrl") || "";
+
+			// Store config in env for access during MCP handler execution
+			(env as any).CANVAS_API_KEY = canvasApiKey;
+			(env as any).CANVAS_BASE_URL = canvasBaseUrl;
+
 			return MyMCP.serve("/demo").fetch(request, env, ctx);
 		}
 
