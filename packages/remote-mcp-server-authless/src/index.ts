@@ -619,46 +619,6 @@ export default {
 			return MyMCP.serve("/mcp").fetch(request, env, ctx);
 		}
 
-		// Public demo endpoint for ChatGPT/Smithery (no authentication)
-		// Smithery expects /mcp endpoint with Streamable HTTP
-		if (url.pathname === "/demo" || url.pathname === "/demo/mcp") {
-			// Parse Canvas config from query parameters
-			let canvasApiKey = "";
-			let canvasBaseUrl = "";
-
-			// Debug: log all query parameters
-			console.error("🔍 Smithery request URL:", request.url);
-			console.error("🔍 Query params:", Object.fromEntries(url.searchParams.entries()));
-
-			// Smithery playground passes config as base64-encoded JSON in ?config= parameter
-			const configParam = url.searchParams.get("config");
-			if (configParam) {
-				try {
-					const configJson = atob(configParam);
-					console.error("📦 Decoded config JSON:", configJson);
-					const config = JSON.parse(configJson);
-					console.error("✅ Parsed config object:", config);
-					canvasApiKey = config.canvasApiKey || "";
-					canvasBaseUrl = config.canvasBaseUrl || "";
-				} catch (e) {
-					console.error("❌ Failed to parse config parameter:", e);
-				}
-			}
-
-			// Fallback: also check direct query parameters (Smithery docs format)
-			if (!canvasApiKey) canvasApiKey = url.searchParams.get("canvasApiKey") || "";
-			if (!canvasBaseUrl) canvasBaseUrl = url.searchParams.get("canvasBaseUrl") || "";
-
-			console.error("🔑 Final config - API Key:", canvasApiKey ? `${canvasApiKey.substring(0, 10)}...` : "(empty)");
-			console.error("🌐 Final config - Base URL:", canvasBaseUrl || "(empty)");
-
-			// Store config in env for access during MCP handler execution
-			(env as any).CANVAS_API_KEY = canvasApiKey;
-			(env as any).CANVAS_BASE_URL = canvasBaseUrl;
-
-			return MyMCP.serve("/demo").fetch(request, env, ctx);
-		}
-
 		return new Response("Not found", { status: 404 });
 	},
 };
