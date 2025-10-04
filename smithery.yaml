@@ -5,9 +5,7 @@ version: "2.0.0"
 author: a-ariff
 homepage: https://github.com/a-ariff/canvas-student-mcp-server
 
-# Package location in monorepo
-package: packages/remote-mcp-server-authless
-
+# This is a remote server (already deployed on Cloudflare Workers)
 remote:
   transport:
     type: sse
