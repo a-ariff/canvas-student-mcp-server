@@ -1,0 +1,39 @@
+# Canvas Student MCP Server - Smithery Configuration
+name: canvas-student-mcp
+description: Canvas LMS integration MCP server for students to access courses, assignments, and grades
+version: "2.0.0"
+author: a-ariff
+homepage: https://github.com/a-ariff/canvas-student-mcp-server
+
+# Use container runtime with Docker
+runtime: "container"
+
+# Docker build configuration
+build:
+  dockerfile: "packages/canvas-student-mcp-server/Dockerfile"
+  dockerBuildPath: "packages/canvas-student-mcp-server"
+
+# Server configuration
+startCommand:
+  type: "http"
+  configSchema:
+    type: "object"
+    required: ["canvasApiKey"]
+    properties:
+      canvasApiKey:
+        type: "string"
+        title: "Canvas API Key"
+        description: "Your Canvas API access token (Get from Canvas → Account → Settings → Approved Integrations)"
+      canvasBaseUrl:
+        type: "string"
+        title: "Canvas Base URL"
+        description: "Your Canvas instance URL (e.g., https://canvas.instructure.com)"
+        default: "https://canvas.instructure.com"
+  exampleConfig:
+    canvasApiKey: "your-canvas-api-key-here"
+    canvasBaseUrl: "https://canvas.instructure.com"
+
+# Environment variables
+env:
+  NODE_ENV: "production"
+  PORT: "3000"
