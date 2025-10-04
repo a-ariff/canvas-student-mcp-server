@@ -21,7 +21,10 @@
         [data-theme="light"] {
             --bg: #ffffff;
             --text: #0a0a0a;
-            --text-muted: #666;
+            -        <p class="subtitle">
+            Lightning-fast Canvas LMS integration for modern AI applications<br>
+            Multi-platform support • OAuth 2.1 • Global edge deployment on Cloudflare
+        </p>t-muted: #666;
             --accent: #00cc66;
             --accent-dim: #00aa55;
             --card: #f8f8f8;
@@ -30,12 +33,36 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+            font-family: var(--font);
+            margin: 0;
+            padding: 0;
             background: var(--bg);
             color: var(--text);
             line-height: 1.6;
-            overflow-x: hidden;
-            transition: background 0.3s ease, color 0.3s ease;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            background: radial-gradient(
+                600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+                rgba(0, 204, 102, 0.15),
+                transparent 40%
+            );
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 1;
+        }
+
+        body.spotlight-active::before {
+            opacity: 1;
         }
 
         html { scroll-behavior: smooth; }
@@ -143,12 +170,18 @@
             font-size: 14px;
             font-weight: 600;
             transition: all 0.3s ease;
+            text-decoration: none;
+            color: var(--text);
+            cursor: pointer;
+            display: inline-block;
         }
 
         .platform-badge:hover {
             border-color: var(--accent);
             transform: translateY(-2px);
             box-shadow: 0 4px 15px var(--glow);
+            background: var(--accent);
+            color: #000;
         }
 
         .author-credit {
@@ -196,12 +229,12 @@
         .btn-primary {
             background: var(--accent);
             color: #000;
-            box-shadow: 0 4px 20px var(--glow);
+            box-shadow: 0 4px 20px var(--glow), 0 0 40px rgba(0, 204, 102, 0.3);
         }
 
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 30px var(--glow);
+            box-shadow: 0 8px 30px var(--glow), 0 0 60px rgba(0, 204, 102, 0.5);
         }
 
         .btn-secondary {
@@ -411,13 +444,18 @@
         .branch-node:hover {
             transform: translateY(-5px);
             border-color: var(--accent);
-            box-shadow: 0 15px 40px var(--glow);
+            box-shadow: 0 10px 30px var(--glow);
+        }
+
+        .branch-node:hover .branch-icon {
+            transform: scale(1.1);
         }
 
         .branch-icon {
             font-size: 40px;
             margin-bottom: 15px;
             display: block;
+            transition: transform 0.3s ease;
         }
 
         .branch-node h3 {
@@ -666,14 +704,14 @@
         <h1>Canvas MCP Server</h1>
         <p class="subtitle">
             Lightning-fast Canvas LMS integration for modern AI applications<br>
-            Multi-platform support • Production-ready • Global edge deployment
+            Multi-platform support • OAuth 2.1 • Global edge deployment on Cloudflare
         </p>
 
         <div class="platforms">
-            <div class="platform-badge">🐳 Docker</div>
-            <div class="platform-badge">💬 Claude Desktop</div>
-            <div class="platform-badge">🤖 OpenAI</div>
-            <div class="platform-badge">☁️ Cloudflare Workers</div>
+            <a href="#setup-docker" class="platform-badge">🐳 Docker</a>
+            <a href="#setup-claude" class="platform-badge">💬 Claude Desktop</a>
+            <a href="#setup-openai" class="platform-badge">🤖 Custom Client</a>
+            <a href="#setup-cloudflare" class="platform-badge">☁️ Cloudflare Workers</a>
         </div>
 
         <p class="author-credit">
@@ -688,10 +726,14 @@
                 <span class="star-icon">⭐</span>
                 Star on GitHub
             </a>
-            <a href="/health" class="btn btn-secondary">Health Check</a>
+            <a href="https://canvas-mcp-sse.ariff.dev/health" target="_blank" class="btn btn-secondary">Health Check</a>
         </div>
 
         <div class="stats">
+            <div class="stat">
+                <div class="stat-value">12</div>
+                <div class="stat-label">Canvas Tools</div>
+            </div>
             <div class="stat">
                 <div class="stat-value">&lt;100ms</div>
                 <div class="stat-label">Response Time</div>
@@ -701,12 +743,8 @@
                 <div class="stat-label">Uptime</div>
             </div>
             <div class="stat">
-                <div class="stat-value">100</div>
-                <div class="stat-label">Req/Min</div>
-            </div>
-            <div class="stat">
-                <div class="stat-value">∞</div>
-                <div class="stat-label">Users</div>
+                <div class="stat-value">OAuth 2.1</div>
+                <div class="stat-label">Security</div>
             </div>
         </div>
 
@@ -728,9 +766,9 @@
                         <span class="node-icon">🚀</span>
                         <h3 class="node-title">Canvas MCP Server</h3>
                         <p class="node-description">
-                            Production-ready Canvas LMS integration with 13+ AI-powered tools,
-                            smart caching, and global edge deployment. Perfect for students,
-                            educators, and institutions.
+                            Production-ready Canvas LMS integration with 12 powerful tools,
+                            OAuth 2.1 security, and global edge deployment. Perfect for students
+                            using Claude Desktop or custom MCP clients.
                         </p>
                     </div>
                 </div>
@@ -753,44 +791,41 @@
                         <span class="branch-icon">📚</span>
                         <h3>Course Management</h3>
                         <ul>
-                            <li><code>get_courses</code></li>
-                            <li><code>get_course_details</code></li>
+                            <li><code>list_courses</code></li>
                             <li><code>get_modules</code></li>
-                            <li><code>get_profile</code></li>
+                            <li><code>get_user_profile</code></li>
                         </ul>
                     </div>
 
                     <div class="branch-node">
                         <span class="branch-icon">📝</span>
-                        <h3>Assignment Tools</h3>
+                        <h3>Assignment & Grade Tools</h3>
                         <ul>
                             <li><code>get_assignments</code></li>
                             <li><code>get_upcoming_assignments</code></li>
-                            <li><code>get_assignment_with_rubric</code></li>
-                            <li><code>process_assignment_workflow</code></li>
+                            <li><code>get_submission_status</code></li>
+                            <li><code>get_todo_items</code></li>
+                            <li><code>get_grades</code></li>
                         </ul>
                     </div>
 
                     <div class="branch-node">
-                        <span class="branch-icon">🔍</span>
-                        <h3>Content & Search</h3>
+                        <span class="branch-icon">�</span>
+                        <h3>Communication Tools</h3>
                         <ul>
-                            <li><code>search_content</code></li>
-                            <li><code>get_page_content</code></li>
-                            <li><code>get_file_content</code></li>
-                            <li><code>analyze_content</code></li>
+                            <li><code>get_announcements</code></li>
+                            <li><code>get_discussions</code></li>
+                            <li><code>get_calendar_events</code></li>
                         </ul>
                     </div>
 
                     <div class="branch-node">
-                        <span class="branch-icon">🤖</span>
-                        <h3>AI Workflows</h3>
+                        <span class="branch-icon">🎯</span>
+                        <h3>Quiz Tools</h3>
                         <ul>
-                            <li>Requirements extraction</li>
-                            <li>Rubric analysis</li>
-                            <li>Research planning</li>
-                            <li>Assignment scaffolding</li>
+                            <li><code>get_quizzes</code></li>
                         </ul>
+                        <p style="margin-top: 15px; font-size: 13px; color: var(--text-muted);">Plus OAuth 2.1 security, intelligent caching, and global edge deployment!</p>
                     </div>
                 </div>
             </div>
@@ -856,59 +891,110 @@
             <h2 class="section-title">Get Started</h2>
             <p class="section-subtitle">Multiple deployment options for your workflow</p>
 
-            <div class="install-box">
-                <h3>💬 Claude Desktop (MCP)</h3>
+            <div class="install-box" id="setup-claude">
+                <h3>💬 Claude Desktop (OAuth 2.1)</h3>
                 <p style="margin-bottom: 20px; color: var(--text-muted);">
-                    Add to your Claude Desktop config. Restart Claude after saving.
+                    Secure authentication via OAuth 2.1. Add to your Claude Desktop config and restart.
                 </p>
                 <div class="code-block">
 <pre><code>{
   "mcpServers": {
-    "canvas-student": {
+    "canvas-mcp": {
       "command": <span class="code-highlight">"npx"</span>,
-      "args": [<span class="code-highlight">"-y"</span>, <span class="code-highlight">"@a-ariff/canvas-student-mcp-server"</span>],
-      "env": {
-        "CANVAS_API_KEY": <span class="code-highlight">"your_canvas_api_token"</span>,
-        "CANVAS_BASE_URL": <span class="code-highlight">"https://canvas.university.edu"</span>
-      }
+      "args": [
+        <span class="code-highlight">"-y"</span>,
+        <span class="code-highlight">"@modelcontextprotocol/client-oauth2"</span>,
+        <span class="code-highlight">"https://canvas-mcp-sse.ariff.dev/sse"</span>
+      ]
     }
   }
 }</code></pre>
                 </div>
                 <p style="margin-top: 20px; color: var(--text-muted); font-size: 14px;">
-                    📍 Get Canvas API token: Canvas → Account → Settings → Approved Integrations → New Access Token
+                    � First use will open browser for OAuth authentication<br>
+                    📍 Server supports OAuth 2.1 with PKCE (RFC 7636)
                 </p>
             </div>
 
-            <div class="install-box">
-                <h3>🐳 Docker Deployment</h3>
+            <div class="install-box" id="setup-docker">
+                <h3>🐳 Docker Deployment (Local)</h3>
                 <p style="margin-bottom: 20px; color: var(--text-muted);">
-                    Run with Docker for isolated deployment
+                    Run locally with Docker Compose for stdio-based MCP
                 </p>
                 <div class="code-block">
-<pre><code><span class="code-highlight"># Pull and run</span>
-docker run -d \
-  -e CANVAS_API_KEY=your_token \
-  -e CANVAS_BASE_URL=https://canvas.university.edu \
-  -p 3000:3000 \
-  canvas-mcp-server</code></pre>
+<pre><code><span class="code-highlight"># Clone repository</span>
+git clone https://github.com/a-ariff/canvas-student-mcp-server.git
+cd canvas-student-mcp-server/packages/canvas-student-mcp-server
+
+<span class="code-highlight"># Create .env file</span>
+cat > .env << EOF
+CANVAS_API_KEY=your_canvas_api_token
+CANVAS_BASE_URL=https://canvas.instructure.com
+DEBUG=false
+EOF
+
+<span class="code-highlight"># Start with Docker Compose</span>
+docker-compose up -d
+
+<span class="code-highlight"># Interact via stdio</span>
+docker exec -it canvas-student-mcp-server /bin/sh</code></pre>
                 </div>
+                <p style="margin-top: 20px; color: var(--text-muted); font-size: 14px;">
+                    📍 Get Canvas API token: Canvas → Account → Settings → Approved Integrations
+                </p>
             </div>
 
-            <div class="install-box">
-                <h3>☁️ Cloudflare Worker API</h3>
+            <div class="install-box" id="setup-openai">
+                <h3>🤖 Custom MCP Client</h3>
                 <p style="margin-bottom: 20px; color: var(--text-muted);">
-                    Use the hosted API endpoint
+                    Build your own MCP client using the SDK
                 </p>
                 <div class="code-block">
-<pre><code><span class="code-highlight"># Authenticate</span>
-curl -X POST https://canvas-mcp.ariff.dev/auth \
-  -H "Content-Type: application/json" \
-  -d '{"canvasUrl": "https://canvas.university.edu", "apiKey": "your_token"}'
+<pre><code><span class="code-highlight"># Install MCP SDK</span>
+npm install @modelcontextprotocol/sdk
 
-<span class="code-highlight"># Use your userId</span>
-curl https://canvas-mcp.ariff.dev/courses/YOUR_USER_ID</code></pre>
+<span class="code-highlight"># Connect to server</span>
+import { Client } from '@modelcontextprotocol/sdk/client/index.js';
+import { SSEClientTransport } from '@modelcontextprotocol/sdk/client/sse.js';
+
+const transport = new SSEClientTransport(
+  new URL('https://canvas-mcp-sse.ariff.dev/sse')
+);
+
+const client = new Client({
+  name: 'my-mcp-client',
+  version: '1.0.0'
+}, { capabilities: {} });
+
+await client.connect(transport);</code></pre>
                 </div>
+                <p style="margin-top: 20px; color: var(--text-muted); font-size: 14px;">
+                    📖 Docs: <a href="https://github.com/a-ariff/canvas-student-mcp-server" style="color: var(--accent);">GitHub Repository</a>
+                </p>
+            </div>
+
+            <div class="install-box" id="setup-cloudflare">
+                <h3>☁️ Cloudflare Workers (OAuth SSE)</h3>
+                <p style="margin-bottom: 20px; color: var(--text-muted);">
+                    Production MCP server with OAuth 2.1 and SSE transport
+                </p>
+                <div class="code-block">
+<pre><code><span class="code-highlight"># Live endpoint</span>
+https://canvas-mcp-sse.ariff.dev/sse
+
+<span class="code-highlight"># OAuth discovery</span>
+curl https://canvas-mcp-sse.ariff.dev/.well-known/oauth-authorization-server
+
+<span class="code-highlight"># MCP configuration</span>
+curl https://canvas-mcp-sse.ariff.dev/.well-known/mcp-config
+
+<span class="code-highlight"># Deploy your own</span>
+cd packages/remote-mcp-server-authless
+npm run deploy</code></pre>
+                </div>
+                <p style="margin-top: 20px; color: var(--text-muted); font-size: 14px;">
+                    🌐 Global edge deployment • ⚡ Sub-100ms response • 🔒 OAuth 2.1 with PKCE
+                </p>
             </div>
         </div>
     </section>
@@ -916,7 +1002,11 @@ curl https://canvas-mcp.ariff.dev/courses/YOUR_USER_ID</code></pre>
     <!-- Footer -->
     <footer>
         <p style="margin-bottom: 10px;">Powered by Cloudflare Workers • Built with ❤️ by <a href="https://github.com/a-ariff" target="_blank">Ariff</a></p>
-        <p><a href="https://github.com/a-ariff/canvas-student-mcp-server" target="_blank">⭐ Star on GitHub</a> • <a href="https://github.com/a-ariff" target="_blank">More Projects</a></p>
+        <p>
+            <a href="https://github.com/a-ariff/canvas-student-mcp-server" target="_blank">⭐ Star on GitHub</a> • 
+            <a href="https://canvas-mcp-sse.ariff.dev/.well-known/oauth-authorization-server" target="_blank">API Docs</a> • 
+            <a href="https://github.com/a-ariff" target="_blank">More Projects</a>
+        </p>
     </footer>
 
     <script>
@@ -948,6 +1038,22 @@ curl https://canvas-mcp.ariff.dev/courses/YOUR_USER_ID</code></pre>
                 scrollIndicator.style.opacity = '0';
                 scrollIndicator.style.pointerEvents = 'none';
             }
+        });
+
+        // Spotlight effect
+        let spotlightTimeout;
+        document.addEventListener('mousemove', (e) => {
+            const x = (e.clientX / window.innerWidth) * 100;
+            const y = (e.clientY / window.innerHeight) * 100;
+            
+            document.body.style.setProperty('--mouse-x', `${x}%`);
+            document.body.style.setProperty('--mouse-y', `${y}%`);
+            document.body.classList.add('spotlight-active');
+            
+            clearTimeout(spotlightTimeout);
+            spotlightTimeout = setTimeout(() => {
+                document.body.classList.remove('spotlight-active');
+            }, 3000);
         });
     </script>
 </body>
