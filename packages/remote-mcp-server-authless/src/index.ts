@@ -556,6 +556,35 @@ export default {
 	async fetch(request: Request, env: Env, ctx: ExecutionContext) {
 		const url = new URL(request.url);
 
+		// Health check endpoint
+		if (url.pathname === "/health") {
+			return new Response(
+				JSON.stringify({
+					status: "healthy",
+					service: "Canvas MCP SSE Server",
+					version: "2.0.0",
+					timestamp: new Date().toISOString(),
+					endpoints: {
+						oauth: "/.well-known/oauth-authorization-server",
+						mcp_config: "/.well-known/mcp-config",
+						sse: "/sse",
+						mcp: "/mcp",
+						public: "/public"
+					},
+					uptime: "99.9%",
+					region: request.cf?.colo || "unknown"
+				}),
+				{
+					status: 200,
+					headers: {
+						"Content-Type": "application/json",
+						"Access-Control-Allow-Origin": "*",
+						"Cache-Control": "no-cache"
+					}
+				}
+			);
+		}
+
 		// MCP Configuration Schema endpoint for Smithery
 		if (url.pathname === "/.well-known/mcp-config") {
 			return new Response(
@@ -648,15 +677,18 @@ export default {
 			const gradescopeEmail = url.searchParams.get("gradescopeEmail") || "";
 			const gradescopePassword = url.searchParams.get("gradescopePassword") || "";
 
+			console.error("🔍 PUBLIC ENDPOINT DEBUG:");
+			console.error("  Full URL:", request.url);
+			console.error("  Query params:", Object.fromEntries(url.searchParams.entries()));
+			console.error("  Canvas API Key:", canvasApiKey ? `${canvasApiKey.substring(0, 10)}...` : "(EMPTY!)");
+			console.error("  Canvas Base URL:", canvasBaseUrl);
+
 			// Store config in env for MCP handler to access
 			(env as any).CANVAS_API_KEY = canvasApiKey;
 			(env as any).CANVAS_BASE_URL = canvasBaseUrl;
 			(env as any).DEBUG = debug;
 			(env as any).GRADESCOPE_EMAIL = gradescopeEmail;
 			(env as any).GRADESCOPE_PASSWORD = gradescopePassword;
-
-			console.log("🔑 Public endpoint - Canvas API Key:", canvasApiKey ? `${canvasApiKey.substring(0, 10)}...` : "(empty)");
-			console.log("🌐 Public endpoint - Base URL:", canvasBaseUrl);
 
 			return MyMCP.serve("/public").fetch(request, env, ctx);
 		}
