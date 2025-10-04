@@ -104,10 +104,21 @@ rm -rf packages/remote-mcp-server-authless/.wrangler
 - Document its purpose if keeping
 
 ### Package: `cloudflare-canvas-api`
-**Status**: ✅ Keep
-**Purpose**: Cloudflare Workers proxy for Canvas API
+**Status**: ✅ **KEEP** - Different purpose from remote-mcp-server
+**Deployed at**: https://canvas-mcp.ariff.dev/
+**Purpose**: Multi-user Canvas REST API proxy (NOT an MCP server)
 
-**Action**: None - appears to be a separate, useful component
+**Use Case**:
+- Public REST API for general Canvas integration
+- Supports multiple users with encrypted API key storage
+- Rate limiting, caching, analytics
+- Used by web apps, mobile apps, scripts - anything that speaks HTTP
+
+**Difference from remote-mcp-server-authless**:
+- `cloudflare-canvas-api` = Traditional REST API for ANY application
+- `remote-mcp-server-authless` = MCP server ONLY for AI agents (Claude, ChatGPT)
+
+**Action**: Keep both - they serve different purposes and audiences
 
 ### Package: `remote-mcp-server-authless`
 **Status**: ✅ Keep (Active - deployed to production)
