@@ -155,6 +155,11 @@ export default {
 			return MyMCP.serve("/mcp").fetch(request, env, ctx);
 		}
 
+		// Public demo endpoint for ChatGPT (no authentication)
+		if (url.pathname === "/demo") {
+			return MyMCP.serveSSE("/demo").fetch(request, env, ctx);
+		}
+
 		return new Response("Not found", { status: 404 });
 	},
 };
