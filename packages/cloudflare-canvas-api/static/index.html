@@ -325,6 +325,11 @@
         <div class="hero">
             <h1>🎓 Canvas API Proxy</h1>
             <p>Multi-user Canvas LMS integration with caching, rate limiting, and global edge deployment</p>
+            <div style="margin-top: 20px;">
+                <a href="https://github.com/a-ariff/canvas-student-mcp-server" target="_blank" style="color: white; text-decoration: none; margin: 0 15px;">⭐ Star on GitHub</a>
+                <a href="/health" style="color: white; text-decoration: none; margin: 0 15px;">🏥 Health Check</a>
+                <a href="https://github.com/a-ariff/canvas-student-mcp-server#readme" target="_blank" style="color: white; text-decoration: none; margin: 0 15px;">📚 Documentation</a>
+            </div>
         </div>
 
         <div class="auth-form">
@@ -455,14 +460,14 @@
 
             <h4>JavaScript (Fetch API)</h4>
             <pre><code>// Get your courses
-const response = await fetch('https://canvas-api.yourdomain.com/courses/YOUR_USER_ID');
+const response = await fetch('https://canvas-mcp.ariff.dev/courses/YOUR_USER_ID');
 const courses = await response.json();
 
 // Get assignments for a course
-const assignments = await fetch('https://canvas-api.yourdomain.com/assignments/YOUR_USER_ID?course_id=123');
+const assignments = await fetch('https://canvas-mcp.ariff.dev/assignments/YOUR_USER_ID?course_id=123');
 
 // Custom Canvas API request
-const customRequest = await fetch('https://canvas-api.yourdomain.com/canvas/YOUR_USER_ID', {
+const customRequest = await fetch('https://canvas-mcp.ariff.dev/canvas/YOUR_USER_ID', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({
@@ -475,11 +480,11 @@ const customRequest = await fetch('https://canvas-api.yourdomain.com/canvas/YOUR
             <pre><code>import requests
 
 # Get your courses
-response = requests.get('https://canvas-api.yourdomain.com/courses/YOUR_USER_ID')
+response = requests.get('https://canvas-mcp.ariff.dev/courses/YOUR_USER_ID')
 courses = response.json()
 
 # Custom Canvas API request
-custom_response = requests.post('https://canvas-api.yourdomain.com/canvas/YOUR_USER_ID',
+custom_response = requests.post('https://canvas-mcp.ariff.dev/canvas/YOUR_USER_ID',
     json={
         'endpoint': '/courses/123/assignments',
         'method': 'GET'
@@ -488,31 +493,85 @@ custom_response = requests.post('https://canvas-api.yourdomain.com/canvas/YOUR_U
 
             <h4>curl</h4>
             <pre><code># Get your courses
-curl https://canvas-api.yourdomain.com/courses/YOUR_USER_ID
+curl https://canvas-mcp.ariff.dev/courses/YOUR_USER_ID
 
 # Custom Canvas API request
-curl -X POST https://canvas-api.yourdomain.com/canvas/YOUR_USER_ID \
+curl -X POST https://canvas-mcp.ariff.dev/canvas/YOUR_USER_ID \
   -H "Content-Type: application/json" \
   -d '{"endpoint": "/courses", "method": "GET"}'</code></pre>
         </div>
 
         <div class="card">
-            <h3>🔧 Integration with Claude Desktop (MCP)</h3>
-            <p>You can also use this proxy with Claude Desktop via Model Context Protocol:</p>
+            <h3>🤖 AI Integration - Claude Desktop (MCP)</h3>
+            <p>Connect Canvas directly to Claude Desktop using our MCP server:</p>
 
-            <pre><code>// claude_desktop_config.json
+            <h4>Using Remote MCP Server</h4>
+            <pre><code>// ~/.config/Claude/claude_desktop_config.json (macOS/Linux)
+// %APPDATA%/Claude/claude_desktop_config.json (Windows)
 {
   "mcpServers": {
-    "canvas-proxy": {
-      "command": "npx",
-      "args": ["@a-ariff/canvas-proxy-mcp-client"],
+    "canvas-student": {
+      "url": "https://canvas-mcp-sse.ariff.dev/demo",
+      "transport": "sse",
       "env": {
-        "CANVAS_PROXY_URL": "https://canvas-api.yourdomain.com",
-        "CANVAS_USER_ID": "your_user_id_here"
+        "canvasApiKey": "YOUR_CANVAS_API_TOKEN",
+        "canvasBaseUrl": "https://your-school.instructure.com"
       }
     }
   }
 }</code></pre>
+
+            <h4>Using Local MCP Server</h4>
+            <pre><code>{
+  "mcpServers": {
+    "canvas-student": {
+      "command": "node",
+      "args": ["/path/to/canvas-student-mcp-server/dist/index.js"],
+      "env": {
+        "CANVAS_API_KEY": "YOUR_CANVAS_API_TOKEN",
+        "CANVAS_BASE_URL": "https://your-school.instructure.com"
+      }
+    }
+  }
+}</code></pre>
+
+            <p><a href="https://github.com/a-ariff/canvas-student-mcp-server" target="_blank">📖 Full setup guide on GitHub</a></p>
+        </div>
+
+        <div class="card">
+            <h3>🔮 Perplexity Integration (MCP)</h3>
+            <p>Use Canvas tools directly in Perplexity AI:</p>
+
+            <h4>Setup Instructions</h4>
+            <ol>
+                <li>Install Node.js (v18 or higher)</li>
+                <li>Clone the repository: <code>git clone https://github.com/a-ariff/canvas-student-mcp-server.git</code></li>
+                <li>Navigate to the package: <code>cd canvas-student-mcp-server/packages/canvas-student-mcp-server</code></li>
+                <li>Build the project: <code>npm install && npm run build</code></li>
+                <li>Create Perplexity config file</li>
+            </ol>
+
+            <h4>Configuration File</h4>
+            <pre><code>// perplexity-mcp-config.json
+{
+  "mcpServers": {
+    "canvas-student": {
+      "command": "node",
+      "args": ["/ABSOLUTE/PATH/TO/canvas-student-mcp-server/packages/canvas-student-mcp-server/dist/index.js"],
+      "env": {
+        "NODE_ENV": "production",
+        "CANVAS_API_KEY": "YOUR_CANVAS_API_TOKEN",
+        "CANVAS_BASE_URL": "https://your-school.instructure.com",
+        "DEBUG": "false",
+        "ENABLE_CACHE": "true",
+        "CACHE_EXPIRATION_MINUTES": "60"
+      }
+    }
+  }
+}</code></pre>
+
+            <p><strong>✅ Tested & Working</strong> - This configuration has been verified with Perplexity AI</p>
+            <p><a href="https://github.com/a-ariff/canvas-student-mcp-server/blob/main/perplexity-mcp-config.json" target="_blank">📄 View example config</a></p>
         </div>
 
         <div class="card">
@@ -563,7 +622,7 @@ curl -X POST https://canvas-api.yourdomain.com/canvas/YOUR_USER_ID \
                         <p>Save your User ID - you'll need it for all API requests!</p>
 
                         <h5>Test your connection:</h5>
-                        <pre><code>curl https://canvas-api.yourdomain.com/courses/${data.userId}</code></pre>
+                        <pre><code>curl https://canvas-mcp.ariff.dev/courses/${data.userId}</code></pre>
                     `;
                 } else {
                     result.className = 'alert alert-error';
