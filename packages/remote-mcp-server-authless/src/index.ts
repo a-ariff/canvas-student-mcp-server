@@ -556,20 +556,20 @@ export default {
 	async fetch(request: Request, env: Env, ctx: ExecutionContext) {
 		const url = new URL(request.url);
 
+		// MCP Configuration Schema endpoint for Smithery
 		if (url.pathname === "/.well-known/mcp-config") {
-			// Configuration schema for Canvas API credentials
 			return new Response(
 				JSON.stringify({
 					"$schema": "http://json-schema.org/draft-07/schema#",
 					"$id": `https://${url.host}/.well-known/mcp-config`,
-					"title": "Canvas LMS Configuration",
-					"description": "Configuration for connecting to Canvas LMS",
+					"title": "Canvas Student MCP Configuration",
+					"description": "Configuration for connecting to Canvas and Gradescope MCP server",
 					"x-query-style": "dot+bracket",
 					"type": "object",
 					"properties": {
 						"canvasApiKey": {
 							"type": "string",
-							"title": "Canvas API Token",
+							"title": "Canvas API Key",
 							"description": "Your Canvas API access token (Get from Canvas → Account → Settings → Approved Integrations)"
 						},
 						"canvasBaseUrl": {
@@ -577,9 +577,25 @@ export default {
 							"title": "Canvas Base URL",
 							"description": "Your Canvas instance URL (e.g., https://canvas.instructure.com)",
 							"default": "https://canvas.instructure.com"
+						},
+						"debug": {
+							"type": "boolean",
+							"title": "Debug Mode",
+							"description": "Enable debug logging",
+							"default": false
+						},
+						"gradescopeEmail": {
+							"type": "string",
+							"title": "Gradescope Email",
+							"description": "Your Gradescope email address (optional)"
+						},
+						"gradescopePassword": {
+							"type": "string",
+							"title": "Gradescope Password",
+							"description": "Your Gradescope password (optional)"
 						}
 					},
-					"required": ["canvasApiKey", "canvasBaseUrl"],
+					"required": ["canvasApiKey"],
 					"additionalProperties": false
 				}),
 				{
