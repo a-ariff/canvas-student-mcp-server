@@ -638,6 +638,29 @@ export default {
 			return MyMCP.serve("/mcp").fetch(request, env, ctx);
 		}
 
+		// Public endpoint for Smithery (no authentication)
+		// Configuration passed via query parameters
+		if (url.pathname === "/public" || url.pathname === "/public/mcp") {
+			// Extract configuration from query parameters
+			const canvasApiKey = url.searchParams.get("canvasApiKey") || "";
+			const canvasBaseUrl = url.searchParams.get("canvasBaseUrl") || "https://canvas.instructure.com";
+			const debug = url.searchParams.get("debug") === "true";
+			const gradescopeEmail = url.searchParams.get("gradescopeEmail") || "";
+			const gradescopePassword = url.searchParams.get("gradescopePassword") || "";
+
+			// Store config in env for MCP handler to access
+			(env as any).CANVAS_API_KEY = canvasApiKey;
+			(env as any).CANVAS_BASE_URL = canvasBaseUrl;
+			(env as any).DEBUG = debug;
+			(env as any).GRADESCOPE_EMAIL = gradescopeEmail;
+			(env as any).GRADESCOPE_PASSWORD = gradescopePassword;
+
+			console.log("🔑 Public endpoint - Canvas API Key:", canvasApiKey ? `${canvasApiKey.substring(0, 10)}...` : "(empty)");
+			console.log("🌐 Public endpoint - Base URL:", canvasBaseUrl);
+
+			return MyMCP.serve("/public").fetch(request, env, ctx);
+		}
+
 		return new Response("Not found", { status: 404 });
 	},
 };
