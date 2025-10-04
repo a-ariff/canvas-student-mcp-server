@@ -615,8 +615,25 @@ export default {
 		// Smithery expects /mcp endpoint with Streamable HTTP
 		if (url.pathname === "/demo" || url.pathname === "/demo/mcp") {
 			// Parse Canvas config from query parameters
-			const canvasApiKey = url.searchParams.get("canvasApiKey") || "";
-			const canvasBaseUrl = url.searchParams.get("canvasBaseUrl") || "";
+			let canvasApiKey = "";
+			let canvasBaseUrl = "";
+
+			// Smithery passes config as base64-encoded JSON in ?config= parameter
+			const configParam = url.searchParams.get("config");
+			if (configParam) {
+				try {
+					const configJson = atob(configParam);
+					const config = JSON.parse(configJson);
+					canvasApiKey = config.canvasApiKey || "";
+					canvasBaseUrl = config.canvasBaseUrl || "";
+				} catch (e) {
+					console.error("Failed to parse config parameter:", e);
+				}
+			}
+
+			// Fallback: also check direct query parameters (for manual testing)
+			if (!canvasApiKey) canvasApiKey = url.searchParams.get("canvasApiKey") || "";
+			if (!canvasBaseUrl) canvasBaseUrl = url.searchParams.get("canvasBaseUrl") || "";
 
 			// Store config in env for access during MCP handler execution
 			(env as any).CANVAS_API_KEY = canvasApiKey;
