@@ -74,48 +74,151 @@ async function authenticate(request: Request, env: Env): Promise<AuthContext | R
 export class MyMCP extends McpAgent {
 	server = new McpServer({
 		name: "Canvas Student MCP Server",
-		version: "1.0.0",
+		version: "2.0.0",
 	});
 
-	async init() {
-		this.server.tool("add", { a: z.number(), b: z.number() }, async ({ a, b }) => ({
-			content: [{ type: "text", text: String(a + b) }],
-		}));
+	private canvasApiKey: string = "";
+	private canvasBaseUrl: string = "";
 
+	async init() {
+		// Parse Canvas credentials from request URL (passed by Smithery)
+		const url = new URL(this.request?.url || "");
+		this.canvasApiKey = url.searchParams.get("canvasApiKey") || "";
+		this.canvasBaseUrl = url.searchParams.get("canvasBaseUrl") || "";
+
+		// List all courses
+		this.server.tool("list_courses", {}, async () => {
+			if (!this.canvasApiKey || !this.canvasBaseUrl) {
+				return {
+					content: [{ type: "text", text: "Error: Canvas API credentials not configured" }],
+				};
+			}
+
+			try {
+				const response = await fetch(`${this.canvasBaseUrl}/api/v1/courses?enrollment_state=active`, {
+					headers: { "Authorization": `Bearer ${this.canvasApiKey}` }
+				});
+				const courses = await response.json();
+
+				const courseList = courses.map((c: any) =>
+					`• ${c.name} (ID: ${c.id})${c.course_code ? ` - ${c.course_code}` : ""}`
+				).join("\n");
+
+				return {
+					content: [{ type: "text", text: `**Your Active Courses:**\n\n${courseList}` }],
+				};
+			} catch (error) {
+				return {
+					content: [{ type: "text", text: `Error fetching courses: ${error}` }],
+				};
+			}
+		});
+
+		// Get assignments for a course
 		this.server.tool(
-			"calculate",
-			{
-				operation: z.enum(["add", "subtract", "multiply", "divide"]),
-				a: z.number(),
-				b: z.number(),
-			},
-			async ({ operation, a, b }) => {
-				let result: number;
-				switch (operation) {
-					case "add":
-						result = a + b;
-						break;
-					case "subtract":
-						result = a - b;
-						break;
-					case "multiply":
-						result = a * b;
-						break;
-					case "divide":
-						if (b === 0)
-							return {
-								content: [
-									{
-										type: "text",
-										text: "Error: Cannot divide by zero",
-									},
-								],
-							};
-						result = a / b;
-						break;
+			"get_assignments",
+			{ course_id: z.number().describe("Canvas course ID") },
+			async ({ course_id }) => {
+				if (!this.canvasApiKey || !this.canvasBaseUrl) {
+					return {
+						content: [{ type: "text", text: "Error: Canvas API credentials not configured" }],
+					};
 				}
-				return { content: [{ type: "text", text: String(result) }] };
-			},
+
+				try {
+					const response = await fetch(
+						`${this.canvasBaseUrl}/api/v1/courses/${course_id}/assignments`,
+						{ headers: { "Authorization": `Bearer ${this.canvasApiKey}` } }
+					);
+					const assignments = await response.json();
+
+					const assignmentList = assignments.map((a: any) => {
+						const dueDate = a.due_at ? new Date(a.due_at).toLocaleString() : "No due date";
+						const points = a.points_possible ? `${a.points_possible} points` : "";
+						return `• **${a.name}**\n  Due: ${dueDate} ${points}\n  ${a.html_url}`;
+					}).join("\n\n");
+
+					return {
+						content: [{ type: "text", text: `**Assignments:**\n\n${assignmentList || "No assignments found"}` }],
+					};
+				} catch (error) {
+					return {
+						content: [{ type: "text", text: `Error fetching assignments: ${error}` }],
+					};
+				}
+			}
+		);
+
+		// Get upcoming assignments across all courses
+		this.server.tool("get_upcoming_assignments", {}, async () => {
+			if (!this.canvasApiKey || !this.canvasBaseUrl) {
+				return {
+					content: [{ type: "text", text: "Error: Canvas API credentials not configured" }],
+				};
+			}
+
+			try {
+				const response = await fetch(
+					`${this.canvasBaseUrl}/api/v1/users/self/upcoming_events`,
+					{ headers: { "Authorization": `Bearer ${this.canvasApiKey}` } }
+				);
+				const events = await response.json();
+
+				const eventList = events.map((e: any) => {
+					const date = new Date(e.assignment?.due_at || e.start_at).toLocaleString();
+					return `• **${e.title}**\n  ${e.context_name}\n  Due: ${date}`;
+				}).join("\n\n");
+
+				return {
+					content: [{ type: "text", text: `**Upcoming Assignments:**\n\n${eventList || "No upcoming assignments"}` }],
+				};
+			} catch (error) {
+				return {
+					content: [{ type: "text", text: `Error fetching upcoming assignments: ${error}` }],
+				};
+			}
+		});
+
+		// Get grades for a course
+		this.server.tool(
+			"get_grades",
+			{ course_id: z.number().describe("Canvas course ID") },
+			async ({ course_id }) => {
+				if (!this.canvasApiKey || !this.canvasBaseUrl) {
+					return {
+						content: [{ type: "text", text: "Error: Canvas API credentials not configured" }],
+					};
+				}
+
+				try {
+					const response = await fetch(
+						`${this.canvasBaseUrl}/api/v1/courses/${course_id}/enrollments?user_id=self`,
+						{ headers: { "Authorization": `Bearer ${this.canvasApiKey}` } }
+					);
+					const enrollments = await response.json();
+
+					if (enrollments.length === 0) {
+						return {
+							content: [{ type: "text", text: "No enrollment found for this course" }],
+						};
+					}
+
+					const enrollment = enrollments[0];
+					const grade = enrollment.grades?.current_grade || "N/A";
+					const score = enrollment.grades?.current_score || "N/A";
+
+					return {
+						content: [{
+							type: "text",
+							text: `**Grade for Course ${course_id}:**\n\nCurrent Grade: ${grade}\nCurrent Score: ${score}%`
+						}],
+					};
+				} catch (error) {
+					return {
+						content: [{ type: "text", text: `Error fetching grades: ${error}` }],
+					};
+				}
+			}
 		);
 	}
 }
