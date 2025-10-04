@@ -277,6 +277,51 @@ PORT=8001
    ```bash
    python app.py --debug
    ```
+
+### JSON-RPC Protocol Errors (Claude Desktop)
+
+**Problem**: `Unexpected token '�', "🧹 Cache c"... is not valid JSON` or similar parsing errors
+
+**Cause**: The MCP server is outputting non-JSON content to stdout, which breaks the JSON-RPC protocol. Console output methods like `console.log()` and `console.debug()` write to stdout, while Claude Desktop expects only valid JSON-RPC messages.
+
+**Solution**:
+
+1. **For TypeScript/Node.js servers**: Replace all `console.log()` and `console.debug()` with `console.error()`:
+
+   ```typescript
+   // ❌ Wrong - writes to stdout, breaks protocol
+   console.log('Server started');
+   console.debug('Cache cleanup');
+
+   // ✅ Correct - writes to stderr
+   console.error('Server started');
+   console.error('Cache cleanup');
+   ```
+
+2. **Check your code**:
+
+   ```bash
+   # Find problematic console statements
+   grep -rn "console\.log\|console\.debug" src/
+   ```
+
+3. **Rebuild and restart**:
+
+   ```bash
+   npm run build
+   # Restart Claude Desktop
+   ```
+
+**Why this happens**:
+- MCP servers use stdio for JSON-RPC communication
+- stdin/stdout = JSON-RPC messages only
+- stderr = logging, debugging, informational output
+- Any non-JSON to stdout breaks the protocol
+
+**Common affected files**:
+- Cache implementations
+- API clients with request logging
+- Startup/initialization scripts
 ## Performance Problems
 
 ### Slow Response Times
