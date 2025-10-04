@@ -2,6 +2,7 @@
 
 A clean, advanced **Model Context Protocol (MCP) server** for Canvas LMS integration with Claude Desktop. This implementation uses Canvas API tokens instead of credentials for a simple, secure, and reliable experience.
 
+[![smithery badge](https://smithery.ai/badge/@a-ariff/canvas-student-mcp)](https://smithery.ai/server/@a-ariff/canvas-student-mcp)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.3+-blue.svg)](https://www.typescriptlang.org/)
 [![Node.js 18+](https://img.shields.io/badge/node.js-18+-green.svg)](https://nodejs.org/)
@@ -29,6 +30,14 @@ A clean, advanced **Model Context Protocol (MCP) server** for Canvas LMS integra
 - **Error Handling** - Comprehensive error management
 - **Configurable** - Extensive customization options
 ## 🚀 Quick Start
+
+### Installing via Smithery
+
+To install canvas-student-mcp automatically via [Smithery](https://smithery.ai/server/@a-ariff/canvas-student-mcp):
+
+```bash
+npx -y @smithery/cli install @a-ariff/canvas-student-mcp
+```
 
 ### 1. Get Your Canvas API Token
 
