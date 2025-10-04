@@ -176,9 +176,10 @@ export default {
 			return MyMCP.serve("/mcp").fetch(request, env, ctx);
 		}
 
-		// Public demo endpoint for ChatGPT (no authentication)
-		if (url.pathname === "/demo") {
-			return MyMCP.serveSSE("/demo").fetch(request, env, ctx);
+		// Public demo endpoint for ChatGPT/Smithery (no authentication)
+		// Smithery expects /mcp endpoint with Streamable HTTP
+		if (url.pathname === "/demo" || url.pathname === "/demo/mcp") {
+			return MyMCP.serve("/demo").fetch(request, env, ctx);
 		}
 
 		return new Response("Not found", { status: 404 });
