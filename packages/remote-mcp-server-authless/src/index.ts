@@ -124,6 +124,27 @@ export default {
 	async fetch(request: Request, env: Env, ctx: ExecutionContext) {
 		const url = new URL(request.url);
 
+		if (url.pathname === "/.well-known/mcp-config") {
+			// Return empty config schema for demo endpoint (no auth required)
+			return new Response(
+				JSON.stringify({
+					"$schema": "http://json-schema.org/draft-07/schema#",
+					"$id": `https://${url.host}/.well-known/mcp-config`,
+					"title": "Canvas MCP Demo Configuration",
+					"description": "Demo endpoint requires no configuration",
+					"type": "object",
+					"properties": {},
+					"additionalProperties": false
+				}),
+				{
+					headers: {
+						"Content-Type": "application/json",
+						"Access-Control-Allow-Origin": "*"
+					}
+				}
+			);
+		}
+
 		if (url.pathname.startsWith("/.well-known/")) {
 			const issuer = env.OAUTH_ISSUER || `https://${url.host}`;
 			return handleWellKnownRequest(request, issuer);
