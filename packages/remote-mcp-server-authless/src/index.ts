@@ -226,6 +226,318 @@ export class MyMCP extends McpAgent<Env> {
 				}
 			}
 		);
+
+		// Get course announcements
+		this.server.tool(
+			"get_announcements",
+			{ course_id: z.number().describe("Canvas course ID") },
+			async ({ course_id }) => {
+				const { canvasApiKey, canvasBaseUrl } = getCanvasConfig();
+				if (!canvasApiKey || !canvasBaseUrl) {
+					return {
+						content: [{ type: "text", text: "Error: Canvas API credentials not configured" }],
+					};
+				}
+
+				try {
+					const response = await fetch(
+						`${canvasBaseUrl}/api/v1/announcements?context_codes[]=course_${course_id}`,
+						{ headers: { "Authorization": `Bearer ${canvasApiKey}` } }
+					);
+					const announcements = await response.json();
+
+					if (announcements.length === 0) {
+						return {
+							content: [{ type: "text", text: "No announcements found" }],
+						};
+					}
+
+					const announcementList = announcements.map((a: any) =>
+						`**${a.title}**\n${a.message}\n_Posted: ${new Date(a.posted_at).toLocaleDateString()}_`
+					).join("\n\n---\n\n");
+
+					return {
+						content: [{ type: "text", text: `**Course Announcements:**\n\n${announcementList}` }],
+					};
+				} catch (error) {
+					return {
+						content: [{ type: "text", text: `Error fetching announcements: ${error}` }],
+					};
+				}
+			}
+		);
+
+		// Get course modules
+		this.server.tool(
+			"get_modules",
+			{ course_id: z.number().describe("Canvas course ID") },
+			async ({ course_id }) => {
+				const { canvasApiKey, canvasBaseUrl } = getCanvasConfig();
+				if (!canvasApiKey || !canvasBaseUrl) {
+					return {
+						content: [{ type: "text", text: "Error: Canvas API credentials not configured" }],
+					};
+				}
+
+				try {
+					const response = await fetch(
+						`${canvasBaseUrl}/api/v1/courses/${course_id}/modules`,
+						{ headers: { "Authorization": `Bearer ${canvasApiKey}` } }
+					);
+					const modules = await response.json();
+
+					if (modules.length === 0) {
+						return {
+							content: [{ type: "text", text: "No modules found" }],
+						};
+					}
+
+					const moduleList = modules.map((m: any) =>
+						`• **${m.name}** (${m.state}) - ${m.items_count || 0} items`
+					).join("\n");
+
+					return {
+						content: [{ type: "text", text: `**Course Modules:**\n\n${moduleList}` }],
+					};
+				} catch (error) {
+					return {
+						content: [{ type: "text", text: `Error fetching modules: ${error}` }],
+					};
+				}
+			}
+		);
+
+		// Get to-do items
+		this.server.tool("get_todo_items", {}, async () => {
+			const { canvasApiKey, canvasBaseUrl } = getCanvasConfig();
+			if (!canvasApiKey || !canvasBaseUrl) {
+				return {
+					content: [{ type: "text", text: "Error: Canvas API credentials not configured" }],
+				};
+			}
+
+			try {
+				const response = await fetch(
+					`${canvasBaseUrl}/api/v1/users/self/todo`,
+					{ headers: { "Authorization": `Bearer ${canvasApiKey}` } }
+				);
+				const todos = await response.json();
+
+				if (todos.length === 0) {
+					return {
+						content: [{ type: "text", text: "No to-do items! 🎉" }],
+					};
+				}
+
+				const todoList = todos.map((t: any) =>
+					`• ${t.assignment?.name || t.quiz?.title || 'Unnamed'} - Due: ${new Date(t.assignment?.due_at || t.quiz?.due_at).toLocaleString()}`
+				).join("\n");
+
+				return {
+					content: [{ type: "text", text: `**Your To-Do Items:**\n\n${todoList}` }],
+				};
+			} catch (error) {
+				return {
+					content: [{ type: "text", text: `Error fetching to-do items: ${error}` }],
+				};
+			}
+		});
+
+		// Get calendar events
+		this.server.tool(
+			"get_calendar_events",
+			{
+				start_date: z.string().optional().describe("Start date (YYYY-MM-DD)"),
+				end_date: z.string().optional().describe("End date (YYYY-MM-DD)")
+			},
+			async ({ start_date, end_date }) => {
+				const { canvasApiKey, canvasBaseUrl } = getCanvasConfig();
+				if (!canvasApiKey || !canvasBaseUrl) {
+					return {
+						content: [{ type: "text", text: "Error: Canvas API credentials not configured" }],
+					};
+				}
+
+				try {
+					let url = `${canvasBaseUrl}/api/v1/calendar_events?per_page=50`;
+					if (start_date) url += `&start_date=${start_date}`;
+					if (end_date) url += `&end_date=${end_date}`;
+
+					const response = await fetch(url, {
+						headers: { "Authorization": `Bearer ${canvasApiKey}` }
+					});
+					const events = await response.json();
+
+					if (events.length === 0) {
+						return {
+							content: [{ type: "text", text: "No calendar events found" }],
+						};
+					}
+
+					const eventList = events.map((e: any) =>
+						`• **${e.title}**\n  ${e.description || 'No description'}\n  ${new Date(e.start_at).toLocaleString()}`
+					).join("\n\n");
+
+					return {
+						content: [{ type: "text", text: `**Calendar Events:**\n\n${eventList}` }],
+					};
+				} catch (error) {
+					return {
+						content: [{ type: "text", text: `Error fetching calendar events: ${error}` }],
+					};
+				}
+			}
+		);
+
+		// Get discussion topics
+		this.server.tool(
+			"get_discussions",
+			{ course_id: z.number().describe("Canvas course ID") },
+			async ({ course_id }) => {
+				const { canvasApiKey, canvasBaseUrl } = getCanvasConfig();
+				if (!canvasApiKey || !canvasBaseUrl) {
+					return {
+						content: [{ type: "text", text: "Error: Canvas API credentials not configured" }],
+					};
+				}
+
+				try {
+					const response = await fetch(
+						`${canvasBaseUrl}/api/v1/courses/${course_id}/discussion_topics`,
+						{ headers: { "Authorization": `Bearer ${canvasApiKey}` } }
+					);
+					const discussions = await response.json();
+
+					if (discussions.length === 0) {
+						return {
+							content: [{ type: "text", text: "No discussions found" }],
+						};
+					}
+
+					const discussionList = discussions.map((d: any) =>
+						`• **${d.title}** - ${d.discussion_subentry_count || 0} replies\n  Posted: ${new Date(d.posted_at).toLocaleDateString()}`
+					).join("\n\n");
+
+					return {
+						content: [{ type: "text", text: `**Discussion Topics:**\n\n${discussionList}` }],
+					};
+				} catch (error) {
+					return {
+						content: [{ type: "text", text: `Error fetching discussions: ${error}` }],
+					};
+				}
+			}
+		);
+
+		// Get quizzes
+		this.server.tool(
+			"get_quizzes",
+			{ course_id: z.number().describe("Canvas course ID") },
+			async ({ course_id }) => {
+				const { canvasApiKey, canvasBaseUrl } = getCanvasConfig();
+				if (!canvasApiKey || !canvasBaseUrl) {
+					return {
+						content: [{ type: "text", text: "Error: Canvas API credentials not configured" }],
+					};
+				}
+
+				try {
+					const response = await fetch(
+						`${canvasBaseUrl}/api/v1/courses/${course_id}/quizzes`,
+						{ headers: { "Authorization": `Bearer ${canvasApiKey}` } }
+					);
+					const quizzes = await response.json();
+
+					if (quizzes.length === 0) {
+						return {
+							content: [{ type: "text", text: "No quizzes found" }],
+						};
+					}
+
+					const quizList = quizzes.map((q: any) =>
+						`• **${q.title}**\n  Points: ${q.points_possible || 'N/A'} | Time Limit: ${q.time_limit || 'None'} mins\n  Due: ${q.due_at ? new Date(q.due_at).toLocaleString() : 'No due date'}`
+					).join("\n\n");
+
+					return {
+						content: [{ type: "text", text: `**Quizzes:**\n\n${quizList}` }],
+					};
+				} catch (error) {
+					return {
+						content: [{ type: "text", text: `Error fetching quizzes: ${error}` }],
+					};
+				}
+			}
+		);
+
+		// Get user profile
+		this.server.tool("get_user_profile", {}, async () => {
+			const { canvasApiKey, canvasBaseUrl } = getCanvasConfig();
+			if (!canvasApiKey || !canvasBaseUrl) {
+				return {
+					content: [{ type: "text", text: "Error: Canvas API credentials not configured" }],
+				};
+			}
+
+			try {
+				const response = await fetch(
+					`${canvasBaseUrl}/api/v1/users/self/profile`,
+					{ headers: { "Authorization": `Bearer ${canvasApiKey}` } }
+				);
+				const profile = await response.json();
+
+				return {
+					content: [{
+						type: "text",
+						text: `**Your Profile:**\n\nName: ${profile.name}\nEmail: ${profile.primary_email || 'N/A'}\nUser ID: ${profile.id}`
+					}],
+				};
+			} catch (error) {
+				return {
+					content: [{ type: "text", text: `Error fetching profile: ${error}` }],
+				};
+			}
+		});
+
+		// Get submission status
+		this.server.tool(
+			"get_submission_status",
+			{
+				course_id: z.number().describe("Canvas course ID"),
+				assignment_id: z.number().describe("Assignment ID")
+			},
+			async ({ course_id, assignment_id }) => {
+				const { canvasApiKey, canvasBaseUrl } = getCanvasConfig();
+				if (!canvasApiKey || !canvasBaseUrl) {
+					return {
+						content: [{ type: "text", text: "Error: Canvas API credentials not configured" }],
+					};
+				}
+
+				try {
+					const response = await fetch(
+						`${canvasBaseUrl}/api/v1/courses/${course_id}/assignments/${assignment_id}/submissions/self`,
+						{ headers: { "Authorization": `Bearer ${canvasApiKey}` } }
+					);
+					const submission = await response.json();
+
+					const status = submission.workflow_state || 'Not submitted';
+					const score = submission.score || 'N/A';
+					const grade = submission.grade || 'N/A';
+					const submittedAt = submission.submitted_at ? new Date(submission.submitted_at).toLocaleString() : 'Not submitted';
+
+					return {
+						content: [{
+							type: "text",
+							text: `**Submission Status:**\n\nStatus: ${status}\nScore: ${score}\nGrade: ${grade}\nSubmitted: ${submittedAt}`
+						}],
+					};
+				} catch (error) {
+					return {
+						content: [{ type: "text", text: `Error fetching submission: ${error}` }],
+					};
+				}
+			}
+		);
 	}
 }
 
