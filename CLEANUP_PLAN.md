@@ -50,6 +50,41 @@ rm packages/remote-mcp-server-authless/smithery.yaml
 
 **Reason**: You mentioned using External MCP deployment instead of GitHub deployment.
 
+### 6. Failed/Old Cloudflare Deployments
+```bash
+# List all deployments
+cd packages/remote-mcp-server-authless
+wrangler deployments list
+
+# Note: Cloudflare keeps deployment history automatically
+# Old deployments don't need manual cleanup - they're just history
+# Current active deployment is the latest one
+```
+
+**Reason**: You have 20+ deployments from testing. These are just history and don't consume resources, but Cloudflare keeps them for rollback purposes.
+
+**Action**: No action needed - Cloudflare manages deployment history automatically. Only the latest deployment is active.
+
+### 7. Wrangler Cache and Artifacts
+```bash
+# Remove local wrangler build cache
+rm -rf packages/remote-mcp-server-authless/.wrangler
+
+# These get regenerated on next deploy
+```
+
+**Reason**: Local build cache from wrangler deployments.
+
+### 8. GitHub Deployment Artifacts (Smithery)
+**Location**: GitHub → Repository → Environments/Deployments
+
+**Manual cleanup via GitHub**:
+1. Go to: https://github.com/a-ariff/canvas-student-mcp-server/deployments
+2. Review failed Smithery deployments
+3. Delete inactive/failed deployment environments
+
+**Note**: GitHub deployments are tied to Smithery attempts. If you're no longer using Smithery GitHub deployment (switched to External MCP), you can clean these up.
+
 ---
 
 ## Packages to Evaluate
@@ -143,18 +178,20 @@ packages/canvas-student-mcp-server/simple_fastmcp_server.py
 1. ✅ Delete `.DS_Store`
 2. ✅ Delete `*.bak` files
 3. ✅ Remove duplicate `claude-desktop-config.json` (keep `claude_desktop_config.example.json`)
-4. ✅ Update `.gitignore`
+4. ✅ Remove `.wrangler` cache directory
+5. ✅ Update `.gitignore`
 
 ### Medium Priority (Verify first)
-5. ⚠️ Evaluate `packages/canvas-student-mcp-smithery/` - is it needed?
-6. ⚠️ Remove Python files (`app.py`, `simple_fastmcp_server.py`) if no longer needed
-7. ⚠️ Remove `test_code_runner.py` if obsolete
-8. ⚠️ Check if `packages/remote-mcp-server-authless/smithery.yaml` is needed
+6. ⚠️ Evaluate `packages/canvas-student-mcp-smithery/` - is it needed?
+7. ⚠️ Remove Python files (`app.py`, `simple_fastmcp_server.py`) if no longer needed
+8. ⚠️ Remove `test_code_runner.py` if obsolete
+9. ⚠️ Check if `packages/remote-mcp-server-authless/smithery.yaml` is needed
+10. 🌐 Clean up failed GitHub/Smithery deployments (manual via GitHub web UI)
 
 ### Low Priority (Document or restructure)
-9. 📝 Add package descriptions to root README
-10. 📝 Document purpose of each package
-11. 📝 Add architecture diagram
+11. 📝 Add package descriptions to root README
+12. 📝 Document purpose of each package
+13. 📝 Add architecture diagram
 
 ---
 
@@ -193,6 +230,7 @@ rm .DS_Store
 rm packages/canvas-student-mcp-server/app.py.bak
 rm packages/canvas-student-mcp-server/src/mcp_server/canvas_mcp.py.bak
 rm claude-desktop-config.json
+rm -rf packages/remote-mcp-server-authless/.wrangler
 
 # Step 3: Review and decide on these
 # ls packages/canvas-student-mcp-smithery/  # Check if needed
@@ -206,6 +244,15 @@ rm claude-desktop-config.json
 git add -A
 git commit -m "chore: Clean up backup files, duplicates, and update .gitignore"
 git push origin main
+
+# Step 6: Clean up GitHub deployments (manual)
+# 1. Go to: https://github.com/a-ariff/canvas-student-mcp-server/deployments
+# 2. Click on each failed/inactive deployment
+# 3. Click "View deployment" → "..." → "Delete environment"
+# 4. OR use GitHub CLI:
+#    gh api repos/a-ariff/canvas-student-mcp-server/deployments | \
+#    jq -r '.[] | select(.environment=="production") | .id' | \
+#    xargs -I {} gh api -X DELETE repos/a-ariff/canvas-student-mcp-server/deployments/{}
 ```
 
 ---
