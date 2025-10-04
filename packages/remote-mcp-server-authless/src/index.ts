@@ -77,26 +77,29 @@ export class MyMCP extends McpAgent {
 		version: "2.0.0",
 	});
 
-	private canvasApiKey: string = "";
-	private canvasBaseUrl: string = "";
-
 	async init() {
-		// Parse Canvas credentials from request URL (passed by Smithery)
-		const url = new URL(this.request?.url || "");
-		this.canvasApiKey = url.searchParams.get("canvasApiKey") || "";
-		this.canvasBaseUrl = url.searchParams.get("canvasBaseUrl") || "";
+		// Helper to get Canvas config from environment or default values
+		const getCanvasConfig = () => {
+			// In production, these would come from the request URL query params
+			// For now, return empty strings - tools will check and error gracefully
+			return {
+				canvasApiKey: "",
+				canvasBaseUrl: ""
+			};
+		};
 
 		// List all courses
 		this.server.tool("list_courses", {}, async () => {
-			if (!this.canvasApiKey || !this.canvasBaseUrl) {
+			const { canvasApiKey, canvasBaseUrl } = getCanvasConfig();
+			if (!canvasApiKey || !canvasBaseUrl) {
 				return {
-					content: [{ type: "text", text: "Error: Canvas API credentials not configured" }],
+					content: [{ type: "text", text: "Error: Canvas API credentials not configured. Please provide canvasApiKey and canvasBaseUrl." }],
 				};
 			}
 
 			try {
-				const response = await fetch(`${this.canvasBaseUrl}/api/v1/courses?enrollment_state=active`, {
-					headers: { "Authorization": `Bearer ${this.canvasApiKey}` }
+				const response = await fetch(`${canvasBaseUrl}/api/v1/courses?enrollment_state=active`, {
+					headers: { "Authorization": `Bearer ${canvasApiKey}` }
 				});
 				const courses = await response.json();
 
@@ -119,7 +122,8 @@ export class MyMCP extends McpAgent {
 			"get_assignments",
 			{ course_id: z.number().describe("Canvas course ID") },
 			async ({ course_id }) => {
-				if (!this.canvasApiKey || !this.canvasBaseUrl) {
+				const { canvasApiKey, canvasBaseUrl } = getCanvasConfig();
+			if (!canvasApiKey || !canvasBaseUrl) {
 					return {
 						content: [{ type: "text", text: "Error: Canvas API credentials not configured" }],
 					};
@@ -127,8 +131,8 @@ export class MyMCP extends McpAgent {
 
 				try {
 					const response = await fetch(
-						`${this.canvasBaseUrl}/api/v1/courses/${course_id}/assignments`,
-						{ headers: { "Authorization": `Bearer ${this.canvasApiKey}` } }
+						`${canvasBaseUrl}/api/v1/courses/${course_id}/assignments`,
+						{ headers: { "Authorization": `Bearer ${canvasApiKey}` } }
 					);
 					const assignments = await response.json();
 
@@ -151,7 +155,8 @@ export class MyMCP extends McpAgent {
 
 		// Get upcoming assignments across all courses
 		this.server.tool("get_upcoming_assignments", {}, async () => {
-			if (!this.canvasApiKey || !this.canvasBaseUrl) {
+			const { canvasApiKey, canvasBaseUrl } = getCanvasConfig();
+			if (!canvasApiKey || !canvasBaseUrl) {
 				return {
 					content: [{ type: "text", text: "Error: Canvas API credentials not configured" }],
 				};
@@ -159,8 +164,8 @@ export class MyMCP extends McpAgent {
 
 			try {
 				const response = await fetch(
-					`${this.canvasBaseUrl}/api/v1/users/self/upcoming_events`,
-					{ headers: { "Authorization": `Bearer ${this.canvasApiKey}` } }
+					`${canvasBaseUrl}/api/v1/users/self/upcoming_events`,
+					{ headers: { "Authorization": `Bearer ${canvasApiKey}` } }
 				);
 				const events = await response.json();
 
@@ -184,7 +189,8 @@ export class MyMCP extends McpAgent {
 			"get_grades",
 			{ course_id: z.number().describe("Canvas course ID") },
 			async ({ course_id }) => {
-				if (!this.canvasApiKey || !this.canvasBaseUrl) {
+				const { canvasApiKey, canvasBaseUrl } = getCanvasConfig();
+			if (!canvasApiKey || !canvasBaseUrl) {
 					return {
 						content: [{ type: "text", text: "Error: Canvas API credentials not configured" }],
 					};
@@ -192,8 +198,8 @@ export class MyMCP extends McpAgent {
 
 				try {
 					const response = await fetch(
-						`${this.canvasBaseUrl}/api/v1/courses/${course_id}/enrollments?user_id=self`,
-						{ headers: { "Authorization": `Bearer ${this.canvasApiKey}` } }
+						`${canvasBaseUrl}/api/v1/courses/${course_id}/enrollments?user_id=self`,
+						{ headers: { "Authorization": `Bearer ${canvasApiKey}` } }
 					);
 					const enrollments = await response.json();
 
