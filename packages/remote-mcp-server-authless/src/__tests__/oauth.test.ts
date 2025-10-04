@@ -1,6 +1,20 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect, beforeEach, beforeAll, vi } from "vitest";
 import { handleWellKnownRequest } from "../well-known";
 import { handleAuthorize, handleToken } from "../oauth-handlers";
+import { registerClient } from "../oauth-config";
+
+interface OAuthMetadata {
+	issuer: string;
+	authorization_endpoint: string;
+	token_endpoint: string;
+	code_challenge_methods_supported: string[];
+	[key: string]: unknown;
+}
+
+interface OAuthErrorResponse {
+	error: string;
+	error_description?: string;
+}
 
 describe("OAuth Endpoints", () => {
 	const mockEnv = {
@@ -15,6 +29,17 @@ describe("OAuth Endpoints", () => {
 		OAUTH_ISSUER: "https://test.example.com",
 		MCP_OBJECT: {} as DurableObjectNamespace,
 	};
+
+	beforeAll(() => {
+		registerClient({
+			client_id: "test",
+			redirect_uris: [
+				"http://localhost/callback",
+			],
+			grant_types: ["authorization_code", "refresh_token"],
+			is_confidential: false,
+		});
+	});
 
 	beforeEach(() => {
 		vi.clearAllMocks();
@@ -36,7 +61,7 @@ describe("OAuth Endpoints", () => {
 				"https://test.example.com/.well-known/oauth-authorization-server"
 			);
 			const response = handleWellKnownRequest(request, "https://test.example.com");
-			const data = await response.json();
+			const data = (await response.json()) as OAuthMetadata;
 
 			expect(data.issuer).toBe("https://test.example.com");
 			expect(data.authorization_endpoint).toBe("https://test.example.com/oauth/authorize");
@@ -58,18 +83,18 @@ describe("OAuth Endpoints", () => {
 			const response = await handleAuthorize(request, mockEnv);
 
 			expect(response.status).toBe(400);
-			const data = await response.json();
+			const data = (await response.json()) as OAuthErrorResponse;
 			expect(data.error).toBe("invalid_request");
 		});
 
 		it("should reject requests without PKCE", async () => {
 			const request = new Request(
-				"https://test.example.com/oauth/authorize?client_id=test&redirect_uri=http://localhost&response_type=code"
+				"https://test.example.com/oauth/authorize?client_id=test&redirect_uri=http://localhost/callback&response_type=code"
 			);
 			const response = await handleAuthorize(request, mockEnv);
 
 			expect(response.status).toBe(400);
-			const data = await response.json();
+			const data = (await response.json()) as OAuthErrorResponse;
 			expect(data.error_description).toContain("PKCE");
 		});
 
@@ -106,8 +131,9 @@ describe("OAuth Endpoints", () => {
 
 			const response = await handleToken(request, mockEnv);
 			expect(response.status).toBe(400);
-			const data = await response.json();
-			expect(data.error).toBe("unsupported_grant_type");
+			const data = (await response.json()) as OAuthErrorResponse;
+			// OAuth spec: unauthorized_client when client not authorized for grant type
+			expect(data.error).toBe("unauthorized_client");
 		});
 
 		it("should require code_verifier for authorization_code grant", async () => {
@@ -118,6 +144,7 @@ describe("OAuth Endpoints", () => {
 					grant_type: "authorization_code",
 					code: "test123",
 					client_id: "test",
+					redirect_uri: "http://localhost/callback",
 				}),
 			});
 

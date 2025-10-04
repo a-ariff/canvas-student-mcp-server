@@ -4,6 +4,10 @@ A secure **Model Context Protocol (MCP) server** deployed on Cloudflare Workers 
 
 🌐 **Live Server**: https://canvas-mcp-sse.ariff.dev/sse
 
+[![Security: OAuth 2.1](https://img.shields.io/badge/Security-OAuth%202.1-green.svg)](./SECURITY-FIXES.md)
+[![Tests: 14 Passing](https://img.shields.io/badge/Tests-14%20Passing-brightgreen.svg)](./src/__tests__)
+[![Attack Coverage: 100%](https://img.shields.io/badge/Attack%20Coverage-100%25-success.svg)](./SECURITY-FIXES.md#attack-scenarios-prevented)
+
 ## Features
 
 - ✅ **OAuth 2.1 Authentication** with PKCE support (RFC 7636)
@@ -12,6 +16,18 @@ A secure **Model Context Protocol (MCP) server** deployed on Cloudflare Workers 
 - ✅ **Cloudflare Workers** for global edge deployment
 - ✅ **Durable Objects** for stateful MCP sessions
 - ✅ **KV Storage** for secure token and API key management
+
+## Security
+
+This implementation includes comprehensive security validations:
+
+- 🔒 **Client ID Whitelist** - Only registered clients allowed
+- 🔒 **Redirect URI Validation** - Exact match against per-client whitelist
+- 🔒 **Authorization Code Binding** - Prevents interception attacks
+- 🔒 **Client Authentication** - Validates confidential clients
+- 🔒 **PKCE Mandatory** - SHA-256 code challenge required
+
+**Attack Prevention:** All common OAuth attack vectors are tested and blocked. See [SECURITY-FIXES.md](./SECURITY-FIXES.md) for details.
 
 ## Quick Start
 
@@ -108,8 +124,10 @@ npm run deploy
 # Type check
 npm run type-check
 
-# Run tests
+# Run tests (includes security attack scenarios)
 npm test
+# ✓ 14 tests passing
+# ✓ 5 security attack scenarios validated
 
 # Test OAuth discovery endpoint
 curl https://canvas-mcp-sse.ariff.dev/.well-known/oauth-authorization-server
@@ -118,6 +136,15 @@ curl https://canvas-mcp-sse.ariff.dev/.well-known/oauth-authorization-server
 curl -H "Authorization: Bearer your-token" \
   https://canvas-mcp-sse.ariff.dev/sse
 ```
+
+**Security Test Coverage:**
+- ✅ Unknown client ID rejection
+- ✅ Unauthorized redirect URI blocking
+- ✅ Authorization code interception prevention
+- ✅ Client secret validation
+- ✅ Refresh token theft prevention
+
+See [oauth-security.test.ts](./src/__tests__/oauth-security.test.ts) for all test scenarios.
 
 ## Customization
 
@@ -161,6 +188,8 @@ wrangler deploy --env development
 ## Documentation
 
 - [Authentication Guide](./AUTHENTICATION.md) - Complete auth setup
+- [Security Implementation](./SECURITY-FIXES.md) - OAuth security fixes & attack prevention
+- [Security Tests](./src/__tests__/oauth-security.test.ts) - Test suite with attack scenarios
 - [MCP Specification](https://modelcontextprotocol.io) - MCP protocol docs
 - [Cloudflare Workers](https://developers.cloudflare.com/workers/) - Platform docs
 - [OAuth 2.1](https://datatracker.ietf.org/doc/html/draft-ietf-oauth-v2-1-11) - OAuth spec

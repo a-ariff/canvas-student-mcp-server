@@ -1,7 +1,15 @@
 /**
  * OAuth 2.1 Authorization and Token Handlers
- * Implements PKCE flow for MCP authentication
+ * Implements PKCE flow for MCP authentication with security validations
  */
+
+import type { OAuthClient } from "./oauth-config";
+import {
+	validateClientId,
+	validateRedirectUri,
+	validateGrantType,
+	validateClientAuthentication,
+} from "./oauth-config";
 
 interface AuthorizationRequest {
 	client_id: string;
@@ -20,6 +28,7 @@ interface TokenRequest {
 	code_verifier?: string;
 	refresh_token?: string;
 	client_id: string;
+	client_secret?: string;
 }
 
 export async function handleAuthorize(
@@ -41,7 +50,24 @@ export async function handleAuthorize(
 
 	// Validate required parameters
 	if (!authReq.client_id || !authReq.redirect_uri || authReq.response_type !== "code") {
-		return new Response(JSON.stringify({ error: "invalid_request" }), {
+		return new Response(JSON.stringify({ error: "invalid_request", error_description: "Missing required parameters" }), {
+			status: 400,
+			headers: { "Content-Type": "application/json" },
+		});
+	}
+
+	// SECURITY: Validate client_id against whitelist
+	const client = validateClientId(authReq.client_id);
+	if (!client) {
+		return new Response(JSON.stringify({ error: "invalid_client", error_description: "Unknown client_id" }), {
+			status: 401,
+			headers: { "Content-Type": "application/json" },
+		});
+	}
+
+	// SECURITY: Validate redirect_uri against client's whitelist
+	if (!validateRedirectUri(client, authReq.redirect_uri)) {
+		return new Response(JSON.stringify({ error: "invalid_request", error_description: "Invalid redirect_uri for this client" }), {
 			status: 400,
 			headers: { "Content-Type": "application/json" },
 		});
@@ -50,6 +76,13 @@ export async function handleAuthorize(
 	// Validate PKCE
 	if (!authReq.code_challenge || authReq.code_challenge_method !== "S256") {
 		return new Response(JSON.stringify({ error: "invalid_request", error_description: "PKCE required" }), {
+			status: 400,
+			headers: { "Content-Type": "application/json" },
+		});
+	}
+
+	if (!validateGrantType(client, "authorization_code")) {
+		return new Response(JSON.stringify({ error: "unauthorized_client" }), {
 			status: 400,
 			headers: { "Content-Type": "application/json" },
 		});
@@ -99,17 +132,69 @@ export async function handleToken(
 			code_verifier: formData.get("code_verifier") as string || undefined,
 			refresh_token: formData.get("refresh_token") as string || undefined,
 			client_id: formData.get("client_id") as string,
+			client_secret: formData.get("client_secret") as string || undefined,
 		};
 	} else {
 		tokenReq = await request.json();
 	}
 
+	if (!tokenReq.client_id) {
+		return new Response(
+			JSON.stringify({ error: "invalid_request", error_description: "Missing client_id" }),
+			{
+				status: 400,
+				headers: { "Content-Type": "application/json" },
+			}
+		);
+	}
+
+	if (!tokenReq.grant_type) {
+		return new Response(
+			JSON.stringify({ error: "invalid_request", error_description: "Missing grant_type" }),
+			{
+				status: 400,
+				headers: { "Content-Type": "application/json" },
+			}
+		);
+	}
+
+	const client = validateClientId(tokenReq.client_id);
+	if (!client) {
+		return new Response(
+			JSON.stringify({ error: "invalid_client", error_description: "Unknown client_id" }),
+			{
+				status: 401,
+				headers: { "Content-Type": "application/json" },
+			}
+		);
+	}
+
+	if (!validateClientAuthentication(client, tokenReq.client_secret)) {
+		return new Response(
+			JSON.stringify({ error: "invalid_client", error_description: "Client authentication failed" }),
+			{
+				status: 401,
+				headers: { "Content-Type": "application/json" },
+			}
+		);
+	}
+
+	if (!validateGrantType(client, tokenReq.grant_type)) {
+		return new Response(
+			JSON.stringify({ error: "unauthorized_client" }),
+			{
+				status: 400,
+				headers: { "Content-Type": "application/json" },
+			}
+		);
+	}
+
 	if (tokenReq.grant_type === "authorization_code") {
-		return await handleAuthorizationCodeGrant(tokenReq, env);
+		return await handleAuthorizationCodeGrant(tokenReq, env, client);
 	}
 
 	if (tokenReq.grant_type === "refresh_token") {
-		return await handleRefreshTokenGrant(tokenReq, env);
+		return await handleRefreshTokenGrant(tokenReq, env, client);
 	}
 
 	return new Response(JSON.stringify({ error: "unsupported_grant_type" }), {
@@ -120,10 +205,11 @@ export async function handleToken(
 
 async function handleAuthorizationCodeGrant(
 	tokenReq: TokenRequest,
-	env: { OAUTH_KV: KVNamespace }
+	env: { OAUTH_KV: KVNamespace },
+	client: OAuthClient
 ): Promise<Response> {
-	if (!tokenReq.code || !tokenReq.code_verifier) {
-		return new Response(JSON.stringify({ error: "invalid_request" }), {
+	if (!tokenReq.code || !tokenReq.code_verifier || !tokenReq.redirect_uri) {
+		return new Response(JSON.stringify({ error: "invalid_request", error_description: "Missing required parameters" }), {
 			status: 400,
 			headers: { "Content-Type": "application/json" },
 		});
@@ -132,13 +218,39 @@ async function handleAuthorizationCodeGrant(
 	// Retrieve authorization code
 	const authCodeData = await env.OAUTH_KV.get(`auth_code:${tokenReq.code}`);
 	if (!authCodeData) {
-		return new Response(JSON.stringify({ error: "invalid_grant" }), {
+		return new Response(JSON.stringify({ error: "invalid_grant", error_description: "Invalid or expired authorization code" }), {
 			status: 400,
 			headers: { "Content-Type": "application/json" },
 		});
 	}
 
 	const authCode = JSON.parse(authCodeData);
+
+	// SECURITY: Verify client_id matches
+	if (authCode.client_id !== tokenReq.client_id) {
+		return new Response(JSON.stringify({ error: "invalid_grant", error_description: "Client mismatch" }), {
+			status: 400,
+			headers: { "Content-Type": "application/json" },
+		});
+	}
+
+	// SECURITY: Verify redirect_uri matches exactly
+	if (authCode.redirect_uri !== tokenReq.redirect_uri) {
+		return new Response(JSON.stringify({ error: "invalid_grant", error_description: "Redirect URI mismatch" }), {
+			status: 400,
+			headers: { "Content-Type": "application/json" },
+		});
+	}
+
+	if (!validateRedirectUri(client, tokenReq.redirect_uri)) {
+		return new Response(
+			JSON.stringify({ error: "invalid_grant", error_description: "Redirect URI no longer allowed" }),
+			{
+				status: 400,
+				headers: { "Content-Type": "application/json" },
+			}
+		);
+	}
 
 	// Verify PKCE challenge
 	const isValid = await verifyPKCE(tokenReq.code_verifier, authCode.code_challenge);
@@ -157,6 +269,7 @@ async function handleAuthorizationCodeGrant(
 	const refreshToken = `mcp_rt_${crypto.randomUUID()}`;
 
 	const tokenData = {
+		client_id: authCode.client_id,
 		user_id: authCode.user_id,
 		scope: authCode.scope,
 		issued_at: Date.now(),
@@ -187,7 +300,8 @@ async function handleAuthorizationCodeGrant(
 
 async function handleRefreshTokenGrant(
 	tokenReq: TokenRequest,
-	env: { OAUTH_KV: KVNamespace }
+	env: { OAUTH_KV: KVNamespace },
+	client: OAuthClient
 ): Promise<Response> {
 	if (!tokenReq.refresh_token) {
 		return new Response(JSON.stringify({ error: "invalid_request" }), {
@@ -205,6 +319,16 @@ async function handleRefreshTokenGrant(
 	}
 
 	const tokenData = JSON.parse(refreshData);
+
+	if (tokenData.client_id !== client.client_id) {
+		return new Response(
+			JSON.stringify({ error: "invalid_grant", error_description: "Client mismatch" }),
+			{
+				status: 400,
+				headers: { "Content-Type": "application/json" },
+			}
+		);
+	}
 
 	// Generate new access token
 	const accessToken = `mcp_at_${crypto.randomUUID()}`;

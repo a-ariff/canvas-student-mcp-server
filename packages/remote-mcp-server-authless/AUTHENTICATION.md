@@ -74,15 +74,49 @@ The server implements the full OAuth 2.1 specification:
 - **Authorization**: `/oauth/authorize`
 - **Token**: `/oauth/token`
 
+### OAuth Client Configuration
+
+Clients must be pre-registered with allowed redirect URIs. Default configuration in `src/oauth-config.ts`:
+
+```typescript
+{
+  client_id: 'canvas-mcp-client',
+  redirect_uris: [
+    'http://localhost:3000/callback',
+    'http://localhost:3000/oauth/callback',
+    'https://localhost:3000/callback',
+    'https://localhost:3000/oauth/callback',
+  ],
+  grant_types: ['authorization_code', 'refresh_token'],
+  is_confidential: false, // Public client using PKCE
+}
+```
+
+**Adding New Clients:**
+
+Edit `src/oauth-config.ts` and add to the `OAUTH_CLIENTS` object:
+
+```typescript
+'your-client-id': {
+  client_id: 'your-client-id',
+  client_secret: 'secret123', // Only for confidential clients
+  redirect_uris: ['https://your-app.com/callback'],
+  grant_types: ['authorization_code', 'refresh_token'],
+  is_confidential: true, // Requires client_secret
+}
+```
+
 ### OAuth Flow
 
 1. Client requests `/.well-known/oauth-authorization-server`
 2. Server returns metadata with authorization/token endpoints
 3. Client initiates authorization with PKCE challenge
-4. User authenticates via browser
-5. Server returns authorization code
-6. Client exchanges code for access token (with PKCE verifier)
-7. Client uses Bearer token for MCP requests
+4. **Server validates client_id and redirect_uri against whitelist**
+5. User authenticates via browser
+6. Server returns authorization code
+7. Client exchanges code for access token (with PKCE verifier)
+8. **Server validates redirect_uri matches and client is authenticated**
+9. Client uses Bearer token for MCP requests
 
 ## Method 2: API Keys
 
@@ -203,13 +237,29 @@ Should return:
 
 ## Security Considerations
 
-### OAuth 2.1 Features
+### OAuth 2.1 Security Features
 
+#### Client Validation
+- **Client ID Whitelist**: Only registered clients can request authorization codes
+- **Redirect URI Whitelist**: Each client has a strict whitelist of allowed redirect URIs
+- **Exact URI Matching**: No partial matches or wildcards - redirect URIs must match exactly
+- **Client Authentication**: Confidential clients must provide valid client_secret
+
+#### PKCE Protection
 - **PKCE Mandatory**: All authorization flows require PKCE (Proof Key for Code Exchange)
+- **SHA-256 Required**: Only S256 code challenge method accepted (no plain text)
+- **Verifier Validation**: Code verifier must match the original challenge
+
+#### Token Security
 - **Short-lived Tokens**: Access tokens expire after 1 hour
 - **Refresh Tokens**: Support for long-lived refresh tokens (30 days)
+- **One-time Codes**: Authorization codes deleted after first use
+- **Redirect URI Binding**: Token endpoint validates redirect_uri matches authorization
+
+#### Additional Protections
 - **HTTPS Only**: All endpoints require HTTPS
 - **State Parameter**: CSRF protection via state parameter
+- **Client Binding**: Authorization codes bound to specific client_id
 
 ### API Key Best Practices
 
