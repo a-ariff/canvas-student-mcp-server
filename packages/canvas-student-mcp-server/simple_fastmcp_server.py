@@ -35,11 +35,11 @@ async def authenticate_student(username: str, password: str) -> str:
     global canvas_client, session_data
 
     try:
-        # Initialize Canvas client with your college URL
-        canvas_client = CanvasClient(canvas_url="https://learn.mywhitecliffe.com")
+        # Initialize Canvas client with your institution URL
+        canvas_client = CanvasClient(canvas_url="https://canvas.instructure.com")
 
         # Log the attempt (without password for security)
-        print(f"Attempting authentication for {username} to https://learn.mywhitecliffe.com", file=sys.stderr)
+        print(f"Attempting authentication for {username} to Canvas", file=sys.stderr)
 
         success = await canvas_client.authenticate(username, password)
 
@@ -47,10 +47,10 @@ async def authenticate_student(username: str, password: str) -> str:
             session_data["authenticated"] = True
             session_data["username"] = username
             print(f"✅ Authentication successful for {username}", file=sys.stderr)
-            return f"✅ Successfully authenticated as {username}! Connected to Whitecliffe Canvas. You can now access your courses."
+            return f"✅ Successfully authenticated as {username}! Connected to Canvas. You can now access your courses."
         else:
             print(f"❌ Authentication failed for {username}", file=sys.stderr)
-            return "❌ Authentication failed. Please check your username and password for Whitecliffe Canvas. Make sure you can log in to https://learn.mywhitecliffe.com manually first."
+            return "❌ Authentication failed. Please check your username and password. Make sure you can log in to your Canvas instance manually first."
 
     except Exception as e:
         print(f"❌ Authentication exception: {str(e)}", file=sys.stderr)
@@ -68,14 +68,14 @@ async def get_student_courses() -> str:
         courses = await canvas_client.list_courses()
 
         if not courses:
-            return "📋 No courses found in your Whitecliffe Canvas account."
+            return "📋 No courses found in your Canvas account."
 
         course_list = "\n".join([
             f"📚 {course['name']} ({course.get('course_code', course.get('code', 'N/A'))}) - ID: {course['id']}"
             for course in courses
         ])
 
-        return f"📋 Your Whitecliffe Canvas Courses ({len(courses)} total):\n\n{course_list}"
+        return f"📋 Your Canvas Courses ({len(courses)} total):\n\n{course_list}"
 
     except Exception as e:
         return f"❌ Error fetching courses: {str(e)}"

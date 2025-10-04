@@ -340,7 +340,7 @@
                         placeholder="https://your-school.instructure.com"
                         required
                     >
-                    <small>Your institution's Canvas URL (e.g., https://learn.mywhitecliffe.com)</small>
+                    <small>Your institution's Canvas URL (e.g., https://university.instructure.com)</small>
                 </div>
 
                 <div class="form-group">
@@ -608,9 +608,7 @@ curl -X POST https://canvas-api.yourdomain.com/canvas/YOUR_USER_ID \
 
             // Auto-suggest institution name based on URL
             const institutionField = document.getElementById('institutionName');
-            if (value.includes('mywhitecliffe.com')) {
-                institutionField.value = 'Whitecliffe College';
-            } else if (value.includes('.instructure.com')) {
+            if (value.includes('.instructure.com')) {
                 const subdomain = value.split('.')[0].replace('https://', '');
                 institutionField.value = subdomain.charAt(0).toUpperCase() + subdomain.slice(1);
             }

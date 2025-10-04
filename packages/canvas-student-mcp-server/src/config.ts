@@ -10,7 +10,7 @@ dotenv.config();
 const ConfigSchema = z.object({
   // Core Canvas Settings
   canvasApiKey: z.string().min(1, 'Canvas API key is required'),
-  canvasBaseUrl: z.string().url().default('https://learn.mywhitecliffe.com'),
+  canvasBaseUrl: z.string().url().default('https://canvas.instructure.com'),
 
   // Server Settings
   debug: z.boolean().default(false),

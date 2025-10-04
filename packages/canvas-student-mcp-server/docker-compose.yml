@@ -7,7 +7,7 @@ services:
     environment:
       - NODE_ENV=${NODE_ENV:-production}
       - CANVAS_API_KEY=${CANVAS_API_KEY}
-      - CANVAS_BASE_URL=${CANVAS_BASE_URL:-https://learn.mywhitecliffe.com}
+      - CANVAS_BASE_URL=${CANVAS_BASE_URL:-https://canvas.instructure.com}
       - DEBUG=${DEBUG:-false}
       - ENABLE_CACHE=${ENABLE_CACHE:-true}
       - CACHE_EXPIRATION_MINUTES=${CACHE_EXPIRATION_MINUTES:-60}

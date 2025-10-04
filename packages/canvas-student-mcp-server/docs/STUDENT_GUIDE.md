@@ -77,9 +77,9 @@ Your Canvas URL is usually:
 - `https://lms.[schoolname].edu`
 
 **Examples:**
-- Whitecliffe: `https://learn.mywhitecliffe.com`
-- University of Auckland: `https://canvas.auckland.ac.nz`
+- Example University: `https://university.instructure.com`
 - MIT: `https://canvas.mit.edu`
+- Stanford: `https://canvas.stanford.edu`
 
 **Don't know your URL?** Check your browser when you log into Canvas normally!
 

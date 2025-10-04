@@ -3,11 +3,11 @@
     "canvas-student": {
       "command": "node",
       "args": [
-        "/Users/ariff/canvas-student-mcp-server/canvas-student-mcp-server/packages/canvas-student-mcp-server/dist/index.js"
+        "/absolute/path/to/canvas-student-mcp-server/packages/canvas-student-mcp-server/dist/index.js"
       ],
       "env": {
-        "CANVAS_API_KEY": "your_token_here",
-        "CANVAS_BASE_URL": "https://learn.mywhitecliffe.com"
+        "CANVAS_API_KEY": "your_canvas_api_token_here",
+        "CANVAS_BASE_URL": "https://your-institution.instructure.com"
       }
     }
   }

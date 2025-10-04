@@ -28,9 +28,9 @@ Register your Canvas credentials and get a user ID.
 curl -X POST https://canvas-mcp.ariff.dev/auth \
   -H "Content-Type: application/json" \
   -d '{
-    "canvasUrl": "https://learn.mywhitecliffe.com",
-    "apiKey": "19765~your_canvas_api_token",
-    "institutionName": "Whitecliffe College"
+    "canvasUrl": "https://your-institution.instructure.com",
+    "apiKey": "YOUR_CANVAS_API_TOKEN",
+    "institutionName": "Your Institution"
   }'
 ```
 
@@ -362,7 +362,7 @@ API available at: `http://localhost:8787`
 curl -X POST http://localhost:8787/auth \
   -H "Content-Type: application/json" \
   -d '{
-    "canvasUrl": "https://learn.mywhitecliffe.com",
+    "canvasUrl": "https://your-institution.instructure.com",
     "apiKey": "your_token",
     "institutionName": "Test"
   }'
@@ -375,10 +375,10 @@ curl http://localhost:8787/health
 
 **Build and run**:
 ```bash
-cd /Users/ariff/canvas-student-mcp-server/packages/canvas-student-mcp-server
+cd /path/to/canvas-student-mcp-server/packages/canvas-student-mcp-server
 docker build -t canvas-mcp-server .
 docker run -e CANVAS_API_KEY=your_token \
-  -e CANVAS_BASE_URL=https://learn.mywhitecliffe.com \
+  -e CANVAS_BASE_URL=https://canvas.instructure.com \
   canvas-mcp-server
 ```
 
@@ -386,7 +386,7 @@ docker run -e CANVAS_API_KEY=your_token \
 ```bash
 # Create .env file with your credentials
 echo "CANVAS_API_KEY=your_token" > .env
-echo "CANVAS_BASE_URL=https://learn.mywhitecliffe.com" >> .env
+echo "CANVAS_BASE_URL=https://canvas.instructure.com" >> .env
 
 # Start container
 docker-compose up -d
