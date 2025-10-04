@@ -13,8 +13,30 @@ remote:
     type: oauth2
     discovery_url: https://canvas-mcp-sse.ariff.dev/.well-known/oauth-authorization-server
 
+# Configuration schema is now exported from src/index.ts
+# Smithery will automatically read the configSchema export
+
 tools:
-  - name: add
-    description: Add two numbers
-  - name: calculate
-    description: Perform basic arithmetic operations (add, subtract, multiply, divide)
+  - name: list_courses
+    description: Get all active Canvas courses
+  - name: get_course_assignments
+    description: Get assignments for a specific course
+  - name: get_upcoming_events
+    description: Get upcoming calendar events
+  - name: get_grades
+    description: Get current grades for a course
+  - name: get_announcements
+    description: Get course announcements
+  - name: get_modules
+    description: Get course modules and structure
+  - name: get_todos
+    description: Get pending to-do items
+  - name: get_calendar
+    description: Get calendar events for date range
+  - name: get_discussions
+    description: Get course discussion topics
+  - name: get_quizzes
+    description: Get quizzes for a course
+  - name: get_profile
+    description: Get user profile information
+

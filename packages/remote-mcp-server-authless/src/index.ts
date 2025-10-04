@@ -5,6 +5,14 @@ import { handleWellKnownRequest } from "./well-known";
 import { handleAuthorize, handleToken } from "./oauth-handlers";
 import type { AuthContext } from "./types";
 
+// Configuration schema for Smithery
+export const configSchema = z.object({
+	canvasApiKey: z.string().describe("Your Canvas API access token (Get from Canvas → Account → Settings → Approved Integrations)"),
+	canvasBaseUrl: z.string().url().default("https://canvas.instructure.com").describe("Your Canvas instance URL (e.g., https://canvas.instructure.com)"),
+});
+
+export type Config = z.infer<typeof configSchema>;
+
 interface Env {
 	OAUTH_KV: KVNamespace;
 	API_KEYS_KV: KVNamespace;
