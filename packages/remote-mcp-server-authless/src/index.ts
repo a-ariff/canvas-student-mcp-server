@@ -125,15 +125,29 @@ export default {
 		const url = new URL(request.url);
 
 		if (url.pathname === "/.well-known/mcp-config") {
-			// Return empty config schema for demo endpoint (no auth required)
+			// Configuration schema for Canvas API credentials
 			return new Response(
 				JSON.stringify({
 					"$schema": "http://json-schema.org/draft-07/schema#",
 					"$id": `https://${url.host}/.well-known/mcp-config`,
-					"title": "Canvas MCP Demo Configuration",
-					"description": "Demo endpoint requires no configuration",
+					"title": "Canvas LMS Configuration",
+					"description": "Configuration for connecting to Canvas LMS",
+					"x-query-style": "dot+bracket",
 					"type": "object",
-					"properties": {},
+					"properties": {
+						"canvasApiKey": {
+							"type": "string",
+							"title": "Canvas API Token",
+							"description": "Your Canvas API access token (Get from Canvas → Account → Settings → Approved Integrations)"
+						},
+						"canvasBaseUrl": {
+							"type": "string",
+							"title": "Canvas Base URL",
+							"description": "Your Canvas instance URL (e.g., https://canvas.instructure.com)",
+							"default": "https://canvas.instructure.com"
+						}
+					},
+					"required": ["canvasApiKey", "canvasBaseUrl"],
 					"additionalProperties": false
 				}),
 				{
