@@ -9,6 +9,9 @@ import type { AuthContext } from "./types";
 export const configSchema = z.object({
 	canvasApiKey: z.string().describe("Your Canvas API access token (Get from Canvas → Account → Settings → Approved Integrations)"),
 	canvasBaseUrl: z.string().url().default("https://canvas.instructure.com").describe("Your Canvas instance URL (e.g., https://canvas.instructure.com)"),
+	debug: z.boolean().optional().default(false).describe("Enable debug logging"),
+	gradescopeEmail: z.string().email().optional().describe("Your Gradescope email address"),
+	gradescopePassword: z.string().optional().describe("Your Gradescope password"),
 });
 
 export type Config = z.infer<typeof configSchema>;
