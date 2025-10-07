@@ -1,4 +1,4 @@
-# Canvas Student MCP Server# Canvas Student MCP Server# Canvas Student MCP Server
+# Canvas Student MCP Server# Canvas Student MCP Server# Canvas Student MCP Server# Canvas Student MCP Server
 
 
 
@@ -6,313 +6,629 @@ A production-ready Model Context Protocol (MCP) server for Canvas LMS, deployed 
 
 
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)A production-ready Model Context Protocol (MCP) server for Canvas LMS, deployed on Cloudflare Workers with OAuth 2.1 authentication.A production-ready Model Context Protocol (MCP) server for Canvas LMS, deployed on Cloudflare Workers with OAuth 2.1 authentication.
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)A production-ready Model Context Protocol (MCP) server for Canvas LMS, deployed on Cloudflare Workers with OAuth 2.1 authentication.
 
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.6+-blue.svg)](https://www.typescriptlang.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.9+-blue.svg)](https://www.typescriptlang.org/)
 
 [![Cloudflare Workers](https://img.shields.io/badge/Cloudflare-Workers-orange.svg)](https://workers.cloudflare.com/)
 
 [![MCP Compatible](https://img.shields.io/badge/MCP-Compatible-purple.svg)](https://modelcontextprotocol.io/)
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![GitHub Stars](https://img.shields.io/github/stars/a-ariff/canvas-student-mcp-server?style=social)](https://github.com/a-ariff/canvas-student-mcp-server)[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)A production-ready Model Context Protocol (MCP) server for Canvas LMS, deployed on Cloudflare Workers with OAuth 2.1 authentication.A production-ready Model Context Protocol (MCP) server for Canvas LMS, deployed on Cloudflare Workers with OAuth 2.1 authentication.
+
+[![Status](https://img.shields.io/website?url=https%3A%2F%2Fcanvas-mcp-sse.ariff.dev%2Fhealth&label=server)](https://canvas-mcp-sse.ariff.dev/health)
+
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.6+-blue.svg)](https://www.typescriptlang.org/)
 
 ## 🚀 Live Server
 
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.6+-blue.svg)](https://www.typescriptlang.org/)[![TypeScript](https://img.shields.io/badge/TypeScript-5.6+-blue.svg)](https://www.typescriptlang.org/)
+[![Cloudflare Workers](https://img.shields.io/badge/Cloudflare-Workers-orange.svg)](https://workers.cloudflare.com/)
 
-**Production URL:** https://canvas-mcp-sse.ariff.dev
+**Production URL:** <https://canvas-mcp-sse.ariff.dev>
 
-[![Cloudflare Workers](https://img.shields.io/badge/Cloudflare-Workers-orange.svg)](https://workers.cloudflare.com/)[![Cloudflare Workers](https://img.shields.io/badge/Cloudflare-Workers-orange.svg)](https://workers.cloudflare.com/)
+[![MCP Compatible](https://img.shields.io/badge/MCP-Compatible-purple.svg)](https://modelcontextprotocol.io/)
 
 **Available Endpoints:**
 
-- `/sse` - OAuth 2.1 authenticated SSE transport (recommended)[![MCP Compatible](https://img.shields.io/badge/MCP-Compatible-purple.svg)](https://modelcontextprotocol.io/)[![MCP Compatible](https://img.shields.io/badge/MCP-Compatible-purple.svg)](https://modelcontextprotocol.io/)
+- `/sse` - OAuth 2.1 authenticated SSE transport (recommended)[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 - `/mcp` - MCP endpoint with API key or OAuth
 
-- `/public` - Public endpoint (config via query params)
+- `/public` - Public endpoint (config via query params)## 🚀 Live Server
 
 - `/.well-known/oauth-authorization-server` - OAuth discovery
 
-- `/health` - Health check endpoint## 🚀 Live Server## 🚀 Live Server
+- `/health` - Health check endpoint[![TypeScript](https://img.shields.io/badge/TypeScript-5.6+-blue.svg)](https://www.typescriptlang.org/)[![TypeScript](https://img.shields.io/badge/TypeScript-5.6+-blue.svg)](https://www.typescriptlang.org/)
 
 
 
-## ✨ Features
+## ✨ Features**Production URL:** https://canvas-mcp-sse.ariff.dev
 
 
 
-### 🎓 Canvas Integration (12 Tools)Production URL: <https://canvas-mcp-sse.ariff.dev>**Production URL:** https://canvas-mcp-sse.ariff.dev
+### 🎓 Canvas Integration (12 Tools)[![Cloudflare Workers](https://img.shields.io/badge/Cloudflare-Workers-orange.svg)](https://workers.cloudflare.com/)[![Cloudflare Workers](https://img.shields.io/badge/Cloudflare-Workers-orange.svg)](https://workers.cloudflare.com/)
 
 - **Course Management** - List courses, modules, and user profiles
 
-- **Assignment Tools** - Get assignments, grades, submissions, and todos
+- **Assignment Tools** - Get assignments, grades, submissions, and todos**Available Endpoints:**
 
 - **Communication** - Access announcements, discussions, and calendar events
 
-- **Quiz Tools** - View quiz information and resultsAvailable Endpoints:**Available Endpoints:**
+- **Quiz Tools** - View quiz information and results- `/sse` - OAuth 2.1 authenticated SSE transport (recommended)[![MCP Compatible](https://img.shields.io/badge/MCP-Compatible-purple.svg)](https://modelcontextprotocol.io/)[![MCP Compatible](https://img.shields.io/badge/MCP-Compatible-purple.svg)](https://modelcontextprotocol.io/)
 
 - **Upcoming Tracking** - See all upcoming assignments across courses
 
-- `/sse` - OAuth 2.1 authenticated SSE transport (recommended)
+- `/mcp` - MCP endpoint with API key or OAuth
 
 ### 🔐 Security
 
-- **OAuth 2.1 with PKCE** - Secure authorization flow- `/sse` - OAuth 2.1 authenticated SSE transport (recommended)- `/mcp` - MCP endpoint with API key or OAuth
+- **OAuth 2.1 with PKCE** - Secure authorization flow- `/public` - Public endpoint (config via query params)
 
 - **Client Whitelist** - Restricted access control
 
-- **Secure Token Storage** - Durable Objects for session management- `/mcp` - MCP endpoint with API key or OAuth- `/public` - Public endpoint (config via query params)
+- **Secure Token Storage** - Durable Objects for session management- `/.well-known/oauth-authorization-server` - OAuth discovery
 
 - **Rate Limiting** - API protection
 
-- **CORS Protection** - Cross-origin security- `/public` - Public endpoint (config via query params)- `/.well-known/oauth-authorization-server` - OAuth discovery
+- **CORS Protection** - Cross-origin security- `/health` - Health check endpoint## 🚀 Live Server## 🚀 Live Server
 
 
 
-### ⚡ Performance- `/.well-known/oauth-authorization-server` - OAuth discovery- `/health` - Health check endpoint
+### ⚡ Performance
 
 - **Edge Deployment** - Low latency via Cloudflare Workers
 
-- **<100ms Response** - Fast API responses- `/health` - Health check endpoint
+- **<100ms Response** - Fast API responses## ✨ Features
 
 - **99.9% Uptime** - Production-grade reliability
 
-- **Global Distribution** - Deployed to multiple regions## ✨ Features
+- **Global Distribution** - Deployed to multiple regions
 
 
 
-## 📦 Repository Structure## ✨ Features
+## 📦 Repository Structure### 🎓 Canvas Integration (12 Tools)Production URL: <https://canvas-mcp-sse.ariff.dev>**Production URL:** https://canvas-mcp-sse.ariff.dev
 
 
 
-```### 🎓 Canvas Integration (12 Tools)
-
-canvas-student-mcp-server/
-
-├── README.md                       # This file### Canvas Integration (12 Tools)- **Course Management** - List courses, modules, and user profiles
-
-├── package.json                    # Workspace configuration
-
-└── packages/- **Assignment Tools** - Get assignments, grades, submissions, and todos
-
-    ├── remote-mcp-server-authless/ # Main MCP Server with OAuth 2.1
-
-    │   ├── src/- **Course Management** - List courses, modules, and user profiles- **Communication** - Access announcements, discussions, and calendar events
-
-    │   │   ├── index.ts            # Main server implementation
-
-    │   │   ├── oauth-config.ts     # OAuth 2.1 configuration- **Assignment Tools** - Get assignments, grades, submissions, and todos- **Quiz Tools** - View quiz information and results
-
-    │   │   ├── oauth-handlers.ts   # Authorization flow handlers
-
-    │   │   ├── types.ts            # TypeScript type definitions- **Communication** - Access announcements, discussions, and calendar events- **Upcoming Tracking** - See all upcoming assignments across courses
-
-    │   │   └── well-known.ts       # OAuth discovery endpoints
-
-    │   ├── package.json            # Server dependencies- **Quiz Tools** - View quiz information and results
-
-    │   ├── tsconfig.json           # TypeScript configuration
-
-    │   ├── wrangler.jsonc          # Cloudflare deployment config- **Upcoming Tracking** - See all upcoming assignments across courses### 🔐 Security
-
-    │   └── README.md               # Detailed server documentation
-
-    └── cloudflare-canvas-api/      # Canvas REST API Proxy- **OAuth 2.1 with PKCE** - Secure authorization flow
-
-        ├── src/
-
-        │   ├── index.ts            # API proxy implementation### Security- **Client Whitelist** - Restricted access control
-
-        │   ├── canvas-proxy.ts     # Canvas API forwarding
-
-        │   └── landing-page.ts     # Marketing landing page- **Secure Token Storage** - Durable Objects for session management
-
-        ├── static/
-
-        │   └── index.html          # Landing page HTML- **OAuth 2.1 with PKCE** - Secure authorization flow- **Rate Limiting** - API protection
-
-        └── README.md               # Proxy documentation
-
-```- **Client Whitelist** - Restricted access control- **CORS Protection** - Cross-origin security
-
-
-
-## 🚀 Quick Start- **Secure Token Storage** - Durable Objects for session management
-
-
-
-### Option 1: Use Hosted Server (Recommended)- **Rate Limiting** - API protection### ⚡ Performance
-
-
-
-Add to your Claude Desktop config (`~/Library/Application Support/Claude/claude_desktop_config.json` on macOS):- **CORS Protection** - Cross-origin security- **Edge Deployment** - Low latency via Cloudflare Workers
-
-
-
-```json- **<100ms Response** - Fast API responses
-
-{
-
-  "mcpServers": {### Performance- **99.9% Uptime** - Production-grade reliability
-
-    "canvas-mcp": {
-
-      "command": "npx",- **Global Distribution** - Deployed to multiple regions
-
-      "args": [
-
-        "-y",- **Edge Deployment** - Low latency via Cloudflare Workers
-
-        "@modelcontextprotocol/client-oauth2",
-
-        "https://canvas-mcp-sse.ariff.dev/sse"- **<100ms Response** - Fast API responses## 📦 Repository Structure
-
-      ]
-
-    }- **99.9% Uptime** - Production-grade reliability
-
-  }
-
-}- **Global Distribution** - Deployed to multiple regions```
-
-```
+```- **Course Management** - List courses, modules, and user profiles
 
 canvas-student-mcp-server/
 
-Restart Claude Desktop and you'll be prompted for OAuth authorization.
+├── README.md                       # This file- **Assignment Tools** - Get assignments, grades, submissions, and todos
 
-## 📦 Repository Structure├── README.md                       # This file
+├── CHANGELOG.md                    # Version history
 
-### Option 2: Deploy Your Own
+├── package.json                    # Workspace configuration- **Communication** - Access announcements, discussions, and calendar events
 
-├── package.json                    # Workspace configuration
+└── packages/
 
-#### Prerequisites
+    ├── remote-mcp-server-authless/ # Main MCP Server with OAuth 2.1- **Quiz Tools** - View quiz information and resultsAvailable Endpoints:**Available Endpoints:**
 
-- Cloudflare account (free tier works)```text└── packages/
+    │   ├── src/
 
-- Wrangler CLI installed (`npm install -g wrangler`)
+    │   │   ├── index.ts            # Main server implementation- **Upcoming Tracking** - See all upcoming assignments across courses
 
-- Canvas API tokencanvas-student-mcp-server/    ├── remote-mcp-server-authless/ # Main Cloudflare Workers MCP server
+    │   │   ├── oauth-config.ts     # OAuth 2.1 configuration
 
+    │   │   ├── oauth-handlers.ts   # Authorization flow handlers- `/sse` - OAuth 2.1 authenticated SSE transport (recommended)
 
+    │   │   ├── types.ts            # TypeScript type definitions
 
-#### Deploy Steps├── README.md                       # This file    │   ├── src/
+    │   │   └── well-known.ts       # OAuth discovery endpoints### 🔐 Security
 
+    │   ├── package.json            # Server dependencies
 
+    │   ├── tsconfig.json           # TypeScript configuration- **OAuth 2.1 with PKCE** - Secure authorization flow- `/sse` - OAuth 2.1 authenticated SSE transport (recommended)- `/mcp` - MCP endpoint with API key or OAuth
 
-```bash├── package.json                    # Workspace configuration    │   │   ├── index.ts            # Main server implementation
+    │   ├── wrangler.jsonc          # Cloudflare deployment config
 
-# Clone the repository
+    │   └── README.md               # Detailed server documentation- **Client Whitelist** - Restricted access control
 
-git clone https://github.com/a-ariff/canvas-student-mcp-server.git└── packages/    │   │   ├── oauth-config.ts     # OAuth 2.1 configuration
+    └── cloudflare-canvas-api/      # Canvas REST API Proxy
 
-cd canvas-student-mcp-server
+        ├── src/- **Secure Token Storage** - Durable Objects for session management- `/mcp` - MCP endpoint with API key or OAuth- `/public` - Public endpoint (config via query params)
 
-    ├── remote-mcp-server-authless/ # Main Cloudflare Workers MCP server    │   │   ├── oauth-handlers.ts   # Authorization flow handlers
+        │   ├── index.ts            # API proxy implementation
 
-# Install dependencies
-
-npm run install:all    │   ├── src/    │   │   ├── types.ts            # TypeScript type definitions
-
-
-
-# Navigate to the MCP server    │   │   ├── index.ts            # Main server implementation    │   │   └── well-known.ts       # OAuth discovery endpoints
-
-cd packages/remote-mcp-server-authless
-
-    │   │   ├── oauth-config.ts     # OAuth 2.1 configuration    │   ├── package.json            # Server dependencies
-
-# Login to Cloudflare
-
-wrangler login    │   │   ├── oauth-handlers.ts   # Authorization flow handlers    │   ├── tsconfig.json           # TypeScript configuration
-
-
-
-# Deploy to Cloudflare Workers    │   │   ├── types.ts            # TypeScript type definitions    │   ├── wrangler.jsonc          # Cloudflare deployment config
-
-npm run deploy
-
-```    │   │   └── well-known.ts       # OAuth discovery endpoints    │   └── README.md               # Detailed server documentation
-
-
-
-## 🔧 Configuration    │   ├── package.json            # Server dependencies    └── cloudflare-canvas-api/      # Canvas API proxy (optional)
-
-
-
-### Canvas API Token    │   ├── tsconfig.json           # TypeScript configuration        ├── src/
-
-
-
-1. Log into Canvas    │   ├── wrangler.jsonc          # Cloudflare deployment config        │   ├── index.ts            # API proxy implementation
-
-2. Go to **Account → Settings**
-
-3. Scroll to **Approved Integrations**    │   └── README.md               # Detailed server documentation        │   └── landing-page.ts     # Marketing landing page
-
-4. Click **New Access Token**
-
-5. Name it "MCP Server"    └── cloudflare-canvas-api/      # Canvas API proxy (optional)        └── static/
-
-6. Copy the token (save securely)
-
-        ├── src/            └── index.html          # Landing page HTML
-
-### OAuth Configuration
-
-        │   ├── index.ts            # API proxy implementation```
-
-The server uses OAuth 2.1 with PKCE. Configuration is in `packages/remote-mcp-server-authless/src/oauth-config.ts`:
+        │   ├── canvas-proxy.ts     # Canvas API forwarding- **Rate Limiting** - API protection
 
         │   └── landing-page.ts     # Marketing landing page
 
+        ├── static/- **CORS Protection** - Cross-origin security- `/public` - Public endpoint (config via query params)- `/.well-known/oauth-authorization-server` - OAuth discovery
+
+        │   └── index.html          # Landing page HTML
+
+        └── README.md               # Proxy documentation
+
+```
+
+### ⚡ Performance- `/.well-known/oauth-authorization-server` - OAuth discovery- `/health` - Health check endpoint
+
+## 🚀 Quick Start
+
+- **Edge Deployment** - Low latency via Cloudflare Workers
+
+### Option 1: Use Hosted Server (Recommended)
+
+- **<100ms Response** - Fast API responses- `/health` - Health check endpoint
+
+Add to your Claude Desktop config (`~/Library/Application Support/Claude/claude_desktop_config.json` on macOS):
+
+- **99.9% Uptime** - Production-grade reliability
+
+```json
+
+{- **Global Distribution** - Deployed to multiple regions## ✨ Features
+
+  "mcpServers": {
+
+    "canvas-mcp": {
+
+      "command": "npx",
+
+      "args": [## 📦 Repository Structure## ✨ Features
+
+        "-y",
+
+        "@modelcontextprotocol/client-oauth2",
+
+        "https://canvas-mcp-sse.ariff.dev/sse"
+
+      ]```### 🎓 Canvas Integration (12 Tools)
+
+    }
+
+  }canvas-student-mcp-server/
+
+}
+
+```├── README.md                       # This file### Canvas Integration (12 Tools)- **Course Management** - List courses, modules, and user profiles
+
+
+
+Restart Claude Desktop and you'll be prompted for OAuth authorization.├── package.json                    # Workspace configuration
+
+
+
+### Option 2: Deploy Your Own└── packages/- **Assignment Tools** - Get assignments, grades, submissions, and todos
+
+
+
+#### Prerequisites    ├── remote-mcp-server-authless/ # Main MCP Server with OAuth 2.1
+
+- Cloudflare account (free tier works)
+
+- Wrangler CLI installed (`npm install -g wrangler`)    │   ├── src/- **Course Management** - List courses, modules, and user profiles- **Communication** - Access announcements, discussions, and calendar events
+
+- Canvas API token
+
+    │   │   ├── index.ts            # Main server implementation
+
+#### Deploy Steps
+
+    │   │   ├── oauth-config.ts     # OAuth 2.1 configuration- **Assignment Tools** - Get assignments, grades, submissions, and todos- **Quiz Tools** - View quiz information and results
+
+```bash
+
+# Clone the repository    │   │   ├── oauth-handlers.ts   # Authorization flow handlers
+
+git clone https://github.com/a-ariff/canvas-student-mcp-server.git
+
+cd canvas-student-mcp-server    │   │   ├── types.ts            # TypeScript type definitions- **Communication** - Access announcements, discussions, and calendar events- **Upcoming Tracking** - See all upcoming assignments across courses
+
+
+
+# Install dependencies    │   │   └── well-known.ts       # OAuth discovery endpoints
+
+npm run install:all
+
+    │   ├── package.json            # Server dependencies- **Quiz Tools** - View quiz information and results
+
+# Navigate to the MCP server
+
+cd packages/remote-mcp-server-authless    │   ├── tsconfig.json           # TypeScript configuration
+
+
+
+# Login to Cloudflare    │   ├── wrangler.jsonc          # Cloudflare deployment config- **Upcoming Tracking** - See all upcoming assignments across courses### 🔐 Security
+
+wrangler login
+
+    │   └── README.md               # Detailed server documentation
+
+# Deploy to Cloudflare Workers
+
+npm run deploy    └── cloudflare-canvas-api/      # Canvas REST API Proxy- **OAuth 2.1 with PKCE** - Secure authorization flow
+
+```
+
+        ├── src/
+
+## 🔧 Configuration
+
+        │   ├── index.ts            # API proxy implementation### Security- **Client Whitelist** - Restricted access control
+
+### Canvas API Token
+
+        │   ├── canvas-proxy.ts     # Canvas API forwarding
+
+1. Log into Canvas
+
+2. Go to **Account → Settings**        │   └── landing-page.ts     # Marketing landing page- **Secure Token Storage** - Durable Objects for session management
+
+3. Scroll to **Approved Integrations**
+
+4. Click **New Access Token**        ├── static/
+
+5. Name it "MCP Server"
+
+6. Copy the token (save securely)        │   └── index.html          # Landing page HTML- **OAuth 2.1 with PKCE** - Secure authorization flow- **Rate Limiting** - API protection
+
+
+
+### OAuth Configuration        └── README.md               # Proxy documentation
+
+
+
+The server uses OAuth 2.1 with PKCE. Configuration is in `packages/remote-mcp-server-authless/src/oauth-config.ts`:```- **Client Whitelist** - Restricted access control- **CORS Protection** - Cross-origin security
+
+
+
 ```typescript
 
-export const OAUTH_CONFIG = {        └── static/## 🚀 Quick Start
+export const OAUTH_CONFIG = {
 
-  clientWhitelist: [
+  clientWhitelist: [## 🚀 Quick Start- **Secure Token Storage** - Durable Objects for session management
 
-    "claude-desktop",            └── index.html          # Landing page HTML
+    "claude-desktop",
 
     "mcp-client"
 
-  ],```### Option 1: Use Hosted Server (Recommended)
+  ],
 
-  redirectUris: [
+  redirectUris: [### Option 1: Use Hosted Server (Recommended)- **Rate Limiting** - API protection### ⚡ Performance
 
     "http://localhost:*",
 
     "https://canvas-mcp-sse.ariff.dev/*"
 
-  ]## 🚀 Quick Start# Build the TypeScript project
+  ]
 
-}
+}Add to your Claude Desktop config (`~/Library/Application Support/Claude/claude_desktop_config.json` on macOS):- **CORS Protection** - Cross-origin security- **Edge Deployment** - Low latency via Cloudflare Workers
 
-```npm run build
-
-
-
-## 📚 Available Tools### Option 1: Use Hosted Server (Recommended)```
+```
 
 
+
+## 📚 Available Tools
+
+```json- **<100ms Response** - Fast API responses
 
 ### Course Management
 
+- `list_courses` - Get all active courses{
+
+- `get_modules` - Get modules for a course
+
+- `get_user_profile` - Get user profile information  "mcpServers": {### Performance- **99.9% Uptime** - Production-grade reliability
+
+
+
+### Assignment Tools    "canvas-mcp": {
+
+- `get_assignments` - Get course assignments
+
+- `get_upcoming_assignments` - Get upcoming assignments      "command": "npx",- **Global Distribution** - Deployed to multiple regions
+
+- `get_submission_status` - Check submission status
+
+- `get_todo_items` - Get todo list      "args": [
+
+- `get_grades` - Get course grades
+
+        "-y",- **Edge Deployment** - Low latency via Cloudflare Workers
+
+### Communication
+
+- `get_announcements` - Get course announcements        "@modelcontextprotocol/client-oauth2",
+
+- `get_discussions` - Get discussion topics
+
+- `get_calendar_events` - Get calendar events        "https://canvas-mcp-sse.ariff.dev/sse"- **<100ms Response** - Fast API responses## 📦 Repository Structure
+
+
+
+### Quiz Tools      ]
+
+- `get_quizzes` - Get quiz information
+
+    }- **99.9% Uptime** - Production-grade reliability
+
+## 🎯 Use Cases
+
+  }
+
+### For Students
+
+- 📚 Quick access to all course materials}- **Global Distribution** - Deployed to multiple regions```
+
+- 📅 Track deadlines and upcoming assignments
+
+- 💬 Stay updated with announcements```
+
+- 📊 Monitor grades and submissions
+
+- 🤖 Use AI to help organize your courseworkcanvas-student-mcp-server/
+
+
+
+### For DevelopersRestart Claude Desktop and you'll be prompted for OAuth authorization.
+
+- 🔌 Easy Canvas API integration
+
+- 🛠️ Built on modern standards (OAuth 2.1, TypeScript)## 📦 Repository Structure├── README.md                       # This file
+
+- ⚡ Serverless deployment (no infrastructure management)
+
+- 🌐 Global edge network (fast anywhere)### Option 2: Deploy Your Own
+
+- 🔒 Security best practices out of the box
+
+├── package.json                    # Workspace configuration
+
+## 🛠️ Development
+
+#### Prerequisites
+
+### Local Development
+
+- Cloudflare account (free tier works)```text└── packages/
+
+```bash
+
+# Navigate to MCP server- Wrangler CLI installed (`npm install -g wrangler`)
+
+cd packages/remote-mcp-server-authless
+
+- Canvas API tokencanvas-student-mcp-server/    ├── remote-mcp-server-authless/ # Main Cloudflare Workers MCP server
+
+# Install dependencies
+
+npm install
+
+
+
+# Start development server#### Deploy Steps├── README.md                       # This file    │   ├── src/
+
+npm run dev
+
+```
+
+
+
+### Testing```bash├── package.json                    # Workspace configuration    │   │   ├── index.ts            # Main server implementation
+
+
+
+```bash# Clone the repository
+
+# Test OAuth endpoint
+
+curl https://canvas-mcp-sse.ariff.dev/.well-known/oauth-authorization-servergit clone https://github.com/a-ariff/canvas-student-mcp-server.git└── packages/    │   │   ├── oauth-config.ts     # OAuth 2.1 configuration
+
+
+
+# Test health endpointcd canvas-student-mcp-server
+
+curl https://canvas-mcp-sse.ariff.dev/health
+
+```    ├── remote-mcp-server-authless/ # Main Cloudflare Workers MCP server    │   │   ├── oauth-handlers.ts   # Authorization flow handlers
+
+
+
+### Available Scripts# Install dependencies
+
+
+
+```bashnpm run install:all    │   ├── src/    │   │   ├── types.ts            # TypeScript type definitions
+
+# Root workspace
+
+npm run install:all    # Install all package dependencies
+
+npm run build          # Build both packages
+
+npm run deploy:mcp     # Deploy MCP server# Navigate to the MCP server    │   │   ├── index.ts            # Main server implementation    │   │   └── well-known.ts       # OAuth discovery endpoints
+
+npm run deploy:api     # Deploy API proxy
+
+npm run clean          # Clean all node_modules and distcd packages/remote-mcp-server-authless
+
+
+
+# MCP Server (packages/remote-mcp-server-authless)    │   │   ├── oauth-config.ts     # OAuth 2.1 configuration    │   ├── package.json            # Server dependencies
+
+npm run dev            # Development mode with hot reload
+
+npm run deploy         # Deploy to Cloudflare Workers# Login to Cloudflare
+
+npm test               # Run tests
+
+npm run type-check     # TypeScript type checkingwrangler login    │   │   ├── oauth-handlers.ts   # Authorization flow handlers    │   ├── tsconfig.json           # TypeScript configuration
+
+
+
+# API Proxy (packages/cloudflare-canvas-api)
+
+npm run dev            # Development mode
+
+npm run deploy         # Deploy to Cloudflare Workers# Deploy to Cloudflare Workers    │   │   ├── types.ts            # TypeScript type definitions    │   ├── wrangler.jsonc          # Cloudflare deployment config
+
+```
+
+npm run deploy
+
+## 🔐 Security
+
+```    │   │   └── well-known.ts       # OAuth discovery endpoints    │   └── README.md               # Detailed server documentation
+
+### OAuth 2.1 Implementation
+
+- PKCE (Proof Key for Code Exchange) required
+
+- State parameter validation
+
+- Client ID whitelist## 🔧 Configuration    │   ├── package.json            # Server dependencies    └── cloudflare-canvas-api/      # Canvas API proxy (optional)
+
+- Redirect URI validation
+
+- Secure token storage in Durable Objects
+
+
+
+### Best Practices### Canvas API Token    │   ├── tsconfig.json           # TypeScript configuration        ├── src/
+
+- Never commit API tokens
+
+- Use environment variables for secrets
+
+- Regularly rotate Canvas tokens
+
+- Monitor access logs1. Log into Canvas    │   ├── wrangler.jsonc          # Cloudflare deployment config        │   ├── index.ts            # API proxy implementation
+
+- Use HTTPS only
+
+2. Go to **Account → Settings**
+
+## 🌟 Why This MCP Server?
+
+3. Scroll to **Approved Integrations**    │   └── README.md               # Detailed server documentation        │   └── landing-page.ts     # Marketing landing page
+
+| Feature | This Server | Others |
+
+|---------|-------------|--------|4. Click **New Access Token**
+
+| **Deployment** | Cloudflare Workers (Global Edge) | Traditional servers |
+
+| **Authentication** | OAuth 2.1 with PKCE | API keys only |5. Name it "MCP Server"    └── cloudflare-canvas-api/      # Canvas API proxy (optional)        └── static/
+
+| **Response Time** | <100ms worldwide | Varies by location |
+
+| **Uptime** | 99.9% (Cloudflare SLA) | Depends on hosting |6. Copy the token (save securely)
+
+| **Cost** | Free tier available | Monthly fees |
+
+| **Security** | Enterprise-grade | Basic |        ├── src/            └── index.html          # Landing page HTML
+
+| **Maintenance** | Serverless (auto-scaling) | Manual management |
+
+### OAuth Configuration
+
+## 📖 Documentation
+
+        │   ├── index.ts            # API proxy implementation```
+
+- [Changelog](CHANGELOG.md) - Version history and release notes
+
+- [MCP Server README](packages/remote-mcp-server-authless/README.md) - Detailed server docsThe server uses OAuth 2.1 with PKCE. Configuration is in `packages/remote-mcp-server-authless/src/oauth-config.ts`:
+
+- [API Proxy README](packages/cloudflare-canvas-api/README.md) - REST API documentation
+
+- [Privacy Policy](PRIVACY_POLICY.md) - Data handling and privacy        │   └── landing-page.ts     # Marketing landing page
+
+- [Security Guide](packages/remote-mcp-server-authless/SECURITY-FIXES.md) - Security details
+
+```typescript
+
+## 📄 License
+
+export const OAUTH_CONFIG = {        └── static/## 🚀 Quick Start
+
+MIT License - see [LICENSE](LICENSE) file for details
+
+  clientWhitelist: [
+
+## 🤝 Contributing
+
+    "claude-desktop",            └── index.html          # Landing page HTML
+
+Contributions welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+    "mcp-client"
+
+1. Fork the repository
+
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)  ],```### Option 1: Use Hosted Server (Recommended)
+
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+
+4. Push to the branch (`git push origin feature/amazing-feature`)  redirectUris: [
+
+5. Open a Pull Request
+
+    "http://localhost:*",
+
+## 🔗 Links
+
+    "https://canvas-mcp-sse.ariff.dev/*"
+
+- [Live Server](https://canvas-mcp-sse.ariff.dev)
+
+- [GitHub Repository](https://github.com/a-ariff/canvas-student-mcp-server)  ]## 🚀 Quick Start# Build the TypeScript project
+
+- [MCP Documentation](https://modelcontextprotocol.io)
+
+- [Canvas API Docs](https://canvas.instructure.com/doc/api/)}
+
+- [Cloudflare Workers](https://workers.cloudflare.com/)
+
+```npm run build
+
+## 💬 Support
+
+
+
+For issues or questions:
+
+1. Check the [Documentation](#-documentation)## 📚 Available Tools### Option 1: Use Hosted Server (Recommended)```
+
+2. Search [existing issues](https://github.com/a-ariff/canvas-student-mcp-server/issues)
+
+3. Open a [new issue](https://github.com/a-ariff/canvas-student-mcp-server/issues/new)
+
+4. Review Canvas API documentation
+
+### Course Management
+
+## 🎯 Roadmap
+
 - `list_courses` - Get all active courses
 
-- `get_modules` - Get modules for a courseAdd to your Claude Desktop config (`~/Library/Application Support/Claude/claude_desktop_config.json` on macOS):### 3. Configure Environment
+- [ ] Gradescope integration
 
-- `get_user_profile` - Get user profile information
+- [ ] Additional Canvas tools (files, rubrics)- `get_modules` - Get modules for a courseAdd to your Claude Desktop config (`~/Library/Application Support/Claude/claude_desktop_config.json` on macOS):### 3. Configure Environment
 
+- [ ] Enhanced caching layer
 
+- [ ] Analytics dashboard- `get_user_profile` - Get user profile information
+
+- [ ] Multi-institution support
+
+- [ ] Mobile app support
+
+- [ ] Webhook notifications
 
 ### Assignment Tools
 
+---
+
 - `get_assignments` - Get course assignments```json```bash
 
+**Built with ❤️ using Cloudflare Workers and MCP**
+
 - `get_upcoming_assignments` - Get upcoming assignments
+
+⭐ Star this repo if you find it useful!
 
 - `get_submission_status` - Check submission status{# Copy the example configuration
 
