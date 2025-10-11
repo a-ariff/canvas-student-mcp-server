@@ -67,6 +67,7 @@ describe("OAuth Endpoints", () => {
 			expect(data.authorization_endpoint).toBe("https://test.example.com/oauth/authorize");
 			expect(data.token_endpoint).toBe("https://test.example.com/oauth/token");
 			expect(data.code_challenge_methods_supported).toContain("S256");
+			expect(data.sse_endpoint).toBe("https://test.example.com/sse");
 		});
 
 		it("should return 404 for unknown well-known paths", () => {
