@@ -20,6 +20,8 @@ export function getAuthorizationServerMetadata(issuer: string): OAuthMetadata {
 			"client_secret_post",
 			"none"
 		],
+		// MCP SSE endpoint (custom extension for ChatGPT/Claude MCP clients)
+		mcp_endpoint: `${issuer}/sse`,
 	};
 }
 
@@ -31,6 +33,22 @@ export function handleWellKnownRequest(request: Request, issuer: string): Respon
 
 	if (url.pathname === "/.well-known/oauth-authorization-server") {
 		const metadata = getAuthorizationServerMetadata(issuer);
+		return new Response(JSON.stringify(metadata, null, 2), {
+			headers: {
+				"Content-Type": "application/json",
+				"Access-Control-Allow-Origin": "*",
+			},
+		});
+	}
+
+	// OpenID Connect Discovery (for better client compatibility)
+	if (url.pathname === "/.well-known/openid-configuration") {
+		const metadata = {
+			...getAuthorizationServerMetadata(issuer),
+			// MCP-specific extensions
+			mcp_sse_endpoint: `${issuer}/sse`,
+			mcp_http_endpoint: `${issuer}/mcp`,
+		};
 		return new Response(JSON.stringify(metadata, null, 2), {
 			headers: {
 				"Content-Type": "application/json",
