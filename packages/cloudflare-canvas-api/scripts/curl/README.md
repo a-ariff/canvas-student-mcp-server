@@ -55,7 +55,7 @@ Authenticate with Canvas and get your user ID.
 
 **Environment Variables:**
 - `CANVAS_API_KEY` (required): Your Canvas API token
-- `CANVAS_URL` (optional): Canvas instance URL (default: https://learn.mywhitecliffe.com)
+- `CANVAS_URL` (optional): Canvas instance URL (default: https://canvas.instructure.com)
 - `INSTITUTION_NAME` (optional): Your institution name (default: My Institution)
 - `API_BASE_URL` (optional): Proxy API URL (default: https://canvas-mcp.ariff.dev)
 

@@ -4,10 +4,16 @@
 	"main": "src/index.ts",
 	"compatibility_date": "2025-03-10",
 	"compatibility_flags": ["nodejs_compat"],
-	"route": {
-		"pattern": "canvas-mcp-sse.ariff.dev/*",
-		"zone_name": "ariff.dev"
-	},
+	"routes": [
+		{
+			"pattern": "canvas-mcp-sse.ariff.dev/*",
+			"zone_name": "ariff.dev"
+		},
+		{
+			"pattern": "canvas-mcp-oauth.ariff.dev/*",
+			"zone_name": "ariff.dev"
+		}
+	],
 	"migrations": [
 		{
 			"new_sqlite_classes": ["MyMCP"],

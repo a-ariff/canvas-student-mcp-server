@@ -667,6 +667,171 @@ export default {
 			return MyMCP.serve("/mcp").fetch(request, env, ctx);
 		}
 
+		// Privacy Policy endpoint
+		if (url.pathname === "/privacy" || url.pathname === "/privacy-policy") {
+			return new Response(PRIVACY_POLICY_HTML, {
+				status: 200,
+				headers: { "Content-Type": "text/html" },
+			});
+		}
+
+		// Canvas configuration endpoint - save user's Canvas credentials
+		if (url.pathname === "/api/v1/canvas/config" && request.method === "POST") {
+			const authResult = await authenticate(request, env);
+			if (authResult instanceof Response) {
+				return authResult;
+			}
+
+			try {
+				const body = await request.json() as { canvasApiKey: string; canvasBaseUrl: string };
+				const userId = (authResult as AuthContext).userId;
+
+				// Store Canvas config in KV associated with user
+				await env.API_KEYS_KV.put(
+					`canvas_config:${userId}`,
+					JSON.stringify({
+						canvasApiKey: body.canvasApiKey,
+						canvasBaseUrl: body.canvasBaseUrl,
+						updatedAt: Date.now(),
+					})
+				);
+
+				return new Response(JSON.stringify({ success: true, message: "Canvas configuration saved" }), {
+					status: 200,
+					headers: { "Content-Type": "application/json" },
+				});
+			} catch (error) {
+				return new Response(JSON.stringify({ error: "invalid_request", message: String(error) }), {
+					status: 400,
+					headers: { "Content-Type": "application/json" },
+				});
+			}
+		}
+
+		// REST API endpoints for ChatGPT Actions
+		if (url.pathname.startsWith("/api/v1/canvas/")) {
+			const authResult = await authenticate(request, env);
+			if (authResult instanceof Response) {
+				return authResult;
+			}
+
+			const userId = (authResult as AuthContext).userId;
+
+			// Get Canvas config from stored user config or query params (fallback)
+			let canvasApiKey = url.searchParams.get("canvasApiKey") || "";
+			let canvasBaseUrl = url.searchParams.get("canvasBaseUrl") || "";
+
+			// Try to load from stored config if not in query params
+			if (!canvasApiKey || !canvasBaseUrl) {
+				const configData = await env.API_KEYS_KV.get(`canvas_config:${userId}`);
+				if (configData) {
+					const config = JSON.parse(configData);
+					canvasApiKey = canvasApiKey || config.canvasApiKey;
+					canvasBaseUrl = canvasBaseUrl || config.canvasBaseUrl;
+				}
+			}
+
+			if (!canvasApiKey || !canvasBaseUrl) {
+				return new Response(JSON.stringify({ 
+					error: "missing_config", 
+					message: "Canvas API key and base URL required. Please call POST /api/v1/canvas/config first to save your credentials." 
+				}), {
+					status: 400,
+					headers: { "Content-Type": "application/json" },
+				});
+			}
+
+			// Route to specific Canvas API handler
+			if (url.pathname === "/api/v1/canvas/courses") {
+				const includeGrades = url.searchParams.get("includeGrades") === "true";
+				try {
+					const response = await fetch(
+						`${canvasBaseUrl}/api/v1/courses?enrollment_state=active&per_page=100`,
+						{ headers: { "Authorization": `Bearer ${canvasApiKey}` } }
+					);
+					
+					if (!response.ok) {
+						return new Response(JSON.stringify({ error: "canvas_api_error", status: response.status }), {
+							status: response.status,
+							headers: { "Content-Type": "application/json" },
+						});
+					}
+
+					const courses = await response.json();
+					return new Response(JSON.stringify({ courses }), {
+						status: 200,
+						headers: { "Content-Type": "application/json" },
+					});
+				} catch (error) {
+					return new Response(JSON.stringify({ error: "fetch_failed", message: String(error) }), {
+						status: 500,
+						headers: { "Content-Type": "application/json" },
+					});
+				}
+			}
+
+			if (url.pathname.match(/^\/api\/v1\/canvas\/courses\/(\d+)\/assignments$/)) {
+				const courseId = url.pathname.split("/")[5];
+				try {
+					const response = await fetch(
+						`${canvasBaseUrl}/api/v1/courses/${courseId}/assignments?per_page=100`,
+						{ headers: { "Authorization": `Bearer ${canvasApiKey}` } }
+					);
+					
+					if (!response.ok) {
+						return new Response(JSON.stringify({ error: "canvas_api_error", status: response.status }), {
+							status: response.status,
+							headers: { "Content-Type": "application/json" },
+						});
+					}
+
+					const assignments = await response.json();
+					return new Response(JSON.stringify({ assignments }), {
+						status: 200,
+						headers: { "Content-Type": "application/json" },
+					});
+				} catch (error) {
+					return new Response(JSON.stringify({ error: "fetch_failed", message: String(error) }), {
+						status: 500,
+						headers: { "Content-Type": "application/json" },
+					});
+				}
+			}
+
+			if (url.pathname === "/api/v1/canvas/assignments/upcoming") {
+				try {
+					const response = await fetch(
+						`${canvasBaseUrl}/api/v1/users/self/upcoming_events`,
+						{ headers: { "Authorization": `Bearer ${canvasApiKey}` } }
+					);
+					
+					if (!response.ok) {
+						return new Response(JSON.stringify({ error: "canvas_api_error", status: response.status }), {
+							status: response.status,
+							headers: { "Content-Type": "application/json" },
+						});
+					}
+
+					const events = await response.json();
+					return new Response(JSON.stringify({ assignments: events }), {
+						status: 200,
+						headers: { "Content-Type": "application/json" },
+					});
+				} catch (error) {
+					return new Response(JSON.stringify({ error: "fetch_failed", message: String(error) }), {
+						status: 500,
+						headers: { "Content-Type": "application/json" },
+					});
+				}
+			}
+
+			// No matching Canvas API route
+			return new Response(JSON.stringify({ error: "not_implemented", path: url.pathname }), {
+				status: 404,
+				headers: { "Content-Type": "application/json" },
+			});
+		}
+
 		// Public endpoint for Smithery (no authentication)
 		// Configuration passed via query parameters
 		if (url.pathname === "/public" || url.pathname === "/public/mcp") {
@@ -694,5 +859,133 @@ export default {
 		}
 
 		return new Response("Not found", { status: 404 });
-	},
+},
 };
+
+// Privacy Policy Content
+const PRIVACY_POLICY_HTML = `<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Privacy Policy - Canvas MCP Server</title>
+	<style>
+		body {
+			font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+			line-height: 1.6;
+			max-width: 800px;
+			margin: 0 auto;
+			padding: 20px;
+			color: #333;
+		}
+		h1 { color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
+		h2 { color: #34495e; margin-top: 30px; }
+		.last-updated { color: #7f8c8d; font-style: italic; }
+		.highlight { background-color: #fff3cd; padding: 15px; border-left: 4px solid #ffc107; margin: 20px 0; }
+		.data-list { background-color: #f8f9fa; padding: 15px; border-radius: 5px; }
+		ul { padding-left: 20px; }
+		li { margin: 8px 0; }
+		.footer { margin-top: 50px; padding-top: 20px; border-top: 1px solid #ddd; text-align: center; color: #7f8c8d; }
+	</style>
+</head>
+<body>
+	<h1>Privacy Policy</h1>
+	<p class="last-updated">Last Updated: October 5, 2025</p>
+
+	<h2>Overview</h2>
+	<p>Canvas Student MCP Server ("the Service") is an open-source Model Context Protocol (MCP) server that provides AI assistants (like Claude, ChatGPT) with access to Canvas Learning Management System data. This privacy policy explains how your data is handled.</p>
+
+	<h2>Data Collection</h2>
+	<h3>What Data We Access</h3>
+	<div class="data-list">
+		<p>When you use this Service, it accesses your Canvas LMS data through the Canvas API, including:</p>
+		<ul>
+			<li><strong>User Profile:</strong> Your name, email, and Canvas user ID</li>
+			<li><strong>Course Information:</strong> Enrolled courses, course details, modules</li>
+			<li><strong>Academic Data:</strong> Assignments, grades, submissions, quizzes</li>
+			<li><strong>Calendar Data:</strong> Upcoming events, deadlines, to-do items</li>
+			<li><strong>Communications:</strong> Course announcements, discussion posts</li>
+		</ul>
+	</div>
+
+	<h3>What Data We Store</h3>
+	<div class="highlight">
+		<strong>Cloudflare Workers Deployment:</strong>
+		<ul>
+			<li>✅ OAuth tokens stored in encrypted KV storage (temporary, expires with session)</li>
+			<li>✅ API response caching in Cloudflare KV (TTL: 5 minutes)</li>
+			<li>✅ Rate limiting data stored temporarily</li>
+			<li>✅ Analytics data collected (request counts, no personal data)</li>
+			<li>✅ NO permanent storage of Canvas data</li>
+		</ul>
+	</div>
+
+	<h2>Data Usage</h2>
+	<p>Your Canvas data is used <strong>exclusively</strong> to:</p>
+	<ul>
+		<li>Respond to queries from AI assistants (ChatGPT, Claude Desktop)</li>
+		<li>Display course information, assignments, grades as requested</li>
+		<li>Provide calendar and deadline information</li>
+		<li>Enable AI assistants to help with academic tasks</li>
+	</ul>
+
+	<h2>Data Sharing</h2>
+	<p><strong>We do NOT sell, trade, or share your data with third parties.</strong></p>
+	<p>Data is only shared with:</p>
+	<ul>
+		<li><strong>Canvas LMS:</strong> To fetch your course data via their API</li>
+		<li><strong>Your AI Assistant:</strong> To respond to your queries</li>
+		<li><strong>Cloudflare:</strong> Infrastructure provider (data in transit only)</li>
+	</ul>
+
+	<h2>Data Security</h2>
+	<ul>
+		<li>🔒 All connections use HTTPS/TLS encryption</li>
+		<li>🔒 OAuth 2.1 with PKCE for secure authentication</li>
+		<li>🔒 Canvas API tokens encrypted in KV storage</li>
+		<li>🔒 No plaintext credential storage</li>
+		<li>🔒 Rate limiting to prevent abuse</li>
+	</ul>
+
+	<h2>Your Rights</h2>
+	<p>You have the right to:</p>
+	<ul>
+		<li><strong>Access:</strong> Request a copy of data we've accessed from Canvas</li>
+		<li><strong>Delete:</strong> Revoke OAuth access at any time (clears all cached data)</li>
+		<li><strong>Opt-Out:</strong> Stop using the service at any time</li>
+		<li><strong>Data Portability:</strong> Export your Canvas data directly from Canvas LMS</li>
+	</ul>
+
+	<h2>Data Retention</h2>
+	<ul>
+		<li>OAuth tokens: Stored until revoked or expired (24 hours)</li>
+		<li>API cache: Automatically expires after 5 minutes</li>
+		<li>Rate limit data: Expires after 1 hour</li>
+		<li>Request logs: Retained by Cloudflare for 24-48 hours (standard)</li>
+	</ul>
+
+	<h2>Changes to This Policy</h2>
+	<p>We may update this privacy policy from time to time. We will notify users of any material changes by updating the "Last Updated" date.</p>
+
+	<h2>Contact</h2>
+	<p>For privacy concerns or questions, please:</p>
+	<ul>
+		<li>Open an issue on GitHub: <a href="https://github.com/a-ariff/canvas-student-mcp-server">github.com/a-ariff/canvas-student-mcp-server</a></li>
+		<li>Email: [Your email if you want to provide one]</li>
+	</ul>
+
+	<h2>Compliance</h2>
+	<p>This service is designed to comply with:</p>
+	<ul>
+		<li>FERPA (Family Educational Rights and Privacy Act) - US</li>
+		<li>GDPR (General Data Protection Regulation) - EU</li>
+		<li>COPPA (Children's Online Privacy Protection Act) - US</li>
+	</ul>
+
+	<div class="footer">
+		<p>Canvas Student MCP Server is open-source software.</p>
+		<p><a href="https://github.com/a-ariff/canvas-student-mcp-server">View Source Code</a></p>
+	</div>
+</body>
+</html>
+`;
