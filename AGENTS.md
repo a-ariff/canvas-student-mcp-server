@@ -1,5 +1,59 @@
 # Repository Guidelines
 
+## 📋 Executive Summary
+
+### Security Status
+- **Public endpoint disabled** - No longer accepts Canvas API keys via URL parameters
+- **Secret logging suppressed** - All Canvas API keys redacted as `[REDACTED]` in logs
+- **Shared Canvas key removed** - Production runs in **single-user safe mode**
+- **Canvas tools intentionally disabled** - Return "credentials not configured" error until per-user storage implemented
+- **Report:** See `SECURITY_FIX_REPORT_2025-10-15.md` for complete details
+
+### Current State
+- **Production Status:** ✅ Deployed and secure (Version `b5a28913-fc1f-4f9c-8c4e-b83cb385944b`)
+- **Security Level:** 🟢 Safe for single-user deployment
+- **Multi-User Canvas:** ⚠️ Intentionally disabled (requires Option 1 implementation)
+- **OAuth Authentication:** ✅ Fully functional with PKCE
+
+### Revised Plan
+
+**Near Term (Now):**
+- Document local self-hosting as the privacy-first option (stdio MCP server)
+- Keep remote worker in single-user safe mode
+- Rotate any legacy secrets if needed
+- Log tool usage per authenticated user
+- Add KV cleanup/rotation path
+
+**Next Milestone (Optional - 6 hours):**
+- Implement Option 1 from `CRITICAL_ARCHITECTURE_ISSUE.md`
+- Add `POST /api/v1/canvas/config` endpoint
+- Store Canvas credentials in KV keyed by OAuth `userId`
+- Update all 12 Canvas tools to read per-user credentials
+- Tools fail fast when no per-user record found
+
+**Follow-Up (Future):**
+- Extend OpenAPI/Actions schema with config endpoint
+- Enable hosted clients to prime credentials automatically
+- Keep MCP approvals enabled until per-user flows proven
+- Rate-limit any future admin/API-key features
+
+### Using It Across Multiple Colleges
+
+**Current Approach (Manual Tokens):**
+- Each student provides their own Canvas API token (from their college's Canvas)
+- Once per-user storage implemented, same worker supports multiple institutions
+- Credentials stored per-user, not globally (no per-institution configuration needed)
+
+**Future Approach (Canvas OAuth - Complex):**
+- Register your MCP app with each Canvas tenant (college by college)
+- Implement Canvas OAuth flow for each institution
+- Swap manual token step for automated OAuth per-college
+- Estimated effort: ~40 hours for full Canvas OAuth integration
+
+**Recommendation:** Start with manual tokens (Option 1), evaluate Canvas OAuth later based on demand.
+
+---
+
 ## 🎯 Current Project Status (October 15, 2025)
 
 **Owner:** Ariff (i@ariff.dev)  
