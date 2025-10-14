@@ -160,15 +160,64 @@ If using Claude Code in VS Code terminal, configure with these settings:
 
 ---
 
-## Current Architecture & Implementation Plan
-- **Local MCP server**: `packages/canvas-student-mcp-server/dist/index.js` remains the reference stdio build for Claude/Codex. Secrets live in per-user `.dev.vars` files and are never committed.
-- **Remote Cloudflare worker**: retire the shared `CANVAS_API_KEY` env; every authenticated user must store their own Canvas base URL + token. Implement `POST /api/v1/canvas/config` to save credentials in KV scoped by OAuth `userId`, and make all Canvas tool handlers read from that record.
-- **Identity**: use Auth0 (or equivalent) only for user auth; Canvas credentials are always user supplied or obtained via a future Canvas OAuth flow. No default/professor token should exist in Wrangler secrets.
-- **OpenAPI / GPT schema**: document the config endpoint so ChatGPT/Claude Actions can prime credentials automatically before calling course APIs. Highlight that the server returns `missing_config` until `saveCanvasConfig` succeeds.
-- **Security posture**: rotate the old shared Canvas key, keep approvals enabled until revalidation, log MCP tool usage, and audit KV writes. If API-key access is ever reintroduced, guard it with admin-only generation plus rate limiting per the security checklist.
+## Security Status (2025-10-15)
+- ✅ `/public` endpoint disabled - Returns `endpoint_disabled` (403), prevents API keys via URL
+- ✅ Canvas API keys redacted in logs - No sensitive values in Cloudflare analytics
+- ✅ Shared `CANVAS_API_KEY` removed - Production worker (`b5a28913-fc1f-4f9c-8c4e-b83cb385944b`) in **single-user safe mode**
+- ✅ All Canvas tools show security error:
+  ```
+  Error: Canvas API credentials not configured.
+  Multi-user Canvas support coming soon.
+  ```
+- ✅ Current deployment safe for personal use
+- ⚠️ Multi-user Canvas access intentionally disabled until per-user storage implemented
 
-**Last Updated**: 2025-10-15
-**Status**: Pre-Public Release - Critical Issues Identified
+**See:** `SECURITY_FIX_REPORT_2025-10-15.md` for complete details of all fixes
+
+## Current Architecture & Implementation Plan
+- **Local MCP server**: `packages/canvas-student-mcp-server/dist/index.js` stays the stdio build for Claude/Codex. Secrets live in the user's `.dev.vars`; this is the recommended privacy-first option.
+- **Remote Cloudflare worker**: next milestone is Option 1 (per-user Canvas keys). Add `POST /api/v1/canvas/config` that writes KV entries scoped by OAuth `userId`, update all Canvas tools to read from KV, and keep the worker failing fast if no entry exists.
+- **Identity**: Auth0 (or similar) continues to handle OAuth; Canvas credentials must be supplied per user (manual API token now, Canvas OAuth later). Never reinstate a global Canvas secret in Wrangler.
+- **OpenAPI / GPT schema**: extend the spec to expose the config endpoint so hosted clients can prime credentials automatically; continue returning `missing_config` until the POST succeeds.
+- **Security posture**: rotate any legacy keys, log tool use per user, provide a KV purge/rotation path, and keep MCP approvals enabled until per-user flows are proven. Rate-limit any future admin/API-key features per the security checklist.
+
+**Last Updated**: 2025-10-15  
+**Status**: Single-user secure; multi-user Canvas support pending per-user credential storage
+
+### Project Goals
+
+This project provides a **public Canvas LMS MCP server** deployed on Cloudflare Workers that:
+
+- Allows multiple users to connect via OAuth 2.1 authentication
+- Provides MCP tools to access Canvas courses, assignments, grades, etc.
+- Scales to support 100+ users on free tier
+- Maintains security and privacy for all users
+
+### Critical Architecture Issues Discovered
+
+#### Issue 1: Canvas API Key Architecture (CRITICAL - FIXED October 15, 2025)
+
+---
+
+## Security Status (2025-10-15)
+- `/public` endpoint now returns `endpoint_disabled` (403) so API keys can’t be passed via URL.
+- Canvas API keys are redacted in logs; no sensitive values persist in Cloudflare analytics.
+- Shared `CANVAS_API_KEY` env usage removed; production worker (`b5a28913-fc1f-4f9c-8c4e-b83cb385944b`) runs in **single-user safe mode**. All Canvas tools reply:
+  ```
+  Error: Canvas API credentials not configured.
+  Multi-user Canvas support coming soon.
+  ```
+- Current deployment is safe for personal use, but multi-user Canvas access is intentionally disabled until per-user storage lands.
+
+## Current Architecture & Implementation Plan
+- **Local MCP server**: `packages/canvas-student-mcp-server/dist/index.js` stays the stdio build for Claude/Codex. Secrets live in the user’s `.dev.vars`; this is the recommended privacy-first option.
+- **Remote Cloudflare worker**: next milestone is Option 1 (per-user Canvas keys). Add `POST /api/v1/canvas/config` that writes KV entries scoped by OAuth `userId`, update all Canvas tools to read from KV, and keep the worker failing fast if no entry exists.
+- **Identity**: Auth0 (or similar) continues to handle OAuth; Canvas credentials must be supplied per user (manual API token now, Canvas OAuth later). Never reinstate a global Canvas secret in Wrangler.
+- **OpenAPI / GPT schema**: extend the spec to expose the config endpoint so hosted clients can prime credentials automatically; continue returning `missing_config` until the POST succeeds.
+- **Security posture**: rotate any legacy keys, log tool use per user, provide a KV purge/rotation path, and keep MCP approvals enabled until per-user flows are proven. Rate-limit any future admin/API-key features per the security checklist.
+
+**Last Updated**: 2025-10-15  
+**Status**: Single-user secure; multi-user Canvas support pending per-user credential storage
 
 ### Project Goals
 
@@ -248,48 +297,83 @@ Disable API key authentication entirely for public deployment. Only use OAuth 2.
 
 ### Implementation Roadmap
 
-#### Phase 1: Fix Critical Issues (Must complete before any public deployment)
+#### ✅ Phase 1: Fix Critical Security Issues (COMPLETED - October 15, 2025)
 
-**Total Estimated Time**: 7.5 hours
+**Completed Tasks:**
 
-1. **Fix Canvas API Architecture** (6 hours) - Issue 1
-   - [ ] Update OAuth handlers to collect Canvas API key
-   - [ ] Modify token storage to include Canvas credentials
-   - [ ] Update authentication to pass Canvas credentials
-   - [ ] Modify all MCP tool handlers
-   - [ ] Update type definitions
-   - [ ] Test with 2+ Canvas accounts
+1. **✅ Fix Public Endpoint Security** - Issue 2 (COMPLETED)
+   - [x] Disabled `/public` endpoint completely
+   - [x] Returns 403 Forbidden with error message
+   - [x] Removed API key acceptance via URL parameters
+   - [x] Updated security documentation
+   - **Deployed:** Version `d564bc1f-79d7-4779-bb9b-ff7a949dd09d`
+   - **Commit:** `02dcf3e`
 
-2. **Implement OAuth-Only Security** (1.5 hours) - Issue 2
-   - [ ] Update documentation (remove API key generation)
-   - [ ] Add configuration flags
-   - [ ] Add API key rejection code
-   - [ ] Update security documentation
+2. **✅ Fix API Key Logging** - Issue 2 (COMPLETED)
+   - [x] Removed all Canvas API key logging
+   - [x] Replaced with `[REDACTED]` placeholders
+   - [x] Verified Cloudflare logs are clean
+   - **Deployed:** Version `d564bc1f-79d7-4779-bb9b-ff7a949dd09d`
+   - **Commit:** `02dcf3e`
 
-#### Phase 2: Testing & Validation (2 hours)
+3. **✅ Remove Shared Canvas API Key** - Issue 1 (COMPLETED)
+   - [x] Removed environment variable usage
+   - [x] Canvas config returns empty strings
+   - [x] All 12 Canvas tools return security error
+   - [x] Added clear user-facing error message
+   - **Deployed:** Version `b5a28913-fc1f-4f9c-8c4e-b83cb385944b`
+   - **Commit:** `2d76c59`
 
-3. **Multi-User Testing**
+**Security Status:** 🟢 **SECURE** - Safe for single-user deployment
+
+---
+
+#### ⏳ Phase 2: Multi-User Canvas Support (OPTIONAL - Not Started)
+
+**Decision Required:** Single-user vs Multi-user deployment
+
+**Option A: Keep Single-User (0 hours)**
+- Current implementation works for personal use
+- OAuth authentication functional
+- Canvas tools disabled with clear error message
+- No additional work needed
+- ✅ Recommended for personal projects
+
+**Option B: Implement Multi-User Canvas Keys (6 hours)**
+- Store per-user Canvas API keys in OAuth tokens
+- Update all 12 Canvas tools to use user's key
+- Test with 2+ Canvas accounts
+- See: `CRITICAL_ARCHITECTURE_ISSUE.md` for steps
+- ⏳ Required for public multi-user deployment
+
+---
+
+#### Phase 3: Testing & Validation (If Option B chosen)
+
+**Multi-User Testing** (2 hours)
    - [ ] Test with 2+ different Canvas accounts
    - [ ] Verify user isolation (users see only their data)
    - [ ] Test OAuth flow end-to-end
-   - [ ] Test API key rejection (returns 403)
+   - [ ] Verify all Canvas tools work with per-user keys
    - [ ] Verify all 14 security tests still pass
 
-4. **Load Testing**
+**Load Testing** (1 hour)
    - [ ] Simulate 10+ concurrent users
    - [ ] Verify KV operations within limits
    - [ ] Check response times
    - [ ] Monitor Cloudflare metrics
 
-#### Phase 3: Documentation & Deployment (2 hours)
+---
 
-5. **Documentation Updates**
+#### Phase 4: Documentation & Final Deployment (If Option B chosen)
+
+5. **Documentation Updates** (1 hour)
    - [ ] Update all user-facing documentation
    - [ ] Add user setup guides
    - [ ] Create troubleshooting guide
    - [ ] Update CHANGELOG.md
 
-6. **Production Deployment**
+6. **Production Deployment** (1 hour)
    - [ ] Deploy to staging
    - [ ] Test staging thoroughly
    - [ ] Deploy to production
@@ -297,6 +381,54 @@ Disable API key authentication entirely for public deployment. Only use OAuth 2.
    - [ ] Update GitHub repository visibility (if going public)
 
 **Total Estimated Time**: ~11.5 hours
+
+---
+
+## 📊 Implementation Summary (October 15, 2025)
+
+### Work Completed Today
+
+✅ **3 Critical Security Vulnerabilities Fixed:**
+
+1. **Public Endpoint Security** (CRITICAL)
+   - Disabled `/public` endpoint that accepted Canvas API keys via URL
+   - Now returns 403 Forbidden with clear error message
+   - Prevents API key exposure in browser history and logs
+
+2. **Canvas API Key Logging** (HIGH)
+   - Removed all Canvas API key logging from code
+   - Replaced with `[REDACTED]` placeholders
+   - Cloudflare logs no longer contain sensitive credentials
+
+3. **Shared Canvas API Key** (CRITICAL)
+   - Removed shared environment variable that would expose one user's data to all
+   - Canvas config now returns empty strings
+   - All Canvas tools return clear error message about multi-user limitation
+
+### Deployments Completed
+
+- **Version 1:** `d564bc1f-79d7-4779-bb9b-ff7a949dd09d` (Public endpoint + logging fix)
+- **Version 2:** `b5a28913-fc1f-4f9c-8c4e-b83cb385944b` (Shared API key fix) ← **CURRENT**
+
+### Git Commits Pushed
+
+- `02dcf3e` - Disable public endpoint and remove API key logging
+- `2d76c59` - Remove shared Canvas API key to prevent multi-user data leakage
+
+### Documentation Created
+
+- `SECURITY_FIX_REPORT_2025-10-15.md` - Comprehensive security fix report
+- Updated `AGENTS.md` - Current project status and roadmap
+- Updated `PERSONAL_AGENT.md` - Current status for future AI assistants
+
+### Current Status
+
+**Security Level:** 🟢 **SECURE** - Safe for single-user deployment  
+**Multi-User Status:** ⚠️ Canvas tools disabled (show error message)  
+**Production Status:** ✅ Deployed and stable  
+**Next Decision:** Choose Option A (single-user) or Option B (multi-user support)
+
+---
 
 ### Architecture Decisions
 
