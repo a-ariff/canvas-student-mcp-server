@@ -112,6 +112,11 @@ htmlcov/
 *.crt
 *.p12
 
+# Internal documentation (not for public repo)
+AGENTS.md
+PERSONAL_AGENT.md
+HOW_TO_USE_AGENT_FILES.md
+
 # Large binaries (Git LFS recommended)
 # Cloudflare workerd binaries
 node_modules/@cloudflare/workerd-*/bin/*
