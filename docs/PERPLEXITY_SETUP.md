@@ -4,21 +4,110 @@ Complete guide to integrate Canvas Student MCP Server with Perplexity AI.
 
 ## 🚀 Overview
 
-Perplexity AI can interact with Canvas MCP Server through its API integration capabilities. This guide shows you how to set up Canvas access for Perplexity queries.
+Perplexity AI now supports MCP (Model Context Protocol) connectors! You can connect Canvas MCP Server directly to Perplexity Desktop app, similar to Claude Desktop integration.
 
-## 📋 Current Status
+## 📋 Quick Start (Native MCP Support)
 
-**Note:** Perplexity AI currently does not have native MCP (Model Context Protocol) support like Claude Desktop. However, you can still access Canvas data through these methods:
+**Good News:** Perplexity Desktop app has native MCP connector support through the Advanced Settings!
 
-### Method 1: REST API Integration (Recommended)
+### Method 1: MCP Connector (Recommended)
 
-Use our REST API endpoints directly in Perplexity queries or custom integrations.
+Use Perplexity's built-in MCP connector feature to connect directly to Canvas MCP Server.
 
-### Method 2: Webhooks & Automation
+### Method 2: REST API Integration
+
+Use our REST API endpoints for custom integrations or web-based access.
+
+### Method 3: Webhooks & Automation
 
 Set up webhooks with tools like Zapier or Make.com to connect Perplexity with Canvas.
 
-## 🔧 REST API Method
+## 🎯 Method 1: Native MCP Connector (Recommended)
+
+### Prerequisites
+
+- Perplexity Desktop app installed (macOS)
+- Canvas LMS account with API access
+- Your Canvas institution URL
+
+### Step 1: Open Perplexity Settings
+
+1. Launch Perplexity Desktop app
+2. Go to **Settings** (⚙️ icon or `Cmd + ,`)
+3. Navigate to **Connectors** section
+4. Click **Add Connector**
+5. Select **Advanced** option
+
+### Step 2: Configure MCP Connector
+
+Add the following JSON configuration (similar to Claude Desktop setup):
+
+```json
+{
+  "mcpServers": {
+    "canvas-mcp": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/client-oauth2",
+        "https://canvas-mcp-sse.ariff.dev/sse"
+      ]
+    }
+  }
+}
+```
+
+### Step 3: Save and Restart
+
+1. Click **Save** or **Add Connector**
+2. Restart Perplexity Desktop app
+3. You should see "Canvas MCP" connector available
+
+### Step 4: Authenticate via OAuth
+
+1. When you first use Canvas commands, Perplexity will prompt for OAuth authentication
+2. Click the authentication link
+3. Authorize the application in your browser
+4. Return to Perplexity - you're connected!
+
+### Step 5: Configure Canvas Credentials
+
+After OAuth, provide your Canvas API token:
+
+```
+Please save my Canvas configuration:
+- Base URL: https://canvas.instructure.com
+- API Token: YOUR_CANVAS_API_TOKEN
+```
+
+**How to get your Canvas API token:** See [Canvas Token Setup](#canvas-token-setup) below.
+
+### Step 6: Start Using Canvas Tools
+
+Try these queries in Perplexity:
+
+```
+What are my Canvas courses?
+```
+
+```
+Show me assignments due this week
+```
+
+```
+What's my current grade in Computer Science?
+```
+
+## 📸 Visual Guide
+
+![Perplexity MCP Connector Setup](/Users/ariff/Downloads/perplexity%20sample.jpg)
+
+The setup screen shows:
+- Settings → Connectors → Add Connector → Advanced
+- JSON configuration field (same format as Claude Desktop)
+- Save button to activate the connector
+
+## 🔧 Method 2: REST API Integration
 
 ### Step 1: Get Your Canvas API Token
 
@@ -307,28 +396,28 @@ All responses are JSON:
 }
 ```
 
-## 🎯 Future Possibilities
+## 🎯 MCP Support Status
 
-### When Perplexity Adds MCP Support
+### ✅ Perplexity HAS MCP Support!
 
-Once Perplexity implements MCP protocol:
+As of October 2025, Perplexity Desktop app includes native MCP connector support through the Advanced settings. This means:
 
-1. Direct SSE connection to `https://canvas-mcp-sse.ariff.dev/sse`
-2. OAuth authentication flow built-in
-3. Real-time Canvas data access in conversations
-4. No need for external API calls or automation
+1. ✅ Direct SSE connection to `https://canvas-mcp-sse.ariff.dev/sse`
+2. ✅ OAuth authentication flow built-in
+3. ✅ Real-time Canvas data access in conversations
+4. ✅ Same setup experience as Claude Desktop
+
+### How It Works
+
+The MCP connector in Perplexity uses the same configuration format as Claude Desktop:
+- JSON-based server configuration
+- OAuth 2.1 authentication
+- Server-Sent Events (SSE) transport
+- Access to all 12 Canvas tools
 
 **Stay Updated:**
-- Watch Perplexity's [changelog](https://www.perplexity.ai/hub/changelog)
-- Follow MCP protocol adoption: [modelcontextprotocol.io](https://modelcontextprotocol.io)
-
-### Requested Features
-
-Vote for these features in Perplexity:
-- [ ] MCP protocol support
-- [ ] OAuth integration for custom APIs
-- [ ] Webhook triggers for automation
-- [ ] Browser extension for data injection
+- Follow Perplexity's [changelog](https://www.perplexity.ai/hub/changelog) for connector updates
+- Check MCP protocol updates: [modelcontextprotocol.io](https://modelcontextprotocol.io)
 
 ## 🆘 Getting Help
 
@@ -339,10 +428,11 @@ Vote for these features in Perplexity:
 - **Perplexity Help**: [Perplexity AI Help Center](https://www.perplexity.ai/help)
 - **Report Issues**: [GitHub Issues](https://github.com/a-ariff/canvas-student-mcp-server/issues)
 
-### Alternative AI Tools with MCP Support
+### Other AI Tools with MCP Support
 
-If you need native MCP integration, consider:
+Confirmed working with Canvas MCP Server:
 
+- ✅ **Perplexity Desktop** - Native MCP connectors (This guide!)
 - ✅ **Claude Desktop** - Full MCP support ([Setup Guide](./CLAUDE_DESKTOP_SETUP.md))
 - ✅ **ChatGPT GPTs** - OAuth & API Actions ([Setup Guide](./CHATGPT_SETUP.md))
 - 🚧 **Cursor IDE** - MCP support in development
