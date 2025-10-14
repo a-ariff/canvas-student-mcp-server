@@ -91,11 +91,12 @@ export class MyMCP extends McpAgent<Env> {
 	});
 
 	async init() {
-		// Helper to get Canvas config from environment
+		// SECURITY FIX: Canvas config should come from user's OAuth token, not environment
+		// Shared environment variables would expose one user's Canvas data to all users
 		const getCanvasConfig = () => {
 			return {
-				canvasApiKey: this.env?.CANVAS_API_KEY || "",
-				canvasBaseUrl: this.env?.CANVAS_BASE_URL || ""
+				canvasApiKey: "",  // Intentionally empty - must come from user auth
+				canvasBaseUrl: ""  // Intentionally empty - must come from user auth
 			};
 		};
 
@@ -104,7 +105,14 @@ export class MyMCP extends McpAgent<Env> {
 			const { canvasApiKey, canvasBaseUrl } = getCanvasConfig();
 			if (!canvasApiKey || !canvasBaseUrl) {
 				return {
-					content: [{ type: "text", text: "Error: Canvas API credentials not configured. Please provide canvasApiKey and canvasBaseUrl." }],
+					content: [{ 
+						type: "text", 
+						text: "Error: Canvas API credentials not configured.\n\n" +
+							"This MCP server requires per-user Canvas API keys for security.\n" +
+							"Multi-user Canvas integration is not yet implemented.\n\n" +
+							"Status: Single-user mode only. Multi-user support coming soon.\n" +
+							"See: CRITICAL_ARCHITECTURE_ISSUE.md for details."
+					}],
 				};
 			}
 
@@ -832,33 +840,19 @@ export default {
 			});
 		}
 
-		// Public endpoint for Smithery (no authentication)
-		// Configuration passed via query parameters
-		if (url.pathname === "/public" || url.pathname === "/public/mcp") {
-			// Extract configuration from query parameters
-			const canvasApiKey = url.searchParams.get("canvasApiKey") || "";
-			const canvasBaseUrl = url.searchParams.get("canvasBaseUrl") || "https://canvas.instructure.com";
-			const debug = url.searchParams.get("debug") === "true";
-			const gradescopeEmail = url.searchParams.get("gradescopeEmail") || "";
-			const gradescopePassword = url.searchParams.get("gradescopePassword") || "";
-
-			console.error("🔍 PUBLIC ENDPOINT DEBUG:");
-			console.error("  Full URL:", request.url);
-			console.error("  Query params:", Object.fromEntries(url.searchParams.entries()));
-			console.error("  Canvas API Key:", canvasApiKey ? `${canvasApiKey.substring(0, 10)}...` : "(EMPTY!)");
-			console.error("  Canvas Base URL:", canvasBaseUrl);
-
-			// Store config in env for MCP handler to access
-			(env as any).CANVAS_API_KEY = canvasApiKey;
-			(env as any).CANVAS_BASE_URL = canvasBaseUrl;
-			(env as any).DEBUG = debug;
-			(env as any).GRADESCOPE_EMAIL = gradescopeEmail;
-			(env as any).GRADESCOPE_PASSWORD = gradescopePassword;
-
-			return MyMCP.serve("/public").fetch(request, env, ctx);
-		}
-
-		return new Response("Not found", { status: 404 });
+	// Public endpoint for Smithery (no authentication)
+	// Configuration passed via query parameters
+	if (url.pathname === "/public" || url.pathname === "/public/mcp") {
+		// SECURITY: Public endpoint disabled - use OAuth authentication instead
+		return new Response(JSON.stringify({
+			error: "endpoint_disabled",
+			message: "Public endpoint has been disabled for security reasons. Please use OAuth authentication at /sse endpoint.",
+			oauth_discovery: `${env.OAUTH_ISSUER}/.well-known/oauth-authorization-server`
+		}), {
+			status: 403,
+			headers: { "Content-Type": "application/json" }
+		});
+	}		return new Response("Not found", { status: 404 });
 },
 };
 
