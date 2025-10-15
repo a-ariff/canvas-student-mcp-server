@@ -27,16 +27,19 @@ This guide shows you how to create a custom ChatGPT GPT that can access your Can
 Fill in these fields:
 
 **Name:**
+
 ```
 Canvas Student Assistant
 ```
 
 **Description:**
+
 ```
 Access your Canvas LMS courses, assignments, grades, and more directly in ChatGPT.
 ```
 
 **Instructions:**
+
 ```
 You are a Canvas Student Assistant that helps students manage their coursework on Canvas LMS.
 
@@ -58,6 +61,7 @@ Always be encouraging and supportive in your responses.
 ```
 
 **Conversation Starters:**
+
 ```
 📚 What courses am I taking?
 📝 What assignments are due soon?
@@ -225,6 +229,7 @@ In the **Authentication** section of Actions:
 In the **Settings** section:
 
 **Privacy Policy URL:**
+
 ```
 https://canvas-mcp-sse.ariff.dev/privacy
 ```
@@ -272,26 +277,31 @@ Save my Canvas configuration:
 ### Common Queries
 
 **View Courses:**
+
 ```
 What courses am I enrolled in?
 ```
 
 **Check Assignments:**
+
 ```
 What assignments are due this week?
 ```
 
 **Get Specific Course Details:**
+
 ```
 Show me all assignments for "Introduction to Computer Science"
 ```
 
 **Priority Management:**
+
 ```
 What should I work on first? Prioritize by due date and grade weight.
 ```
 
 **Grade Tracking:**
+
 ```
 How am I doing in my courses? Show my current grades.
 ```
@@ -325,6 +335,7 @@ How am I doing in my courses? Show my current grades.
 ### Issue: "Authentication failed"
 
 **Solution:**
+
 1. Verify OAuth client credentials are correct
 2. Check that redirect URI matches ChatGPT's callback URL
 3. Ensure authorization and token URLs are correct
@@ -333,6 +344,7 @@ How am I doing in my courses? Show my current grades.
 ### Issue: "Canvas API returned 401 Unauthorized"
 
 **Solution:**
+
 1. Verify your Canvas API token is valid and not expired
 2. Re-save your Canvas configuration with a fresh token
 3. Check that Canvas base URL is correct (with https://)
@@ -341,6 +353,7 @@ How am I doing in my courses? Show my current grades.
 ### Issue: "No courses found"
 
 **Solution:**
+
 1. Ensure you're enrolled in courses on Canvas
 2. Check that you saved your Canvas config first
 3. Verify the token has permissions to read courses
@@ -349,6 +362,7 @@ How am I doing in my courses? Show my current grades.
 ### Issue: "Action schema validation failed"
 
 **Solution:**
+
 1. Copy the exact OpenAPI schema from this guide
 2. Verify JSON is valid at [jsonlint.com](https://jsonlint.com)
 3. Ensure all URLs use `https://` (not `http://`)

@@ -1,7 +1,7 @@
 # Security Fix Report - October 15, 2025
 
 **Project:** Canvas Student MCP Server  
-**Owner:** Ariff (i@ariff.dev)  
+**Owner:** Ariff (<i@ariff.dev>)  
 **Branch:** `feature/chatgpt-oauth-and-docs`  
 **Production URL:** `https://canvas-mcp-sse.ariff.dev`  
 **Report Date:** October 15, 2025
@@ -24,19 +24,23 @@ Identified and fixed **3 critical security vulnerabilities** in the Canvas MCP S
 **Status:** ✅ **FIXED**
 
 **Problem:**
+
 - The `/public` endpoint accepted Canvas API keys via URL query parameters
 - Example: `https://canvas-mcp-sse.ariff.dev/public?canvasApiKey=19765~xxx&canvasBaseUrl=...`
 - API keys visible in browser history, server logs, and network monitoring tools
 - No authentication required - anyone could use the endpoint
 
 **Impact:**
+
 - Canvas API credentials exposed in plain text
 - Potential unauthorized access to Canvas data
 - API keys logged in Cloudflare analytics
 
 **Fix Applied:**
+
 - Disabled `/public` endpoint completely
 - Returns 403 Forbidden with error message:
+
   ```json
   {
     "error": "endpoint_disabled",
@@ -45,6 +49,7 @@ Identified and fixed **3 critical security vulnerabilities** in the Canvas MCP S
   ```
 
 **Code Changed:**
+
 ```typescript
 // File: packages/remote-mcp-server-authless/src/index.ts (lines 836-860)
 if (pathname === '/public') {
@@ -63,6 +68,7 @@ if (pathname === '/public') {
 ```
 
 **Verification:**
+
 ```bash
 # Test command
 curl -s "https://canvas-mcp-sse.ariff.dev/public?canvasApiKey=test&canvasBaseUrl=test"
@@ -79,25 +85,31 @@ curl -s "https://canvas-mcp-sse.ariff.dev/public?canvasApiKey=test&canvasBaseUrl
 **Status:** ✅ **FIXED**
 
 **Problem:**
+
 - Canvas API keys were being logged in debug statements
 - Example: `console.log(canvasApiKey: ${canvasApiKey})`
 - Keys stored in Cloudflare Workers logs
 - Accessible to anyone with Cloudflare dashboard access
 
 **Impact:**
+
 - API keys persisted in log storage
 - Potential exposure if logs accessed by unauthorized users
 - Compliance violation (logging sensitive credentials)
 
 **Fix Applied:**
+
 - Removed all `canvasApiKey` logging statements
 - Replaced with redacted placeholders:
+
   ```typescript
   console.log(`canvasApiKey: [REDACTED]`)
   ```
+
 - Keys never written to logs
 
 **Code Changed:**
+
 ```typescript
 // File: packages/remote-mcp-server-authless/src/index.ts (line 847)
 // Before
@@ -115,28 +127,34 @@ console.log(`canvasApiKey: [REDACTED]`);
 **Status:** ✅ **FIXED**
 
 **Problem:**
+
 - Canvas configuration used single shared API key from environment variable
 - Code: `canvasApiKey: this.env?.CANVAS_API_KEY || ""`
 - **All OAuth users would see the same Canvas account's data**
 - Multi-user architecture fundamentally broken
 
 **Impact:**
+
 - User Alice authenticates → sees Owner's Canvas courses (not hers) ❌
 - User Bob authenticates → sees Owner's Canvas courses (not his) ❌
 - **Massive privacy violation** - wrong data shown to users
 - Cannot support multiple users safely
 
 **Fix Applied:**
+
 - Removed environment variable usage completely
 - Canvas config now returns empty strings:
+
   ```typescript
   canvasApiKey: ""   // Intentionally empty
   canvasBaseUrl: ""  // Intentionally empty
   ```
+
 - All 12 Canvas tools now return error message instead of using shared key
 - Clear explanation to users about multi-user limitation
 
 **Code Changed:**
+
 ```typescript
 // File: packages/remote-mcp-server-authless/src/index.ts (lines 93-100)
 
@@ -159,6 +177,7 @@ const getCanvasConfig = () => {
 
 **User Experience:**
 All Canvas tools now show this error:
+
 ```
 Error: Canvas API credentials not configured.
 
@@ -174,6 +193,7 @@ See: CRITICAL_ARCHITECTURE_ISSUE.md for details.
 ## Deployment History
 
 ### Deployment 1: Public Endpoint & Logging Fix
+
 - **Date:** October 15, 2025 (14:30 UTC)
 - **Version:** `d564bc1f-79d7-4779-bb9b-ff7a949dd09d`
 - **Changes:**
@@ -182,6 +202,7 @@ See: CRITICAL_ARCHITECTURE_ISSUE.md for details.
 - **Commit:** `02dcf3e`
 
 ### Deployment 2: Shared API Key Fix
+
 - **Date:** October 15, 2025 (15:45 UTC)
 - **Version:** `b5a28913-fc1f-4f9c-8c4e-b83cb385944b` ← **CURRENT**
 - **Changes:**
@@ -194,6 +215,7 @@ See: CRITICAL_ARCHITECTURE_ISSUE.md for details.
 ## Testing Performed
 
 ### 1. Public Endpoint Test
+
 ```bash
 # Command
 curl -s "https://canvas-mcp-sse.ariff.dev/public"
@@ -205,6 +227,7 @@ curl -s "https://canvas-mcp-sse.ariff.dev/public"
 ```
 
 ### 2. OAuth Discovery Test
+
 ```bash
 # Command
 curl -s "https://canvas-mcp-sse.ariff.dev/.well-known/oauth-authorization-server"
@@ -216,6 +239,7 @@ curl -s "https://canvas-mcp-sse.ariff.dev/.well-known/oauth-authorization-server
 ```
 
 ### 3. Canvas Tools Test
+
 ```bash
 # Command
 # (Attempted to call Canvas tools via MCP)
@@ -227,6 +251,7 @@ curl -s "https://canvas-mcp-sse.ariff.dev/.well-known/oauth-authorization-server
 ```
 
 ### 4. Cloudflare Logs Test
+
 ```bash
 # Command
 wrangler tail canvas-mcp-sse
@@ -309,12 +334,14 @@ Security fix for multi-user deployment safety."
 If you want to support multiple Canvas users:
 
 **Option 1: Per-User Canvas API Keys** (~6 hours)
+
 - Store each user's Canvas API key with their OAuth token
 - Update all 12 Canvas tools to use per-user keys
 - Test with multiple Canvas accounts
 - See: `CRITICAL_ARCHITECTURE_ISSUE.md` for implementation steps
 
 **Option 2: Canvas OAuth Integration** (~40 hours)
+
 - Implement Canvas OAuth flow for each institution
 - Store Canvas OAuth tokens per user
 - Auto-refresh Canvas tokens
@@ -325,6 +352,7 @@ If you want to support multiple Canvas users:
 ## Verification Commands
 
 ### Check Current Deployment
+
 ```bash
 # Get deployment info
 wrangler deployments list --name canvas-mcp-sse
@@ -335,6 +363,7 @@ Created: 2025-10-15
 ```
 
 ### Test Public Endpoint (Should Fail)
+
 ```bash
 curl -v "https://canvas-mcp-sse.ariff.dev/public?canvasApiKey=test&canvasBaseUrl=test"
 
@@ -342,6 +371,7 @@ curl -v "https://canvas-mcp-sse.ariff.dev/public?canvasApiKey=test&canvasBaseUrl
 ```
 
 ### Test OAuth Discovery (Should Work)
+
 ```bash
 curl -s "https://canvas-mcp-sse.ariff.dev/.well-known/oauth-authorization-server" | jq
 
@@ -349,6 +379,7 @@ curl -s "https://canvas-mcp-sse.ariff.dev/.well-known/oauth-authorization-server
 ```
 
 ### Check Cloudflare Logs (Should Be Clean)
+
 ```bash
 wrangler tail canvas-mcp-sse
 
@@ -377,6 +408,7 @@ wrangler tail canvas-mcp-sse
 ## Risk Assessment
 
 ### Before Fixes
+
 **Risk Level:** 🔴 **CRITICAL**
 
 - Public endpoint exposed API keys
@@ -385,6 +417,7 @@ wrangler tail canvas-mcp-sse
 - **Cannot safely deploy to public**
 
 ### After Fixes  
+
 **Risk Level:** 🟢 **LOW**
 
 - No public authentication bypass
@@ -393,6 +426,7 @@ wrangler tail canvas-mcp-sse
 - **Safe for single-user or OAuth-only deployment**
 
 ### Remaining Risks
+
 **Risk Level:** 🟡 **MEDIUM** (if multi-user needed)
 
 - Canvas tools disabled (show error message)
@@ -417,7 +451,7 @@ wrangler tail canvas-mcp-sse
    - Test with 2+ Canvas accounts
    - Estimated time: 6 hours
 
-2. ⏳ **Alternative: Keep as single-user** 
+2. ⏳ **Alternative: Keep as single-user**
    - Document clearly in README
    - Use for personal/testing only
    - No additional work needed
@@ -427,6 +461,7 @@ wrangler tail canvas-mcp-sse
 ## Technical Details
 
 ### Architecture Before Fix
+
 ```
 User → OAuth Login → MCP Server
                         ↓
@@ -438,6 +473,7 @@ User → OAuth Login → MCP Server
 ```
 
 ### Architecture After Fix
+
 ```
 User → OAuth Login → MCP Server
                         ↓
@@ -447,6 +483,7 @@ User → OAuth Login → MCP Server
 ```
 
 ### Correct Multi-User Architecture (Future)
+
 ```
 User A → OAuth Login → Token + Canvas Key A → Canvas API → User A's Data ✓
 User B → OAuth Login → Token + Canvas Key B → Canvas API → User B's Data ✓
@@ -457,11 +494,12 @@ User B → OAuth Login → Token + Canvas Key B → Canvas API → User B's Data
 ## Contact & Support
 
 **Owner:** Ariff  
-**Email:** i@ariff.dev  
-**Repository:** https://github.com/a-ariff/canvas-student-mcp-server  
-**Production:** https://canvas-mcp-sse.ariff.dev
+**Email:** <i@ariff.dev>  
+**Repository:** <https://github.com/a-ariff/canvas-student-mcp-server>  
+**Production:** <https://canvas-mcp-sse.ariff.dev>
 
 For questions about these security fixes, see:
+
 - `CRITICAL_ARCHITECTURE_ISSUE.md` - Multi-user problem details
 - `SECURITY-FIXES.md` - Complete security audit
 - `AGENTS.md` - Current project status

@@ -5,6 +5,7 @@ Complete guide for integrating Canvas Student MCP Server with any MCP-compatible
 ## 🚀 Overview
 
 This guide covers:
+
 - Understanding MCP (Model Context Protocol)
 - Connecting any MCP client to Canvas MCP Server
 - OAuth 2.1 authentication flow
@@ -64,6 +65,7 @@ This guide covers:
 ```
 
 See specific guides:
+
 - [Claude Desktop Setup](./CLAUDE_DESKTOP_SETUP.md)
 
 ### Method 2: REST API
@@ -86,6 +88,7 @@ See specific guides:
 | `/canvas/assignments/upcoming` | GET | Get upcoming assignments |
 
 See specific guides:
+
 - [ChatGPT Setup](./CHATGPT_SETUP.md)
 - [Perplexity Setup](./PERPLEXITY_SETUP.md)
 
@@ -129,6 +132,7 @@ curl https://canvas-mcp-sse.ariff.dev/.well-known/oauth-authorization-server
 ```
 
 Response:
+
 ```json
 {
   "issuer": "https://canvas-mcp-sse.ariff.dev",
@@ -153,6 +157,7 @@ GET https://canvas-mcp-sse.ariff.dev/oauth/authorize?
 ```
 
 Parameters:
+
 - `client_id`: Your registered client ID
 - `redirect_uri`: Your callback URL (must be whitelisted)
 - `state`: Random string for CSRF protection
@@ -162,6 +167,7 @@ Parameters:
 #### Step 3: Handle Callback
 
 User authorizes → redirected to:
+
 ```
 YOUR_CALLBACK_URL?code=AUTH_CODE&state=RANDOM_STATE
 ```
@@ -181,6 +187,7 @@ curl -X POST https://canvas-mcp-sse.ariff.dev/oauth/token \
 ```
 
 Response:
+
 ```json
 {
   "access_token": "mcp_at_...",
@@ -200,12 +207,14 @@ curl https://canvas-mcp-sse.ariff.dev/api/v1/canvas/courses \
 ### PKCE Implementation
 
 **Generate Code Verifier:**
+
 ```javascript
 const crypto = require('crypto');
 const codeVerifier = crypto.randomBytes(32).toString('base64url');
 ```
 
 **Generate Code Challenge:**
+
 ```javascript
 const codeChallenge = crypto
   .createHash('sha256')
@@ -214,6 +223,7 @@ const codeChallenge = crypto
 ```
 
 **Python Example:**
+
 ```python
 import secrets
 import hashlib
@@ -461,6 +471,7 @@ curl https://canvas-mcp-sse.ariff.dev/health
 ```
 
 Expected:
+
 ```json
 {
   "status": "healthy",
@@ -514,6 +525,7 @@ logging.basicConfig(level=logging.DEBUG)
 ### CORS Issues
 
 If building a web app:
+
 ```javascript
 // MCP server has CORS enabled for whitelisted origins
 // If you get CORS errors, use server-side requests
@@ -522,6 +534,7 @@ If building a web app:
 ### Rate Limiting
 
 Canvas API limits:
+
 - ~100 requests per 10 seconds per token
 - Implement exponential backoff
 - Cache responses when possible
@@ -529,6 +542,7 @@ Canvas API limits:
 ### Token Expiration
 
 OAuth tokens expire after 24 hours:
+
 - Store token expiration time
 - Refresh before expiration
 - Handle 401 errors gracefully

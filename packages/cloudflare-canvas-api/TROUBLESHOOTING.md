@@ -21,6 +21,7 @@ Common issues and solutions for the Canvas API Proxy.
 **Symptoms**: 401 Unauthorized error when calling `/auth` endpoint
 
 **Causes**:
+
 - Canvas API token has expired
 - Token was copied incorrectly (whitespace, missing characters)
 - Token doesn't have sufficient permissions
@@ -34,6 +35,7 @@ Common issues and solutions for the Canvas API Proxy.
    - Generate new token if expired
 
 2. **Re-copy your token carefully**:
+
    ```bash
    # Make sure there's no whitespace or line breaks
    curl -X POST https://canvas-mcp.ariff.dev/auth \
@@ -55,6 +57,7 @@ Common issues and solutions for the Canvas API Proxy.
 **Symptoms**: 404 error when using saved user ID
 
 **Causes**:
+
 - User session expired (24 hour limit)
 - User ID was copied incorrectly
 - Cache was cleared
@@ -62,6 +65,7 @@ Common issues and solutions for the Canvas API Proxy.
 **Solutions**:
 
 1. **Re-authenticate**:
+
    ```bash
    # Get a fresh user ID
    curl -X POST https://canvas-mcp.ariff.dev/auth \
@@ -70,6 +74,7 @@ Common issues and solutions for the Canvas API Proxy.
    ```
 
 2. **Save user ID properly**:
+
    ```javascript
    // Store in localStorage for web apps
    localStorage.setItem('canvasUserId', userId);
@@ -83,6 +88,7 @@ Common issues and solutions for the Canvas API Proxy.
 **Symptoms**: 502 Bad Gateway or timeout errors
 
 **Causes**:
+
 - Canvas instance URL is incorrect
 - Canvas is behind a firewall
 - Canvas is experiencing downtime
@@ -90,6 +96,7 @@ Common issues and solutions for the Canvas API Proxy.
 **Solutions**:
 
 1. **Verify Canvas URL format**:
+
    ```bash
    # Correct formats:
    https://canvas.instructure.com
@@ -102,6 +109,7 @@ Common issues and solutions for the Canvas API Proxy.
    ```
 
 2. **Test Canvas API directly**:
+
    ```bash
    curl https://learn.mywhitecliffe.com/api/v1/courses \
      -H "Authorization: Bearer YOUR_TOKEN"
@@ -120,6 +128,7 @@ Common issues and solutions for the Canvas API Proxy.
 **Symptoms**: 429 Too Many Requests error
 
 **Causes**:
+
 - Exceeded 100 requests per minute per user
 - Multiple clients using same user ID
 - Burst of requests without throttling
@@ -127,6 +136,7 @@ Common issues and solutions for the Canvas API Proxy.
 **Solutions**:
 
 1. **Implement request throttling**:
+
    ```javascript
    // JavaScript example
    const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
@@ -147,6 +157,7 @@ Common issues and solutions for the Canvas API Proxy.
    ```
 
 2. **Check rate limit headers**:
+
    ```bash
    curl -I https://canvas-mcp.ariff.dev/courses/your_user_id
 
@@ -157,6 +168,7 @@ Common issues and solutions for the Canvas API Proxy.
    ```
 
 3. **Spread requests over time**:
+
    ```bash
    # Instead of this:
    for course in $(seq 1 50); do
@@ -171,6 +183,7 @@ Common issues and solutions for the Canvas API Proxy.
    ```
 
 4. **Increase rate limit (admin only)**:
+
    ```toml
    # Edit wrangler.toml
    [vars]
@@ -186,6 +199,7 @@ Common issues and solutions for the Canvas API Proxy.
 **Symptoms**: Updates in Canvas not reflected in API responses
 
 **Causes**:
+
 - Cache TTL too long (default 5 minutes)
 - Recent Canvas changes not yet propagated
 - Cache headers not being checked
@@ -193,6 +207,7 @@ Common issues and solutions for the Canvas API Proxy.
 **Solutions**:
 
 1. **Check cache status**:
+
    ```bash
    curl -I https://canvas-mcp.ariff.dev/courses/your_user_id
 
@@ -206,6 +221,7 @@ Common issues and solutions for the Canvas API Proxy.
    - Cache automatically refreshes after expiration
 
 3. **Reduce cache TTL** (admin only):
+
    ```toml
    # Edit wrangler.toml
    [vars]
@@ -213,6 +229,7 @@ Common issues and solutions for the Canvas API Proxy.
    ```
 
 4. **Disable caching temporarily** (local development):
+
    ```bash
    # In wrangler.toml
    [vars]
@@ -224,6 +241,7 @@ Common issues and solutions for the Canvas API Proxy.
 **Symptoms**: All requests showing `X-Cache: MISS`
 
 **Causes**:
+
 - KV namespace not properly configured
 - Cache TTL set to 0
 - Each request has unique parameters
@@ -231,6 +249,7 @@ Common issues and solutions for the Canvas API Proxy.
 **Solutions**:
 
 1. **Verify KV namespaces**:
+
    ```bash
    wrangler kv:namespace list
 
@@ -240,6 +259,7 @@ Common issues and solutions for the Canvas API Proxy.
    ```
 
 2. **Check wrangler.toml configuration**:
+
    ```toml
    [[kv_namespaces]]
    binding = "CACHE_KV"
@@ -247,6 +267,7 @@ Common issues and solutions for the Canvas API Proxy.
    ```
 
 3. **Test cache manually**:
+
    ```bash
    # First request (should be MISS)
    curl -I https://canvas-mcp.ariff.dev/courses/your_user_id
@@ -264,6 +285,7 @@ Common issues and solutions for the Canvas API Proxy.
 **Symptoms**: CORS error in browser console
 
 **Causes**:
+
 - Frontend domain not in allowed origins list
 - Preflight OPTIONS request failing
 - Missing CORS headers
@@ -271,6 +293,7 @@ Common issues and solutions for the Canvas API Proxy.
 **Solutions**:
 
 1. **Check current CORS configuration**:
+
    ```bash
    curl -H "Origin: https://yourapp.com" \
      -H "Access-Control-Request-Method: GET" \
@@ -279,6 +302,7 @@ Common issues and solutions for the Canvas API Proxy.
    ```
 
 2. **Configure allowed origins** (admin only):
+
    ```toml
    # wrangler.toml
    [vars]
@@ -286,6 +310,7 @@ Common issues and solutions for the Canvas API Proxy.
    ```
 
 3. **Allow all origins** (development only):
+
    ```toml
    # wrangler.toml
    [vars]
@@ -293,6 +318,7 @@ Common issues and solutions for the Canvas API Proxy.
    ```
 
 4. **Use a proxy for local development**:
+
    ```bash
    # Use a local proxy to bypass CORS
    npm install -g local-cors-proxy
@@ -324,6 +350,7 @@ npx wrangler deploy
 **Solutions**:
 
 1. **Create KV namespaces**:
+
    ```bash
    wrangler kv:namespace create "CACHE_KV"
    wrangler kv:namespace create "CACHE_KV" --preview
@@ -332,6 +359,7 @@ npx wrangler deploy
    ```
 
 2. **Update wrangler.toml with namespace IDs**:
+
    ```toml
    [[kv_namespaces]]
    binding = "CACHE_KV"
@@ -364,16 +392,19 @@ wrangler secret put ADMIN_API_KEY
 **Solutions**:
 
 1. **Check existing routes**:
+
    ```bash
    wrangler routes list
    ```
 
 2. **Delete conflicting route**:
+
    ```bash
    wrangler route delete <route-id>
    ```
 
 3. **Update wrangler.toml with unique pattern**:
+
    ```toml
    [route]
    pattern = "canvas-api-v2.yourdomain.com/*"  # Different subdomain
@@ -389,6 +420,7 @@ wrangler secret put ADMIN_API_KEY
 **Symptoms**: Requests taking >2 seconds
 
 **Causes**:
+
 - Canvas API is slow
 - Cold start (worker not recently used)
 - Large response payload
@@ -397,12 +429,14 @@ wrangler secret put ADMIN_API_KEY
 **Solutions**:
 
 1. **Check Canvas API response time**:
+
    ```bash
    time curl https://learn.mywhitecliffe.com/api/v1/courses \
      -H "Authorization: Bearer YOUR_TOKEN"
    ```
 
 2. **Use pagination for large datasets**:
+
    ```bash
    # Instead of fetching all courses:
    curl https://canvas-mcp.ariff.dev/courses/user_id
@@ -412,6 +446,7 @@ wrangler secret put ADMIN_API_KEY
    ```
 
 3. **Monitor cache hit rate**:
+
    ```bash
    # Check if caching is working
    for i in {1..10}; do
@@ -422,6 +457,7 @@ wrangler secret put ADMIN_API_KEY
    ```
 
 4. **Warm up worker** (keep it active):
+
    ```bash
    # Ping health endpoint every 5 minutes
    */5 * * * * curl https://canvas-mcp.ariff.dev/health
@@ -433,9 +469,10 @@ wrangler secret put ADMIN_API_KEY
 
 1. **Verify Cloudflare edge deployment**:
    - Workers should deploy to 300+ locations
-   - Check https://www.cloudflare.com/network/
+   - Check <https://www.cloudflare.com/network/>
 
 2. **Test from different locations**:
+
    ```bash
    # Use online tools like:
    # - uptrends.com/tools/uptime
@@ -455,6 +492,7 @@ wrangler secret put ADMIN_API_KEY
 **Symptoms**: Proxy works but Canvas rejects requests
 
 **Causes**:
+
 - Canvas API token expired
 - Insufficient Canvas permissions
 - Canvas account locked/disabled
@@ -462,6 +500,7 @@ wrangler secret put ADMIN_API_KEY
 **Solutions**:
 
 1. **Test Canvas API directly**:
+
    ```bash
    curl -v https://learn.mywhitecliffe.com/api/v1/courses \
      -H "Authorization: Bearer YOUR_TOKEN"
@@ -482,6 +521,7 @@ wrangler secret put ADMIN_API_KEY
 **Symptoms**: Specific endpoint returns 404
 
 **Causes**:
+
 - Endpoint not available at your Canvas instance
 - Course/assignment ID doesn't exist
 - Incorrect endpoint path
@@ -489,12 +529,14 @@ wrangler secret put ADMIN_API_KEY
 **Solutions**:
 
 1. **Verify endpoint exists**:
+
    ```bash
    # Check Canvas API documentation
    # https://canvas.instructure.com/doc/api/
    ```
 
 2. **Test with known good IDs**:
+
    ```bash
    # Get your course list first
    curl https://canvas-mcp.ariff.dev/courses/your_user_id
@@ -510,10 +552,11 @@ wrangler secret put ADMIN_API_KEY
 **Solutions**:
 
 1. **Check Canvas status**:
-   - Visit https://status.instructure.com
+   - Visit <https://status.instructure.com>
    - Check your institution's status page
 
 2. **Implement retry logic**:
+
    ```javascript
    async function fetchWithRetry(url, retries = 3) {
      for (let i = 0; i < retries; i++) {
@@ -564,13 +607,14 @@ wrangler tail --status error
 
 If you're still experiencing issues:
 
-1. **Check GitHub Issues**: https://github.com/a-ariff/canvas-student-mcp-server/issues
+1. **Check GitHub Issues**: <https://github.com/a-ariff/canvas-student-mcp-server/issues>
 2. **Create new issue** with:
    - Error message and full response
    - Steps to reproduce
    - curl command that fails
    - Expected vs actual behavior
 3. **Include logs** (with sensitive data removed):
+
    ```bash
    wrangler tail > debug.log
    # Remove tokens/keys before sharing

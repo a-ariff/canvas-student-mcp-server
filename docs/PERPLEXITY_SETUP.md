@@ -103,6 +103,7 @@ What's my current grade in Computer Science?
 ![Perplexity MCP Connector Setup](/Users/ariff/Downloads/perplexity%20sample.jpg)
 
 The setup screen shows:
+
 - Settings → Connectors → Add Connector → Advanced
 - JSON configuration field (same format as Claude Desktop)
 - Save button to activate the connector
@@ -202,6 +203,7 @@ Since Perplexity doesn't natively support OAuth:
    - Any other service
 
 **Example Zap:**
+
 ```
 Schedule (Daily 8 AM)
   ↓
@@ -226,6 +228,7 @@ You can then ask Perplexity to analyze the data from your email or sheet.
 4. Access via API endpoint
 
 **Example Scenario:**
+
 ```
 Schedule → Canvas API → Parse JSON → Store in Airtable
 ```
@@ -284,6 +287,7 @@ Then paste the JSON output into Perplexity for analysis.
 ### 1. Assignment Analysis
 
 **Workflow:**
+
 1. Fetch your assignments from Canvas API
 2. Paste the data into Perplexity
 3. Ask: *"Analyze these assignments and create a study schedule prioritizing by difficulty and due date"*
@@ -291,6 +295,7 @@ Then paste the JSON output into Perplexity for analysis.
 ### 2. Course Planning
 
 **Workflow:**
+
 1. Get course syllabi and assignment list
 2. Share with Perplexity
 3. Ask: *"Create a semester plan that balances my workload across these courses"*
@@ -298,6 +303,7 @@ Then paste the JSON output into Perplexity for analysis.
 ### 3. Grade Tracking
 
 **Workflow:**
+
 1. Fetch current grades from Canvas
 2. Input into Perplexity
 3. Ask: *"What GPA do I need on remaining assignments to achieve a 3.5 overall?"*
@@ -305,6 +311,7 @@ Then paste the JSON output into Perplexity for analysis.
 ### 4. Study Resource Recommendations
 
 **Workflow:**
+
 1. Share assignment topics from Canvas
 2. Ask Perplexity: *"What are the best resources to learn [topic] for this assignment?"*
 
@@ -337,6 +344,7 @@ Then paste the JSON output into Perplexity for analysis.
 
 **Solution:**
 Perplexity doesn't execute code or make HTTP requests. Use one of these alternatives:
+
 - Fetch data externally and paste results
 - Use automation tools (Zapier, Make.com)
 - Build a custom middleware
@@ -344,6 +352,7 @@ Perplexity doesn't execute code or make HTTP requests. Use one of these alternat
 ### Issue: "OAuth token expired"
 
 **Solution:**
+
 1. OAuth tokens from the MCP server expire after 24 hours
 2. Re-authenticate to get a new token
 3. Consider building a refresh token mechanism in your middleware
@@ -351,6 +360,7 @@ Perplexity doesn't execute code or make HTTP requests. Use one of these alternat
 ### Issue: "Canvas API rate limiting"
 
 **Solution:**
+
 1. Canvas limits API calls to ~100 requests per 10 seconds per token
 2. Implement caching in your middleware
 3. Batch requests when possible
@@ -359,6 +369,7 @@ Perplexity doesn't execute code or make HTTP requests. Use one of these alternat
 ### Issue: "CORS errors in browser"
 
 **Solution:**
+
 - The MCP server API has CORS restrictions
 - Use server-side requests (Node.js, Python) instead of browser fetch
 - Or use a proxy service that handles CORS
@@ -398,7 +409,7 @@ All responses are JSON:
 
 ## 🎯 MCP Support Status
 
-### ✅ Perplexity HAS MCP Support!
+### ✅ Perplexity HAS MCP Support
 
 As of October 2025, Perplexity Desktop app includes native MCP connector support through the Advanced settings. This means:
 
@@ -410,12 +421,14 @@ As of October 2025, Perplexity Desktop app includes native MCP connector support
 ### How It Works
 
 The MCP connector in Perplexity uses the same configuration format as Claude Desktop:
+
 - JSON-based server configuration
 - OAuth 2.1 authentication
 - Server-Sent Events (SSE) transport
 - Access to all 12 Canvas tools
 
 **Stay Updated:**
+
 - Follow Perplexity's [changelog](https://www.perplexity.ai/hub/changelog) for connector updates
 - Check MCP protocol updates: [modelcontextprotocol.io](https://modelcontextprotocol.io)
 

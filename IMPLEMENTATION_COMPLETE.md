@@ -10,11 +10,13 @@
 ### ✅ 1. Implemented Complete CRUD Operations for Canvas Config
 
 **New Endpoints Added:**
+
 - `POST /api/v1/canvas/config` - Save user's Canvas credentials
 - `GET /api/v1/canvas/config` - Check if user has configured Canvas
 - `DELETE /api/v1/canvas/config` - Remove user's Canvas credentials
 
 **How It Works:**
+
 - Each OAuth user gets a unique `userId` when they authenticate
 - Canvas credentials stored as `canvas_config:${userId}` in Cloudflare KV
 - Complete user isolation - no data leakage between users
@@ -23,21 +25,25 @@
 ### ✅ 2. Fixed OAuth PKCE Implementation
 
 **Problem Found:**
+
 - Test scripts were generating 42-character PKCE values instead of 43
 - Used `cut -c1-43` which truncated improperly encoded base64
 
 **Solution Applied:**
+
 - Proper base64url encoding: `base64 | tr -d '=' | tr '+/' '-_'`
 - Generates valid 43-character verifiers and challenges
 - PKCE verification now works perfectly
 
 **Files Fixed:**
+
 - `/test-oauth-automated.sh` - Full automated test suite
 - `/test-oauth-debug.sh` - Debug version with detailed logging
 
 ### ✅ 3. Comprehensive Testing
 
 **All Tests Passing:**
+
 1. ✅ OAuth Authorization (with PKCE)
 2. ✅ OAuth Token Exchange
 3. ✅ Canvas Config Storage (POST)
@@ -47,6 +53,7 @@
 7. ✅ Canvas data endpoints reading from KV
 
 **Test Evidence:**
+
 ```bash
 # OAuth flow working
 Access Token: mcp_at_29a744b2-8a24-4a64-a7c7-3cda8db1cd7a ✅
@@ -61,29 +68,34 @@ DELETE response: {"success": true, "message": "Canvas configuration deleted"} �
 ### ✅ 4. Updated Documentation
 
 **New Files Created:**
+
 - `/PER_USER_CANVAS_TEST_REPORT.md` - Complete 300+ line test report
 - `/test-oauth-automated.sh` - Automated test script
 - `/test-oauth-debug.sh` - Debug test script
 
 **Updated Files:**
+
 - `/AGENTS.md` - Updated with verified implementation status
 - `/packages/remote-mcp-server-authless/src/index.ts` - Added GET/DELETE handlers
 
 ## 🔍 What Was Verified
 
 ### Per-User Storage
+
 ✅ Tested OAuth user gets unique `userId`  
 ✅ Canvas credentials stored under `canvas_config:${userId}`  
 ✅ Different users would get different KV keys  
 ✅ No cross-user data leakage possible
 
 ### API Security
+
 ✅ All endpoints require OAuth bearer token  
 ✅ Returns 401 without authentication  
 ✅ Canvas API key never returned in GET response  
 ✅ Only Canvas API receives the actual key
 
 ### Endpoint Functionality
+
 ✅ POST saves credentials successfully  
 ✅ GET shows configuration status  
 ✅ DELETE removes credentials cleanly  
@@ -92,12 +104,14 @@ DELETE response: {"success": true, "message": "Canvas configuration deleted"} �
 ## 📊 Current Status
 
 ### ✅ Working (Production Ready)
+
 - **HTTP API Endpoints** - All CRUD operations functional
 - **OAuth Authentication** - PKCE working perfectly
 - **Per-User Storage** - Isolated KV entries per user
 - **Canvas Data Endpoints** - Reading from per-user config
 
 ### ⏳ Remaining Work (MCP SSE Tools)
+
 - **Context Wiring** - Need to thread `userId` through SSE connection
 - **Tool Handlers** - Update 12 MCP tools to read from per-user KV
 - **Testing** - Verify MCP tools work with stored credentials
@@ -111,6 +125,7 @@ DELETE response: {"success": true, "message": "Canvas configuration deleted"} �
 **Deployment Time:** October 15, 2025  
 
 **What's Live:**
+
 - ✅ OAuth 2.1 with PKCE authentication
 - ✅ Per-user Canvas configuration (POST/GET/DELETE)
 - ✅ Canvas data endpoints (courses, assignments, upcoming)
@@ -119,22 +134,27 @@ DELETE response: {"success": true, "message": "Canvas configuration deleted"} �
 ## 📝 Test Scripts Available
 
 ### Automated Test (Recommended)
+
 ```bash
 ./test-oauth-automated.sh
 ```
+
 - Complete OAuth + Canvas config flow
 - Tests all CRUD operations
 - Outputs access/refresh tokens for future use
 
 ### Debug Test
+
 ```bash
 ./test-oauth-debug.sh
 ```
+
 - Shows PKCE parameters
 - Useful for debugging OAuth issues
 - Stops after token exchange
 
 ### Manual Testing
+
 ```bash
 # Test with saved access token
 ACCESS_TOKEN="mcp_at_29a744b2-8a24-4a64-a7c7-3cda8db1cd7a"
@@ -157,16 +177,19 @@ curl -X DELETE 'https://canvas-mcp-sse.ariff.dev/api/v1/canvas/config' \
 ## 🎯 Next Steps (Optional)
 
 ### Option 1: Keep as HTTP API Only (0 hours)
+
 - Current implementation works for ChatGPT Actions, Perplexity, etc.
 - HTTP endpoints are multi-user ready
 - No additional work needed
 
 ### Option 2: Complete MCP SSE Integration (2-4 hours)
+
 - Thread OAuth userId through SSE connection
 - Update MCP tool handlers to read from KV
 - Test with Claude Desktop, Cursor, etc.
 
 ### Option 3: Test with Real Canvas (30 min)
+
 - Replace `19765~test` with real Canvas API key
 - Verify courses/assignments return actual data
 - Test with multiple Canvas instances
@@ -174,17 +197,20 @@ curl -X DELETE 'https://canvas-mcp-sse.ariff.dev/api/v1/canvas/config' \
 ## 📚 Documentation References
 
 **Primary Documents:**
+
 - `PER_USER_CANVAS_TEST_REPORT.md` - Complete test results
 - `AGENTS.md` - Updated project status and architecture
 - `SECURITY_FIX_REPORT_2025-10-15.md` - Initial security fixes
 
 **Code Changes:**
+
 - `packages/remote-mcp-server-authless/src/index.ts` (lines ~687-770)
   - Added GET handler for Canvas config
   - Added DELETE handler for Canvas config
   - Already had POST handler (working)
 
 **Test Scripts:**
+
 - `test-oauth-automated.sh` - Automated test suite
 - `test-oauth-debug.sh` - Debug version
 
@@ -215,6 +241,7 @@ curl -X DELETE 'https://canvas-mcp-sse.ariff.dev/api/v1/canvas/config' \
 **Deployment:** ✅ LIVE IN PRODUCTION  
 
 **Ready For:**
+
 - ✅ ChatGPT Actions integration
 - ✅ Perplexity integration
 - ✅ Multi-user HTTP API usage

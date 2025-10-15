@@ -1,19 +1,20 @@
 # Contributing to Canvas Student MCP Server
 
-First off, thank you for considering contributing to Canvas Student MCP Server! It's people like you that make this project such a great tool for the community.
+First off, thank you for considering contributing to Canvas Student MCP Server!
+It's people like you that make this project such a great tool for the community.
 
-## 🎯 Ways to Contribute
+## Ways to Contribute
 
 There are many ways you can contribute to this project:
 
-- 🐛 **Report bugs** - Found a bug? Let us know!
-- ✨ **Suggest features** - Have an idea? We'd love to hear it!
-- 📝 **Improve documentation** - Help make our docs better
-- 🔧 **Submit pull requests** - Fix bugs or add features
-- 💬 **Answer questions** - Help others in discussions
-- ⭐ **Star the repo** - Show your support!
+- Report bugs - Found a bug? Let us know!
+- Suggest features - Have an idea? We'd love to hear it!
+- Improve documentation - Help make our docs better
+- Submit pull requests - Fix bugs or add features
+- Answer questions - Help others in discussions
+- Star the repo - Show your support!
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -29,6 +30,7 @@ Before you begin, ensure you have:
 ### Development Setup
 
 1. **Fork the repository**
+
    ```bash
    # Click the "Fork" button on GitHub, then clone your fork
    git clone https://github.com/YOUR_USERNAME/canvas-student-mcp-server.git
@@ -36,22 +38,25 @@ Before you begin, ensure you have:
    ```
 
 2. **Add upstream remote**
+
    ```bash
    git remote add upstream https://github.com/a-ariff/canvas-student-mcp-server.git
    ```
 
 3. **Install dependencies**
+
    ```bash
    npm run install:all
    ```
 
 4. **Set up environment**
+
    ```bash
    # For MCP server
    cd packages/remote-mcp-server-authless
    cp wrangler.jsonc.example wrangler.jsonc
    # Edit wrangler.jsonc with your Cloudflare settings
-   
+
    # For API proxy
    cd ../cloudflare-canvas-api
    cp wrangler.toml.example wrangler.toml
@@ -59,22 +64,24 @@ Before you begin, ensure you have:
    ```
 
 5. **Run locally**
+
    ```bash
    # MCP Server
    cd packages/remote-mcp-server-authless
    npm run dev
-   
+
    # API Proxy (in another terminal)
    cd packages/cloudflare-canvas-api
    npm run dev
    ```
 
-## 📋 Development Workflow
+## Development Workflow
 
 ### Before You Code
 
 1. **Check existing issues**
-   - Search [open issues](https://github.com/a-ariff/canvas-student-mcp-server/issues)
+   - Search
+     [open issues](<https://github.com/a-ariff/canvas-student-mcp-server/issues>)
    - Comment on the issue you'd like to work on
    - Wait for approval before starting significant work
 
@@ -86,6 +93,7 @@ Before you begin, ensure you have:
 ### While Coding
 
 1. **Create a feature branch**
+
    ```bash
    git checkout -b feature/your-feature-name
    # or
@@ -99,15 +107,17 @@ Before you begin, ensure you have:
    - Add comments for complex logic
 
 3. **Write tests**
+
    ```bash
    # Run tests
    npm test
-   
+
    # Run type checking
    npm run type-check
    ```
 
 4. **Keep commits clean**
+
    ```bash
    # Use conventional commit messages
    git commit -m "feat: add new Canvas tool for file uploads"
@@ -117,9 +127,9 @@ Before you begin, ensure you have:
 
 ### Commit Message Format
 
-We follow [Conventional Commits](https://www.conventionalcommits.org/):
+We follow [Conventional Commits](<https://www.conventionalcommits.org/>):
 
-```
+```text
 <type>(<scope>): <subject>
 
 <body>
@@ -128,6 +138,7 @@ We follow [Conventional Commits](https://www.conventionalcommits.org/):
 ```
 
 **Types:**
+
 - `feat`: New feature
 - `fix`: Bug fix
 - `docs`: Documentation changes
@@ -137,6 +148,7 @@ We follow [Conventional Commits](https://www.conventionalcommits.org/):
 - `chore`: Maintenance tasks
 
 **Examples:**
+
 ```bash
 feat(oauth): add PKCE support for mobile clients
 fix(tools): resolve grade calculation rounding error
@@ -147,16 +159,17 @@ refactor(api): simplify error handling logic
 ### Before Submitting
 
 1. **Test your changes**
+
    ```bash
    # Run all tests
    npm test
-   
+
    # Type check
    npm run type-check
-   
+
    # Build
    npm run build
-   
+
    # Test locally
    npm run dev
    ```
@@ -168,16 +181,18 @@ refactor(api): simplify error handling logic
    - Update relevant package READMEs
 
 3. **Keep your fork up to date**
+
    ```bash
    git fetch upstream
    git rebase upstream/main
    ```
 
-## 🔍 Pull Request Process
+## Pull Request Process
 
 ### Creating a Pull Request
 
 1. **Push your branch**
+
    ```bash
    git push origin feature/your-feature-name
    ```
@@ -189,7 +204,8 @@ refactor(api): simplify error handling logic
    - Add screenshots if applicable
 
 3. **PR title format**
-   ```
+
+   ```text
    feat: Add support for Canvas rubrics
    fix: Resolve OAuth token expiration issue
    docs: Improve quick start guide
@@ -229,12 +245,12 @@ refactor(api): simplify error handling logic
    - Once approved, a maintainer will merge
    - Your contribution will be in the next release!
 
-## 📚 Coding Standards
+## Coding Standards
 
 ### TypeScript
 
 ```typescript
-// ✅ Good: Clear types, descriptive names
+// Good: Clear types, descriptive names
 interface CanvasAssignment {
   id: number;
   name: string;
@@ -246,7 +262,7 @@ async function getAssignments(courseId: number): Promise<CanvasAssignment[]> {
   // Implementation
 }
 
-// ❌ Bad: Any types, unclear names
+// Bad: Any types, unclear names
 function getStuff(x: any): any {
   // Implementation
 }
@@ -255,7 +271,7 @@ function getStuff(x: any): any {
 ### Error Handling
 
 ```typescript
-// ✅ Good: Specific errors with context
+// Good: Specific errors with context
 try {
   const assignments = await fetchAssignments(courseId);
   return assignments;
@@ -263,7 +279,7 @@ try {
   throw new Error(`Failed to fetch assignments for course ${courseId}: ${error.message}`);
 }
 
-// ❌ Bad: Silent failures
+// Bad: Silent failures
 try {
   const assignments = await fetchAssignments(courseId);
 } catch (error) {
@@ -274,14 +290,14 @@ try {
 ### Async/Await
 
 ```typescript
-// ✅ Good: Use async/await
+// Good: Use async/await
 async function getCourseData(courseId: number) {
   const course = await fetchCourse(courseId);
   const assignments = await fetchAssignments(courseId);
   return { course, assignments };
 }
 
-// ❌ Bad: Promise chains
+// Bad: Promise chains
 function getCourseData(courseId: number) {
   return fetchCourse(courseId).then(course => {
     return fetchAssignments(courseId).then(assignments => {
@@ -291,35 +307,35 @@ function getCourseData(courseId: number) {
 }
 ```
 
-## 🔒 Security Guidelines
+## Security Guidelines
 
 ### Never Commit Secrets
 
 ```bash
-# ❌ Never commit these
+# Never commit these
 .env
 wrangler.toml (with secrets)
 *.key
 *.pem
 config/secrets.json
 
-# ✅ Always in .gitignore
+# Always in .gitignore
 ```
 
 ### API Tokens
 
 ```typescript
-// ✅ Good: Environment variables
+// Good: Environment variables
 const apiToken = env.CANVAS_API_TOKEN;
 
-// ❌ Bad: Hardcoded
+// Bad: Hardcoded
 const apiToken = "12345-abc-secret";
 ```
 
 ### Input Validation
 
 ```typescript
-// ✅ Good: Validate input
+// Good: Validate input
 import { z } from 'zod';
 
 const CourseIdSchema = z.number().positive();
@@ -329,13 +345,13 @@ function getCourse(courseId: unknown) {
   // Use validId
 }
 
-// ❌ Bad: No validation
+// Bad: No validation
 function getCourse(courseId: any) {
   // Directly use courseId
 }
 ```
 
-## 🧪 Testing
+## Testing
 
 ### Writing Tests
 
@@ -368,7 +384,7 @@ npm test -- --watch
 npm test -- --coverage
 ```
 
-## 📖 Documentation
+## Documentation
 
 ### Code Comments
 
@@ -395,9 +411,9 @@ async function getAssignments(
 - Update configuration examples
 - Document new features
 
-## 🎨 Project Structure
+## Project Structure
 
-```
+```text
 canvas-student-mcp-server/
 ├── packages/
 │   ├── remote-mcp-server-authless/  # Main MCP server
@@ -417,11 +433,12 @@ canvas-student-mcp-server/
 └── package.json                     # Root workspace config
 ```
 
-## 🐛 Reporting Bugs
+## Reporting Bugs
 
 ### Before Submitting
 
-1. Check [existing issues](https://github.com/a-ariff/canvas-student-mcp-server/issues)
+1. Check
+   [existing issues](<https://github.com/a-ariff/canvas-student-mcp-server/issues>)
 2. Update to latest version
 3. Test with minimal configuration
 
@@ -453,7 +470,7 @@ If applicable, add screenshots.
 Any other relevant information.
 ```
 
-## 💡 Feature Requests
+## Feature Requests
 
 ### Before Suggesting
 
@@ -477,30 +494,36 @@ Other solutions you've thought about.
 Any other relevant information, mockups, or examples.
 ```
 
-## 📞 Getting Help
+## Getting Help
 
 - **Documentation**: Check our [README](README.md) and package docs
-- **Discussions**: Use [GitHub Discussions](https://github.com/a-ariff/canvas-student-mcp-server/discussions)
+- **Discussions**: Use
+  [GitHub Discussions](<https://github.com/a-ariff/canvas-student-mcp-server/discussions>)
 - **Issues**: For bugs only
-- **Security**: Email security@ariff.dev for security issues
+- **Security**: Email <security@ariff.dev> for security issues
 
-## 🏆 Recognition
+## Recognition
 
 Contributors will be:
+
 - Listed in release notes
 - Mentioned in CHANGELOG.md
 - Credited in documentation (if significant contribution)
 - Eligible for "Contributor" badge on GitHub
 
-## 📜 Code of Conduct
+## Code of Conduct
 
 ### Our Pledge
 
-We pledge to make participation in our project a harassment-free experience for everyone, regardless of age, body size, disability, ethnicity, gender identity, level of experience, nationality, personal appearance, race, religion, or sexual identity and orientation.
+We pledge to make participation in our project a harassment-free experience for
+everyone, regardless of age, body size, disability, ethnicity, gender identity,
+level of experience, nationality, personal appearance, race, religion, or sexual
+identity and orientation.
 
 ### Our Standards
 
 **Positive behavior:**
+
 - Using welcoming and inclusive language
 - Being respectful of differing viewpoints
 - Accepting constructive criticism gracefully
@@ -508,6 +531,7 @@ We pledge to make participation in our project a harassment-free experience for 
 - Showing empathy towards others
 
 **Unacceptable behavior:**
+
 - Trolling, insulting comments, or personal attacks
 - Public or private harassment
 - Publishing others' private information
@@ -515,14 +539,17 @@ We pledge to make participation in our project a harassment-free experience for 
 
 ### Enforcement
 
-Violations may be reported to contact@ariff.dev. All complaints will be reviewed and result in appropriate response.
+Violations may be reported to <contact@ariff.dev>. All complaints will be reviewed
+and result in appropriate response.
 
-## 📄 License
+## License
 
-By contributing, you agree that your contributions will be licensed under the MIT License.
+By contributing, you agree that your contributions will be licensed under the
+MIT License.
 
 ---
 
-**Thank you for contributing! 🎉**
+**Thank you for contributing!**
 
-Every contribution, no matter how small, makes a difference. We appreciate your time and effort!
+Every contribution, no matter how small, makes a difference. We appreciate your
+time and effort!

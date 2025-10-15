@@ -15,16 +15,19 @@ The easiest way to get started is using our hosted production server with OAuth 
 ### Step 1: Locate Your Configuration File
 
 **macOS:**
+
 ```bash
 ~/Library/Application Support/Claude/claude_desktop_config.json
 ```
 
 **Windows:**
+
 ```bash
 %APPDATA%\Claude\claude_desktop_config.json
 ```
 
 **Linux:**
+
 ```bash
 ~/.config/claude/claude_desktop_config.json
 ```
@@ -162,6 +165,7 @@ If you're running your own deployment:
 ### Issue: "MCP server not found" or "Connection failed"
 
 **Solution:**
+
 1. Verify the config file path is correct
 2. Ensure JSON syntax is valid (use [jsonlint.com](https://jsonlint.com))
 3. Restart Claude Desktop completely
@@ -170,7 +174,9 @@ If you're running your own deployment:
 ### Issue: "OAuth authentication failed"
 
 **Solution:**
+
 1. Clear your OAuth tokens:
+
    ```bash
    # macOS/Linux
    rm -rf ~/Library/Application\ Support/Claude/oauth_tokens/
@@ -178,12 +184,14 @@ If you're running your own deployment:
    # Windows
    rmdir /s %APPDATA%\Claude\oauth_tokens
    ```
+
 2. Restart Claude Desktop
 3. Try authenticating again
 
 ### Issue: "Canvas API returned 401 Unauthorized"
 
 **Solution:**
+
 1. Verify your Canvas API token is valid
 2. Check that your token hasn't expired
 3. Ensure you're using the correct Canvas base URL
@@ -192,6 +200,7 @@ If you're running your own deployment:
 ### Issue: "No courses found" or empty results
 
 **Solution:**
+
 1. Verify you're enrolled in courses on Canvas
 2. Check that your API token has the correct permissions
 3. Try accessing Canvas directly in a browser to confirm your account status
@@ -199,6 +208,7 @@ If you're running your own deployment:
 ### Issue: Commands are slow or timing out
 
 **Solution:**
+
 1. Check your internet connection
 2. Verify Canvas API is accessible: `curl https://your-canvas-url/api/v1/users/self/profile -H "Authorization: Bearer YOUR_TOKEN"`
 3. Check Cloudflare Workers status: [cloudflarestatus.com](https://www.cloudflarestatus.com)
@@ -206,6 +216,7 @@ If you're running your own deployment:
 ### Issue: "Invalid JSON in config file"
 
 **Solution:**
+
 1. Validate your JSON at [jsonlint.com](https://jsonlint.com)
 2. Common issues:
    - Missing commas between objects
@@ -218,27 +229,32 @@ If you're running your own deployment:
 Once connected, you can ask Claude to:
 
 ### Course Management
+
 - "List all my Canvas courses"
 - "Show me modules in [course name]"
 - "What's my profile information?"
 
 ### Assignments
+
 - "Show me assignments for [course name]"
 - "What assignments are due this week?"
 - "List all my upcoming assignments"
 - "What's my grade on [assignment name]?"
 
 ### Submissions
+
 - "Show me my submission for [assignment]"
 - "List my recent submissions"
 - "What feedback did I get on [assignment]?"
 
 ### Communication
+
 - "Show me recent announcements"
 - "What discussions are active in [course]?"
 - "What's on my Canvas calendar?"
 
 ### Grades & Progress
+
 - "What are my current grades?"
 - "Show me my todo list"
 - "What courses am I failing?"
@@ -258,6 +274,7 @@ Once connected, you can ask Claude to:
 Read our full privacy policy at: [https://canvas-mcp-sse.ariff.dev/privacy](https://canvas-mcp-sse.ariff.dev/privacy)
 
 **Key points:**
+
 - We never store your Canvas API token permanently
 - Your credentials are isolated per OAuth session
 - No analytics or tracking

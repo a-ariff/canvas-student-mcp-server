@@ -54,12 +54,14 @@ export COURSE_ID="123456"
 Authenticate with Canvas and get your user ID.
 
 **Environment Variables:**
+
 - `CANVAS_API_KEY` (required): Your Canvas API token
-- `CANVAS_URL` (optional): Canvas instance URL (default: https://canvas.instructure.com)
+- `CANVAS_URL` (optional): Canvas instance URL (default: <https://canvas.instructure.com>)
 - `INSTITUTION_NAME` (optional): Your institution name (default: My Institution)
-- `API_BASE_URL` (optional): Proxy API URL (default: https://canvas-mcp.ariff.dev)
+- `API_BASE_URL` (optional): Proxy API URL (default: <https://canvas-mcp.ariff.dev>)
 
 **Example:**
+
 ```bash
 CANVAS_API_KEY="19765~token" \
 CANVAS_URL="https://canvas.instructure.com" \
@@ -68,6 +70,7 @@ INSTITUTION_NAME="My University" \
 ```
 
 **Output:**
+
 ```json
 {
   "success": true,
@@ -83,15 +86,18 @@ INSTITUTION_NAME="My University" \
 Retrieve all courses for authenticated user.
 
 **Environment Variables:**
+
 - `CANVAS_USER_ID` (required): Your user ID from auth.sh
 - `API_BASE_URL` (optional): Proxy API URL
 
 **Example:**
+
 ```bash
 CANVAS_USER_ID="user_abc123xyz" ./get-courses.sh
 ```
 
 **Output:**
+
 ```json
 {
   "data": [
@@ -112,11 +118,13 @@ CANVAS_USER_ID="user_abc123xyz" ./get-courses.sh
 Retrieve assignments for a specific course.
 
 **Environment Variables:**
+
 - `CANVAS_USER_ID` (required): Your user ID
 - `COURSE_ID` (required): Canvas course ID
 - `API_BASE_URL` (optional): Proxy API URL
 
 **Example:**
+
 ```bash
 CANVAS_USER_ID="user_abc123xyz" \
 COURSE_ID="123456" \
@@ -124,6 +132,7 @@ COURSE_ID="123456" \
 ```
 
 **Output:**
+
 ```json
 {
   "data": [
@@ -144,15 +153,18 @@ COURSE_ID="123456" \
 Retrieve upcoming assignments and events.
 
 **Environment Variables:**
+
 - `CANVAS_USER_ID` (required): Your user ID
 - `API_BASE_URL` (optional): Proxy API URL
 
 **Example:**
+
 ```bash
 CANVAS_USER_ID="user_abc123xyz" ./get-upcoming.sh
 ```
 
 **Output:**
+
 ```json
 {
   "data": [
@@ -173,14 +185,17 @@ CANVAS_USER_ID="user_abc123xyz" ./get-upcoming.sh
 Check API health and status.
 
 **Environment Variables:**
+
 - `API_BASE_URL` (optional): Proxy API URL
 
 **Example:**
+
 ```bash
 ./health-check.sh
 ```
 
 **Output:**
+
 ```json
 {
   "status": "healthy",

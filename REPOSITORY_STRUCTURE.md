@@ -74,7 +74,9 @@ canvas-student-mcp-server/
 ## Key Directories
 
 ### `/packages/remote-mcp-server-authless`
+
 The main MCP server implementation with:
+
 - **OAuth 2.1** authentication (PKCE support)
 - **Server-Sent Events (SSE)** transport
 - **12 Canvas LMS tools** (courses, assignments, submissions, etc.)
@@ -83,7 +85,9 @@ The main MCP server implementation with:
 - **Privacy policy** endpoint for public GPT requirements
 
 ### `/packages/cloudflare-canvas-api`
+
 A standalone REST API proxy for Canvas LMS:
+
 - **Multi-user support** with rate limiting
 - **Caching layer** for performance
 - **Authentication management**
@@ -178,6 +182,7 @@ npm run deploy:api      # Deploy API proxy
 ## API Endpoints
 
 ### MCP Server (`canvas-mcp-sse.ariff.dev`)
+
 - `GET /.well-known/oauth-authorization-server` - OAuth metadata
 - `GET /oauth/authorize` - OAuth authorization endpoint
 - `POST /oauth/token` - OAuth token endpoint
@@ -190,6 +195,7 @@ npm run deploy:api      # Deploy API proxy
 - `GET /api/v1/canvas/assignments/upcoming` - Upcoming assignments
 
 ### API Proxy (`canvas-mcp.ariff.dev`)
+
 - `GET /health` - Health check
 - `POST /auth` - Authenticate and get user ID
 - `GET /proxy/:userId/courses` - Get user's courses
@@ -214,5 +220,5 @@ MIT License - See LICENSE file for details
 ---
 
 **Maintained by**: Ariff  
-**Repository**: https://github.com/a-ariff/canvas-student-mcp-server  
-**Issues**: https://github.com/a-ariff/canvas-student-mcp-server/issues
+**Repository**: <https://github.com/a-ariff/canvas-student-mcp-server>  
+**Issues**: <https://github.com/a-ariff/canvas-student-mcp-server/issues>
