@@ -130,3 +130,8 @@ START_HERE.md
 node_modules/@cloudflare/workerd-*/bin/*
 node_modules/**/*.node
 node_modules/**/bin/*
+
+# Git rewrite artifacts
+.git-rewrite-msg-*.txt
+rewrite-*.sh
+rewrite-*.py
