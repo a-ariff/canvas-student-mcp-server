@@ -9,6 +9,7 @@ export interface OAuthClient {
 	redirect_uris: string[];
 	grant_types: string[];
 	is_confidential: boolean;
+	require_pkce?: boolean; // Whether PKCE is required (default: true)
 }
 
 /**
@@ -26,6 +27,17 @@ const OAUTH_CLIENTS: Record<string, OAuthClient> = {
 		],
 		grant_types: ["authorization_code", "refresh_token"],
 		is_confidential: false,
+	},
+	// ChatGPT OAuth client
+	"HqSTFXhPtTRy2nCUgI0ewhlResFPckU8": {
+		client_id: "HqSTFXhPtTRy2nCUgI0ewhlResFPckU8",
+		redirect_uris: [
+			"https://chat.openai.com/aip/g-690db50f97d77dacbb580e8c54dc4155a1897f11/oauth/callback",
+			"https://chatgpt.com/aip/g-690db50f97d77dacbb580e8c54dc4155a1897f11/oauth/callback",
+		],
+		grant_types: ["authorization_code", "refresh_token"],
+		is_confidential: false, // Public client - no secret required
+		require_pkce: false, // ChatGPT GPT Actions don't automatically send PKCE parameters
 	},
 };
 

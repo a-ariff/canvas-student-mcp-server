@@ -2,7 +2,7 @@
 
 Multi-user Canvas LMS integration with caching, rate limiting, and global edge deployment. Deploy this to your own domain and let anyone integrate with Canvas through a simple REST API.
 
-**Live Demo**: https://canvas-mcp.ariff.dev/
+**Live Demo**: <https://canvas-mcp.ariff.dev/>
 
 ## 🌟 Features
 
@@ -24,6 +24,7 @@ Register your Canvas credentials and get a user ID.
 **Endpoint**: `POST /auth`
 
 **Request**:
+
 ```bash
 curl -X POST https://canvas-mcp.ariff.dev/auth \
   -H "Content-Type: application/json" \
@@ -35,6 +36,7 @@ curl -X POST https://canvas-mcp.ariff.dev/auth \
 ```
 
 **Response**:
+
 ```json
 {
   "success": true,
@@ -54,6 +56,7 @@ Access any Canvas API endpoint through the proxy.
 **Endpoint**: `POST /canvas/{userId}`
 
 **Request**:
+
 ```bash
 curl -X POST https://canvas-mcp.ariff.dev/canvas/user_abc123xyz \
   -H "Content-Type: application/json" \
@@ -78,16 +81,19 @@ Retrieve all active courses for the authenticated user.
 **Endpoint**: `GET /courses/{userId}`
 
 **Request**:
+
 ```bash
 curl https://canvas-mcp.ariff.dev/courses/user_abc123xyz
 ```
 
 **Query Parameters**:
+
 - `enrollment_state` (optional): `active`, `completed`, `invited`, `rejected`. Default: `active`
 - `per_page` (optional): Results per page (1-100). Default: 20
 - `page` (optional): Page number for pagination
 
 **Response**:
+
 ```json
 {
   "data": [
@@ -117,19 +123,23 @@ Retrieve assignments for a specific course.
 **Endpoint**: `GET /assignments/{userId}`
 
 **Request**:
+
 ```bash
 curl "https://canvas-mcp.ariff.dev/assignments/user_abc123xyz?course_id=123456"
 ```
 
 **Query Parameters** (required):
+
 - `course_id`: Canvas course ID
 
 **Optional Parameters**:
+
 - `include[]`: Additional data (e.g., `submission`, `rubric`, `due_at`)
 - `per_page`: Results per page (1-100). Default: 20
 - `page`: Page number
 
 **Response**:
+
 ```json
 {
   "data": [
@@ -159,11 +169,13 @@ Retrieve upcoming assignments, events, and calendar items.
 **Endpoint**: `GET /upcoming/{userId}`
 
 **Request**:
+
 ```bash
 curl https://canvas-mcp.ariff.dev/upcoming/user_abc123xyz
 ```
 
 **Response**:
+
 ```json
 {
   "data": [
@@ -192,11 +204,13 @@ Check API status and configuration.
 **Endpoint**: `GET /health`
 
 **Request**:
+
 ```bash
 curl https://canvas-mcp.ariff.dev/health
 ```
 
 **Response**:
+
 ```json
 {
   "status": "healthy",
@@ -220,6 +234,7 @@ curl https://canvas-mcp.ariff.dev/health
 - **Default**: 100 requests per minute per user
 - **Algorithm**: Token bucket with automatic refill
 - **Headers**: Rate limit info returned in response headers
+
   ```
   X-RateLimit-Limit: 100
   X-RateLimit-Remaining: 95
@@ -237,11 +252,13 @@ curl https://canvas-mcp.ariff.dev/health
 All list endpoints support pagination:
 
 **Request**:
+
 ```bash
 curl "https://canvas-mcp.ariff.dev/courses/user_abc123xyz?page=2&per_page=50"
 ```
 
 **Response Headers**:
+
 ```
 Link: <https://canvas-mcp.ariff.dev/courses/user_abc123xyz?page=3&per_page=50>; rel="next",
       <https://canvas-mcp.ariff.dev/courses/user_abc123xyz?page=1&per_page=50>; rel="first"
@@ -374,6 +391,7 @@ curl http://localhost:8787/health
 ### Docker Setup
 
 **Build and run**:
+
 ```bash
 cd /path/to/canvas-student-mcp-server/packages/canvas-student-mcp-server
 docker build -t canvas-mcp-server .
@@ -383,6 +401,7 @@ docker run -e CANVAS_API_KEY=your_token \
 ```
 
 **Using Docker Compose**:
+
 ```bash
 # Create .env file with your credentials
 echo "CANVAS_API_KEY=your_token" > .env
@@ -403,20 +422,24 @@ docker-compose down
 ## 🔒 Security
 
 ### API Key Encryption
+
 - Canvas API keys encrypted using XOR cipher with `ENCRYPTION_KEY`
 - Keys never stored in plaintext
 - User sessions expire after 24 hours
 
 ### Rate Limiting
+
 - 100 requests/minute per user by default
 - Prevents API abuse
 - Automatic cleanup of expired tokens
 
 ### CORS
+
 - Configurable allowed origins
 - Default: `*` (configure for production use)
 
 ### Admin Operations
+
 - Protected endpoints require `ADMIN_API_KEY` header
 - Access to system statistics and monitoring
 
@@ -434,6 +457,7 @@ docker-compose down
 | 502 | Bad Gateway | Canvas API unreachable |
 
 **Error Response Format**:
+
 ```json
 {
   "error": "Rate limit exceeded",
@@ -448,24 +472,28 @@ docker-compose down
 ## 🌍 Use Cases
 
 ### For Students
+
 - Personal Canvas dashboards
 - Assignment tracking apps
 - Integration with productivity tools (Notion, Todoist)
 - Mobile app development
 
 ### For Educators
+
 - Custom grading interfaces
 - Student progress analytics
 - Assignment distribution automation
 - Attendance tracking systems
 
 ### For Developers
+
 - Canvas LMS integrations
 - Educational app development
 - Learning analytics platforms
 - Third-party tool connections
 
 ### For Institutions
+
 - Custom Canvas extensions
 - Data migration tools
 - Reporting dashboards
@@ -476,18 +504,21 @@ docker-compose down
 ## 🚀 Advanced Features
 
 ### Intelligent Caching
+
 - Endpoint-specific TTL
 - Automatic cache invalidation
 - Global edge caching via Cloudflare KV
 - Cache status in response headers
 
 ### Performance Optimization
+
 - Deployed across 300+ Cloudflare edge locations
 - Sub-100ms response times globally
 - Automatic request deduplication
 - Connection pooling
 
 ### Monitoring & Analytics
+
 - All requests logged to Cloudflare Analytics Engine
 - Geographic distribution tracking
 - Response time monitoring
@@ -500,6 +531,7 @@ docker-compose down
 See [TROUBLESHOOTING.md](./TROUBLESHOOTING.md) for detailed solutions to common issues.
 
 **Quick fixes**:
+
 - **Authentication fails**: Verify Canvas API token hasn't expired
 - **Rate limited**: Wait 60 seconds between bursts
 - **Caching issues**: Check `CACHE_TTL_SECONDS` in wrangler.toml
