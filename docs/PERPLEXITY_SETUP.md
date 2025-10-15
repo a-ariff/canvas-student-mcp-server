@@ -127,8 +127,8 @@ curl -X POST https://canvas-mcp-sse.ariff.dev/api/v1/canvas/config \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer YOUR_OAUTH_TOKEN" \
   -d '{
-    "canvas_base_url": "https://canvas.instructure.com",
-    "canvas_api_key": "YOUR_CANVAS_API_TOKEN"
+    "canvasBaseUrl": "https://canvas.instructure.com",
+    "canvasApiKey": "YOUR_CANVAS_API_TOKEN"
   }'
 ```
 
@@ -462,3 +462,9 @@ Compare course workloads across semesters using Canvas data + Perplexity analysi
 
 **Built with ❤️ using Cloudflare Workers and OAuth 2.1**  
 **Star us on [GitHub](https://github.com/a-ariff/canvas-student-mcp-server)** ⭐
+
+---
+
+## 🏷️ Tags & Keywords
+
+`#perplexity` `#perplexity-ai` `#perplexity-desktop` `#mcp` `#mcp-connector` `#model-context-protocol` `#canvas-lms` `#canvas-integration` `#oauth2` `#canvas-api` `#ai-search` `#ai-assistant` `#rest-api` `#student-tools` `#education-technology` `#edtech` `#learning-management-system` `#cloudflare-workers` `#serverless` `#instructure-canvas` `#canvas-student` `#canvas-courses` `#canvas-assignments` `#canvas-grades` `#academic-tools` `#study-assistant` `#perplexity-integration` `#mcp-server` `#ai-education`

@@ -106,8 +106,8 @@ See specific guides:
 curl -X POST https://canvas-mcp.ariff.dev/auth \
   -H "Content-Type: application/json" \
   -d '{
-    "canvas_base_url": "https://canvas.instructure.com",
-    "canvas_api_key": "YOUR_CANVAS_TOKEN"
+    "canvasBaseUrl": "https://canvas.instructure.com",
+    "canvasApiKey": "YOUR_CANVAS_TOKEN"
   }'
 
 # Use the returned user_id
@@ -281,8 +281,8 @@ class CanvasMCPClient:
             f'{self.base_url}/canvas/config',
             headers=self.headers,
             json={
-                'canvas_base_url': canvas_url,
-                'canvas_api_key': canvas_token
+                'canvasBaseUrl': canvas_url,
+                'canvasApiKey': canvas_token
             }
         )
         return response.json()
@@ -477,8 +477,8 @@ curl -X POST https://canvas-mcp-sse.ariff.dev/api/v1/canvas/config \
   -H "Authorization: Bearer YOUR_OAUTH_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
-    "canvas_base_url": "https://canvas.instructure.com",
-    "canvas_api_key": "YOUR_CANVAS_TOKEN"
+    "canvasBaseUrl": "https://canvas.instructure.com",
+    "canvasApiKey": "YOUR_CANVAS_TOKEN"
   }'
 
 # Fetch courses
@@ -565,3 +565,9 @@ OAuth tokens expire after 24 hours:
 
 **Built with ❤️ using Cloudflare Workers and MCP**  
 **Star us on [GitHub](https://github.com/a-ariff/canvas-student-mcp-server)** ⭐
+
+---
+
+## 🏷️ Tags & Keywords
+
+`#mcp` `#model-context-protocol` `#mcp-server` `#mcp-client` `#canvas-lms` `#canvas-integration` `#oauth2` `#oauth2.1` `#pkce` `#canvas-api` `#rest-api` `#sse` `#server-sent-events` `#api-integration` `#typescript` `#python` `#nodejs` `#javascript` `#cloudflare-workers` `#serverless` `#instructure-canvas` `#canvas-student` `#developer-tools` `#api-documentation` `#education-technology` `#edtech` `#learning-management-system` `#custom-integration` `#oauth-flow` `#canvas-courses` `#canvas-assignments` `#student-tools` `#academic-tools`

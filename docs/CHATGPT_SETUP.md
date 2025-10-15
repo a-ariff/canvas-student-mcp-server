@@ -98,13 +98,13 @@ Scroll down to **Actions** section and click **Create new action**.
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["canvas_base_url", "canvas_api_key"],
+                "required": ["canvasBaseUrl", "canvasApiKey"],
                 "properties": {
-                  "canvas_base_url": {
+                  "canvasBaseUrl": {
                     "type": "string",
                     "description": "Canvas instance URL (e.g., https://canvas.instructure.com)"
                   },
-                  "canvas_api_key": {
+                  "canvasApiKey": {
                     "type": "string",
                     "description": "Canvas API access token"
                   }
@@ -433,3 +433,9 @@ A: Currently, the API is read-only. It can fetch data but not submit assignments
 
 **Built with ❤️ using Cloudflare Workers and OAuth 2.1**  
 **Star us on [GitHub](https://github.com/a-ariff/canvas-student-mcp-server)** ⭐
+
+---
+
+## 🏷️ Tags & Keywords
+
+`#chatgpt` `#gpt-actions` `#openai` `#custom-gpt` `#canvas-lms` `#canvas-integration` `#oauth2` `#oauth2.1` `#canvas-api` `#rest-api` `#openapi` `#openapi-schema` `#chatgpt-plus` `#gpt-builder` `#student-tools` `#education-technology` `#edtech` `#learning-management-system` `#ai-assistant` `#cloudflare-workers` `#serverless` `#instructure-canvas` `#canvas-student` `#canvas-courses` `#canvas-assignments` `#canvas-grades` `#academic-tools` `#study-assistant` `#gpt-integration` `#chatgpt-api` `#ai-education`

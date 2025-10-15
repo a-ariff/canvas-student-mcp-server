@@ -308,3 +308,9 @@ A: Your Canvas API token is only used to make requests directly to Canvas. The M
 
 **Built with ❤️ using Cloudflare Workers and MCP**  
 **Star us on [GitHub](https://github.com/a-ariff/canvas-student-mcp-server)** ⭐
+
+---
+
+## 🏷️ Tags & Keywords
+
+`#claude-desktop` `#claude-ai` `#canvas-lms` `#canvas-integration` `#mcp` `#model-context-protocol` `#oauth2` `#canvas-api` `#student-tools` `#education-technology` `#edtech` `#learning-management-system` `#ai-assistant` `#chatbot` `#cloudflare-workers` `#serverless` `#instructure-canvas` `#canvas-student` `#mcp-server` `#sse` `#server-sent-events` `#typescript` `#oauth-authentication` `#canvas-courses` `#canvas-assignments` `#canvas-grades` `#academic-tools` `#study-assistant`
