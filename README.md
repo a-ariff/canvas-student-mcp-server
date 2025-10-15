@@ -1118,6 +1118,7 @@ For issues or questions:## 🔧 Recent Fixes & Improvements
    ```
 
 3. **Configure environment:**
+
    ```bash
    cp .env.example .env
    # Edit .env with your Canvas API token
@@ -1125,6 +1126,7 @@ For issues or questions:## 🔧 Recent Fixes & Improvements
 
 4. **Setup Claude Desktop:**
    Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
+
    ```json
    {
      "mcpServers": {
@@ -1178,6 +1180,6 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 1. Create a feature branch (`git checkout -b feature/amazing-feature`)
 1. Commit your changes (`git commit -m 'Add some amazing feature'`)
 1. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+1. Open a Pull Request
 The CI/CD pipeline will automatically test your changes across multiple Python
 and Node.js versions!
