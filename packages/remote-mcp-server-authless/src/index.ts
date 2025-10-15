@@ -683,37 +683,96 @@ export default {
 			});
 		}
 
-		// Canvas configuration endpoint - save user's Canvas credentials
-		if (url.pathname === "/api/v1/canvas/config" && request.method === "POST") {
+		// Canvas configuration endpoint - save/retrieve user's Canvas credentials
+		if (url.pathname === "/api/v1/canvas/config") {
 			const authResult = await authenticate(request, env);
 			if (authResult instanceof Response) {
 				return authResult;
 			}
 
-			try {
-				const body = await request.json() as { canvasApiKey: string; canvasBaseUrl: string };
-				const userId = (authResult as AuthContext).userId;
+			const userId = (authResult as AuthContext).userId;
 
-				// Store Canvas config in KV associated with user
-				await env.API_KEYS_KV.put(
-					`canvas_config:${userId}`,
-					JSON.stringify({
-						canvasApiKey: body.canvasApiKey,
-						canvasBaseUrl: body.canvasBaseUrl,
-						updatedAt: Date.now(),
-					})
-				);
+			// POST - Save Canvas credentials
+			if (request.method === "POST") {
+				try {
+					const body = await request.json() as { canvasApiKey: string; canvasBaseUrl: string };
 
-				return new Response(JSON.stringify({ success: true, message: "Canvas configuration saved" }), {
-					status: 200,
-					headers: { "Content-Type": "application/json" },
-				});
-			} catch (error) {
-				return new Response(JSON.stringify({ error: "invalid_request", message: String(error) }), {
-					status: 400,
-					headers: { "Content-Type": "application/json" },
-				});
+					// Store Canvas config in KV associated with user
+					await env.API_KEYS_KV.put(
+						`canvas_config:${userId}`,
+						JSON.stringify({
+							canvasApiKey: body.canvasApiKey,
+							canvasBaseUrl: body.canvasBaseUrl,
+							updatedAt: Date.now(),
+						})
+					);
+
+					return new Response(JSON.stringify({ success: true, message: "Canvas configuration saved" }), {
+						status: 200,
+						headers: { "Content-Type": "application/json" },
+					});
+				} catch (error) {
+					return new Response(JSON.stringify({ error: "invalid_request", message: String(error) }), {
+						status: 400,
+						headers: { "Content-Type": "application/json" },
+					});
+				}
 			}
+
+			// GET - Retrieve Canvas configuration status
+			if (request.method === "GET") {
+				try {
+					const configData = await env.API_KEYS_KV.get(`canvas_config:${userId}`);
+					
+					if (!configData) {
+						return new Response(JSON.stringify({ 
+							configured: false,
+							message: "No Canvas configuration found. Please POST your Canvas credentials to this endpoint."
+						}), {
+							status: 200,
+							headers: { "Content-Type": "application/json" },
+						});
+					}
+
+					const config = JSON.parse(configData);
+					return new Response(JSON.stringify({ 
+						configured: true,
+						canvasBaseUrl: config.canvasBaseUrl,
+						// Don't return the API key for security
+						updatedAt: config.updatedAt
+					}), {
+						status: 200,
+						headers: { "Content-Type": "application/json" },
+					});
+				} catch (error) {
+					return new Response(JSON.stringify({ error: "server_error", message: String(error) }), {
+						status: 500,
+						headers: { "Content-Type": "application/json" },
+					});
+				}
+			}
+
+			// DELETE - Remove Canvas credentials
+			if (request.method === "DELETE") {
+				try {
+					await env.API_KEYS_KV.delete(`canvas_config:${userId}`);
+					return new Response(JSON.stringify({ success: true, message: "Canvas configuration deleted" }), {
+						status: 200,
+						headers: { "Content-Type": "application/json" },
+					});
+				} catch (error) {
+					return new Response(JSON.stringify({ error: "server_error", message: String(error) }), {
+						status: 500,
+						headers: { "Content-Type": "application/json" },
+					});
+				}
+			}
+
+			// Method not allowed
+			return new Response(JSON.stringify({ error: "method_not_allowed" }), {
+				status: 405,
+				headers: { "Content-Type": "application/json", "Allow": "GET, POST, DELETE" },
+			});
 		}
 
 		// REST API endpoints for ChatGPT Actions
