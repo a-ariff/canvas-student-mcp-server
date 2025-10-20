@@ -20,6 +20,7 @@ export function getAuthorizationServerMetadata(issuer: string): OAuthMetadata {
 			"client_secret_post",
 			"none"
 		],
+		sse_endpoint: `${issuer}/sse`,
 	};
 }
 
