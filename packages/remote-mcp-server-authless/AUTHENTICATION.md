@@ -55,11 +55,13 @@ claude mcp add --transport sse canvas https://canvas-mcp-sse.ariff.dev/sse
 2. **Authenticate via /mcp command**
 
 In Claude Code, run:
+
 ```
 /mcp
 ```
 
 Select "Canvas" and choose "Authenticate". This will:
+
 - Open your browser
 - Redirect to OAuth authorization page
 - Complete PKCE flow
@@ -240,23 +242,27 @@ Should return:
 ### OAuth 2.1 Security Features
 
 #### Client Validation
+
 - **Client ID Whitelist**: Only registered clients can request authorization codes
 - **Redirect URI Whitelist**: Each client has a strict whitelist of allowed redirect URIs
 - **Exact URI Matching**: No partial matches or wildcards - redirect URIs must match exactly
 - **Client Authentication**: Confidential clients must provide valid client_secret
 
 #### PKCE Protection
+
 - **PKCE Mandatory**: All authorization flows require PKCE (Proof Key for Code Exchange)
 - **SHA-256 Required**: Only S256 code challenge method accepted (no plain text)
 - **Verifier Validation**: Code verifier must match the original challenge
 
 #### Token Security
+
 - **Short-lived Tokens**: Access tokens expire after 1 hour
 - **Refresh Tokens**: Support for long-lived refresh tokens (30 days)
 - **One-time Codes**: Authorization codes deleted after first use
 - **Redirect URI Binding**: Token endpoint validates redirect_uri matches authorization
 
 #### Additional Protections
+
 - **HTTPS Only**: All endpoints require HTTPS
 - **State Parameter**: CSRF protection via state parameter
 - **Client Binding**: Authorization codes bound to specific client_id
@@ -284,6 +290,7 @@ Should return:
 ### OAuth Discovery Fails
 
 Verify the well-known endpoint is accessible:
+
 ```bash
 curl -v https://canvas-mcp-sse.ariff.dev/.well-known/oauth-authorization-server
 ```
@@ -295,5 +302,6 @@ Ensure your OAuth client properly implements PKCE with SHA-256.
 ## Support
 
 For issues or questions:
-- GitHub Issues: https://github.com/a-ariff/canvas-student-mcp-server/issues
-- MCP Documentation: https://modelcontextprotocol.io
+
+- GitHub Issues: <https://github.com/a-ariff/canvas-student-mcp-server/issues>
+- MCP Documentation: <https://modelcontextprotocol.io>

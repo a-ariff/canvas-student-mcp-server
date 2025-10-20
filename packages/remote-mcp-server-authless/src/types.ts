@@ -14,4 +14,6 @@ export interface OAuthMetadata {
 	response_types_supported: string[];
 	code_challenge_methods_supported: string[];
 	token_endpoint_auth_methods_supported: string[];
+	// MCP-specific extension for SSE endpoint discovery
+	mcp_endpoint?: string;
 }
