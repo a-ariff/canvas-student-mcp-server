@@ -9,7 +9,8 @@ There are many ways you can contribute to this project:
 - 🐛 **Report bugs** - Found a bug? Let us know!
 - ✨ **Suggest features** - Have an idea? We'd love to hear it!
 - 📝 **Improve documentation** - Help make our docs better
-- 🔧 **Submit pull requests** - Fix bugs or add features
+-
+We appreciate all contributions and encourage community involvement. 🔧 **Submit pull requests** - Fix bugs or add features
 - 💬 **Answer questions** - Help others in discussions
 - ⭐ **Star the repo** - Show your support!
 
