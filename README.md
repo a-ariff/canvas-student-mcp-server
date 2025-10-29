@@ -9,3 +9,5 @@ A production-ready Model Context Protocol (MCP) server for Canvas LMS, deployed 
 [![GitHub Stars](https://img.shields.io/github/stars/a-ariff/canvas-student-mcp-server?style=social)](https://github.com/a-ariff/canvas-student-mcp-server/stargazers)  
 
 This repository provides a Model Context Protocol server for Canvas LMS. It is designed to run on Cloudflare Workers and includes OAuth 2.1 authentication support.
+
+Feel free to contribute via issues or pull requests.
