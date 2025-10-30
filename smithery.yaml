@@ -1,5 +1,5 @@
-name: canvas-student-mcp
-description: Canvas LMS integration MCP server with OAuth 2.1 authentication for secure multi-user access
+name: canvas-ai-assistant
+description: AI-powered Canvas LMS assistant that helps students manage assignments, track grades, and never miss deadlines
 version: "3.0.0"
 author: a-ariff
 homepage: https://github.com/a-ariff/canvas-student-mcp-server
