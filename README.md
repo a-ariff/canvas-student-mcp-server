@@ -1,12 +1,12 @@
-# Canvas Student MCP Server
+# 🎓 Canvas Student MCP Server
 
-A production-ready Model Context Protocol (MCP) server for Canvas LMS,
-deployed on Cloudflare Workers with OAuth 2.1 authentication.
+**Transform your Canvas LMS experience with AI-powered automation!** Connect Claude Desktop or ChatGPT directly to Canvas for instant access to courses, assignments, grades, and more.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9+-blue.svg)](https://www.typescriptlang.org/)
 [![Cloudflare Workers](https://img.shields.io/badge/Cloudflare-Workers-orange.svg)](https://workers.cloudflare.com/)
 [![MCP Compatible](https://img.shields.io/badge/MCP-Compatible-purple.svg)](https://modelcontextprotocol.io/)
+[![Smithery](https://img.shields.io/badge/Smithery-Available-green.svg)](https://smithery.ai/server/@a-ariff/canvas-student-mcp)
 [![GitHub Stars](https://img.shields.io/github/stars/a-ariff/canvas-student-mcp-server?style=social)](https://github.com/a-ariff/canvas-student-mcp-server)
 [![Status](https://img.shields.io/website?url=https%3A%2F%2Fcanvas-mcp-sse.ariff.dev%2Fhealth&label=server)](https://canvas-mcp-sse.ariff.dev/health)
 
@@ -21,6 +21,29 @@ deployed on Cloudflare Workers with OAuth 2.1 authentication.
 - `/public` - Public endpoint (config via query params)
 - `/.well-known/oauth-authorization-server` - OAuth discovery
 - `/health` - Health check endpoint
+
+## 🌟 Why Choose Canvas Student MCP Server?
+
+### For Students
+
+- **Save Hours**: Automate assignment tracking and deadline management
+- **Never Miss Deadlines**: AI-powered reminders for upcoming assignments
+- **Smart Study Planning**: Let AI analyze your course load and suggest study schedules
+- **Grade Tracking**: Instant access to all your grades and progress
+
+### For Developers
+
+- **Production-Ready**: Deployed on Cloudflare's global edge network
+- **Secure by Design**: OAuth 2.1 with PKCE, no passwords stored
+- **Open Source**: MIT licensed, contribute and customize freely
+- **Well-Documented**: Comprehensive guides for every integration
+
+### For Institutions
+
+- **Privacy-First**: No data collection, all processing happens locally
+- **Multi-User Safe**: Each user authenticates with their own Canvas credentials
+- **Zero Infrastructure**: Serverless deployment, no maintenance required
+- **API Compliant**: Follows Canvas API best practices and rate limits
 
 ## ✨ Features
 
@@ -78,7 +101,28 @@ canvas-student-mcp-server/
 
 ## 🚀 Quick Start
 
-### Option 1: Use Hosted Server (Recommended)
+### Option 1: Install via Smithery (Easiest)
+
+Install directly from the Smithery registry:
+
+```bash
+npx -y @smithery/cli install @a-ariff/canvas-student-mcp
+```
+
+Or add to your Claude Desktop config manually:
+
+```json
+{
+  "mcpServers": {
+    "canvas-student-mcp": {
+      "command": "npx",
+      "args": ["-y", "@smithery/cli", "run", "@a-ariff/canvas-student-mcp"]
+    }
+  }
+}
+```
+
+### Option 2: Use Hosted Server with OAuth
 
 Add to your Claude Desktop config
 (`~/Library/Application Support/Claude/claude_desktop_config.json` on macOS):
@@ -100,7 +144,7 @@ Add to your Claude Desktop config
 
 Restart Claude Desktop and you'll be prompted for OAuth authorization.
 
-### Option 2: Deploy Your Own
+### Option 3: Deploy Your Own
 
 #### Prerequisites
 
@@ -185,7 +229,7 @@ export const OAUTH_CONFIG = {
 
 ## 🎯 Use Cases
 
-### For Students
+### Student Use Cases
 
 - 📚 Quick access to all course materials
 - 📅 Track deadlines and upcoming assignments
@@ -193,7 +237,7 @@ export const OAUTH_CONFIG = {
 - 📊 Monitor grades and submissions
 - 🤖 Use AI to help organize your coursework
 
-### For Developers
+### Developer Use Cases
 
 - 🔌 Easy Canvas API integration
 - 🛠️ Built on modern standards (OAuth 2.1, TypeScript)
@@ -305,11 +349,12 @@ guidelines.
 
 ## 🔗 Links
 
-- [Live Server](https://canvas-mcp-sse.ariff.dev)
-- [GitHub Repository](https://github.com/a-ariff/canvas-student-mcp-server)
-- [MCP Documentation](https://modelcontextprotocol.io)
-- [Canvas API Docs](https://canvas.instructure.com/doc/api/)
-- [Cloudflare Workers](https://workers.cloudflare.com/)
+- [🚀 Install from Smithery](https://smithery.ai/server/@a-ariff/canvas-student-mcp)
+- [💻 Live Server](https://canvas-mcp-sse.ariff.dev)
+- [📦 GitHub Repository](https://github.com/a-ariff/canvas-student-mcp-server)
+- [📚 MCP Documentation](https://modelcontextprotocol.io)
+- [🎓 Canvas API Docs](https://canvas.instructure.com/doc/api/)
+- [⚡ Cloudflare Workers](https://workers.cloudflare.com/)
 
 ## 💬 Support
 
@@ -332,8 +377,37 @@ For issues or questions:
 - [ ] Mobile app support
 - [ ] Webhook notifications
 
+## ⭐ Show Your Support
+
+If you find this project useful, please consider:
+
+- **⭐ Star this repository** - Help us reach 16 stars for the GitHub achievement!
+- **🔀 Fork and contribute** - Your improvements help everyone
+- **📢 Share with classmates** - Spread the word about automated Canvas management
+- **💬 Join the discussion** - Share your use cases and ideas
+
+### Share on Social Media
+
+```text
+🎓 Just discovered Canvas Student MCP Server - connects AI directly to Canvas LMS!
+
+✨ Features:
+• Auto-track assignments & deadlines
+• AI-powered study planning
+• Grade monitoring
+• OAuth 2.1 security
+
+Built with @CloudflareWorkers & TypeScript
+100% open source!
+
+⭐ GitHub: github.com/a-ariff/canvas-student-mcp-server
+🚀 Install: smithery.ai/server/@a-ariff/canvas-student-mcp
+
+#EdTech #AI #Canvas #OpenSource #MCP
+```
+
 ---
 
-**Built with ❤️ using Cloudflare Workers and MCP**
+**Built with ❤️ by [Ariff](https://ariff.dev) | MIT License**
 
-⭐ Star this repo if you find it useful!
+*Making education smarter with AI, one Canvas integration at a time.*
