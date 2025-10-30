@@ -42,7 +42,8 @@
     "type": "git",
     "url": "https://github.com/a-ariff/canvas-student-mcp-server.git"
   },
-  "devDependencies": {
+  "devDependencies": {},
+  "dependencies": {
     "@smithery/sdk": "^1.6.3",
     "chalk": "^5.3.0"
   }
