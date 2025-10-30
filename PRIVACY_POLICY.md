@@ -4,7 +4,9 @@
 
 ## Overview
 
-Canvas Student MCP Server ("the Service") is an open-source Model Context Protocol (MCP) server that provides AI assistants (like Claude, ChatGPT) with access to Canvas Learning Management System data. This privacy policy explains how your data is handled.
+Canvas Student MCP Server ("the Service") is an open-source Model Context Protocol (MCP) server that provides AI assistants (like Claude, ChatGPT) with access to Canvas Learning Management System data. 
+We value your privacy and are committed to transparency in how we handle your information.
+This privacy policy explains how your data is handled.
 
 ---
 
