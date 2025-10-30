@@ -4,6 +4,7 @@ version: "3.0.0"
 author: a-ariff
 homepage: https://github.com/a-ariff/canvas-student-mcp-server
 license: MIT
+runtime: "typescript"
 
 remotes:
   - url: https://canvas-mcp-sse.ariff.dev/sse
