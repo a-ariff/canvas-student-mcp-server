@@ -83,22 +83,22 @@ canvas-student-mcp-server/
 ### Server Configuration
 
 ```yaml
-name: canvas-student-mcp
-version: "3.0.0"
-remote:
-  transport:
-    type: sse
-    url: https://canvas-mcp-sse.ariff.dev/sse
-  authentication:
-    type: oauth2
-    discovery_url: https://canvas-mcp-sse.ariff.dev/.well-known/oauth-authorization-server
+name: canvas-ai-assistant
+version: "3.0.1"
+runtime: typescript
+# The TypeScript entry (src/index.ts) bridges to the hosted SSE server.
+# Remote endpoints are documented for reference only.
+deployment:
+  endpoints:
+    sse: https://canvas-mcp-sse.ariff.dev/sse
+    oauth_discovery: https://canvas-mcp-sse.ariff.dev/.well-known/oauth-authorization-server
 ```
 
 ## Troubleshooting
 
 ### Issue: Smithery can't find smithery.yaml
 
-**Solution**: Ensure `smithery.yaml` is in the repository root, not in a subdirectory.
+**Solution**: Ensure `smithery.yaml` is in the repository root, not in a subdirectory. Also avoid publishing a `remote:`-only config; Smithery’s GitHub publishing expects a buildable TypeScript entry.
 
 ```bash
 # Fix location
@@ -137,14 +137,14 @@ If you have Smithery CLI installed:
 # Search for Canvas servers
 smithery search canvas
 
-# Inspect a server
-smithery inspect @a-ariff/canvas-student-mcp
+# Inspect a server (after approval)
+smithery inspect @a-ariff/canvas-ai-assistant
 
 # Install locally for testing
-smithery install @a-ariff/canvas-student-mcp
+smithery install @a-ariff/canvas-ai-assistant
 
 # Run the server
-smithery run @a-ariff/canvas-student-mcp
+smithery run @a-ariff/canvas-ai-assistant
 ```
 
 ## Verification Checklist
