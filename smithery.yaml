@@ -5,5 +5,6 @@ author: a-ariff
 homepage: https://github.com/a-ariff/canvas-student-mcp-server
 license: MIT
 
-remote:
-  url: https://canvas-mcp-sse.ariff.dev/sse
+remotes:
+  - url: https://canvas-mcp-sse.ariff.dev/sse
+    transport: sse
