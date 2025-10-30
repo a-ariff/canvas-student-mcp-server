@@ -27,7 +27,7 @@
   "dependencies": {
     "@cloudflare/workers-types": "^4.20240208.0",
     "date-fns": "^3.6.0",
-    "hono": "^4.0.0",
+    "hono": "^4.10.3",
     "zod": "^3.22.4"
   },
   "devDependencies": {
