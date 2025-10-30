@@ -27,7 +27,7 @@
   },
   "keywords": [
     "canvas",
-    "mcp", 
+    "mcp",
     "model-context-protocol",
     "cloudflare-workers",
     "typescript",
@@ -41,5 +41,9 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/a-ariff/canvas-student-mcp-server.git"
+  },
+  "devDependencies": {
+    "@smithery/sdk": "^1.6.3",
+    "chalk": "^5.3.0"
   }
 }
