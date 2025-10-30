@@ -1,0 +1,136 @@
+name: Smithery Submission
+
+on:
+  push:
+    branches:
+      - main
+      - feat/smithery-fresh-deployment
+    paths:
+      - 'smithery.yaml'
+      - 'packages/remote-mcp-server-authless/**'
+      - '.github/workflows/smithery-submission.yml'
+  workflow_dispatch:
+    inputs:
+      manual_trigger:
+        description: 'Manual submission to Smithery'
+        required: false
+        default: 'true'
+
+jobs:
+  validate:
+    name: Validate Smithery Configuration
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Validate smithery.yaml exists
+        run: |
+          if [ ! -f "smithery.yaml" ]; then
+            echo "❌ smithery.yaml not found in repository root"
+            exit 1
+          fi
+          echo "✅ smithery.yaml found in repository root"
+
+      - name: Validate YAML structure
+        run: |
+          # Basic YAML validation
+          python3 -c "import yaml; yaml.safe_load(open('smithery.yaml'))"
+          echo "✅ smithery.yaml is valid YAML"
+
+      - name: Display configuration
+        run: |
+          echo "📋 Current Smithery Configuration:"
+          cat smithery.yaml
+
+  notify:
+    name: Notify Smithery
+    runs-on: ubuntu-latest
+    needs: validate
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Create submission record
+        run: |
+          TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          COMMIT_SHA="${{ github.sha }}"
+          REPO_URL="https://github.com/${{ github.repository }}"
+
+          cat > submission-record.json <<EOF
+          {
+            "repository": "${{ github.repository }}",
+            "commit": "$COMMIT_SHA",
+            "timestamp": "$TIMESTAMP",
+            "branch": "${{ github.ref_name }}",
+            "smithery_config": "smithery.yaml",
+            "server_url": "https://canvas-mcp-sse.ariff.dev",
+            "repository_url": "$REPO_URL",
+            "submission_type": "automated",
+            "server_details": {
+              "name": "canvas-student-mcp",
+              "version": "3.0.0",
+              "transport": "sse",
+              "authentication": "oauth2"
+            }
+          }
+          EOF
+
+          echo "📝 Submission record created:"
+          cat submission-record.json
+
+      - name: Update README badge
+        run: |
+          # Add Smithery badge to README if not present
+          if ! grep -q "smithery.ai" README.md; then
+            echo "Adding Smithery badge to README..."
+            # This would add a badge, but for now just log
+            echo "⚠️  Consider adding Smithery badge to README.md"
+          fi
+
+      - name: Create issue for manual verification
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: '🚀 Smithery Submission - Manual Verification Required',
+              body: `## Smithery Submission Checklist
+
+              This automated workflow has prepared your server for Smithery submission.
+
+              ### ✅ Automated Steps Completed:
+              - [x] smithery.yaml validated and in repository root
+              - [x] Repository structure verified
+              - [x] Configuration details recorded
+
+              ### 📋 Manual Steps Required:
+              - [ ] Visit [Smithery.ai](https://smithery.ai)
+              - [ ] Login/Register with your account
+              - [ ] Submit server URL: https://github.com/${context.repo.owner}/${context.repo.repo}
+              - [ ] Verify OAuth configuration at: https://canvas-mcp-sse.ariff.dev/.well-known/oauth-authorization-server
+              - [ ] Test the server connection
+              - [ ] Confirm publication on Smithery
+
+              ### 🔗 Important Links:
+              - **Repository**: https://github.com/${context.repo.owner}/${context.repo.repo}
+              - **Server Endpoint**: https://canvas-mcp-sse.ariff.dev/sse
+              - **OAuth Discovery**: https://canvas-mcp-sse.ariff.dev/.well-known/oauth-authorization-server
+              - **Smithery Config**: [smithery.yaml](https://github.com/${context.repo.owner}/${context.repo.repo}/blob/main/smithery.yaml)
+
+              ### 📊 Server Details:
+              - **Name**: canvas-student-mcp
+              - **Version**: 3.0.0
+              - **Transport**: SSE (Server-Sent Events)
+              - **Authentication**: OAuth 2.1 with PKCE
+
+              Commit: ${context.sha}
+              Triggered by: @${context.actor}
+              `,
+              labels: ['smithery', 'deployment', 'documentation']
+            });
+
+            console.log(`Issue created: ${issue.data.html_url}`);

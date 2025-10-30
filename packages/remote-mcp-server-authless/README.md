@@ -2,7 +2,7 @@
 
 A secure **Model Context Protocol (MCP) server** deployed on Cloudflare Workers with OAuth 2.1 and API Key authentication.
 
-🌐 **Live Server**: https://canvas-mcp-sse.ariff.dev/sse
+🌐 **Live Server**: <https://canvas-mcp-sse.ariff.dev/sse>
 
 [![Security: OAuth 2.1](https://img.shields.io/badge/Security-OAuth%202.1-green.svg)](./SECURITY-FIXES.md)
 [![Tests: 14 Passing](https://img.shields.io/badge/Tests-14%20Passing-brightgreen.svg)](./src/__tests__)
@@ -138,6 +138,7 @@ curl -H "Authorization: Bearer your-token" \
 ```
 
 **Security Test Coverage:**
+
 - ✅ Unknown client ID rejection
 - ✅ Unauthorized redirect URI blocking
 - ✅ Authorization code interception prevention
@@ -161,12 +162,14 @@ async init() {
 ## Authentication Methods
 
 ### OAuth 2.1 (Recommended)
+
 - Browser-based authentication
 - Automatic token refresh
 - Secure PKCE flow (RFC 7636)
 - Best for end users
 
 ### API Keys
+
 - Simple header-based auth
 - `X-API-Key: your-key` header
 - Best for server-to-server integrations

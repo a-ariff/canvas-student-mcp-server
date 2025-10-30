@@ -1,9 +1,10 @@
-# Smithery MCP server configuration
 name: canvas-student-mcp
-description: Canvas LMS integration MCP server with OAuth 2.1 and API Key authentication
-version: "2.0.0"
+description: Canvas LMS integration MCP server with OAuth 2.1 authentication for secure multi-user access
+version: "3.0.0"
 author: a-ariff
 homepage: https://github.com/a-ariff/canvas-student-mcp-server
+repository: https://github.com/a-ariff/canvas-student-mcp-server
+license: MIT
 
 remote:
   transport:
@@ -12,31 +13,54 @@ remote:
   authentication:
     type: oauth2
     discovery_url: https://canvas-mcp-sse.ariff.dev/.well-known/oauth-authorization-server
+    client_id: canvas-mcp-client
+    scopes:
+      - canvas:read
+      - canvas:write
+      - profile
 
-# Configuration schema is now exported from src/index.ts
-# Smithery will automatically read the configSchema export
-
+# Canvas LMS Tools
 tools:
   - name: list_courses
-    description: Get all active Canvas courses
+    description: Get all active Canvas courses for the authenticated user
   - name: get_course_assignments
-    description: Get assignments for a specific course
+    description: Get assignments for a specific course with due dates and submission status
   - name: get_upcoming_events
-    description: Get upcoming calendar events
+    description: Get upcoming calendar events and assignments across all courses
   - name: get_grades
-    description: Get current grades for a course
+    description: Get current grades and scores for a specific course
   - name: get_announcements
-    description: Get course announcements
+    description: Get recent announcements from a specific course
   - name: get_modules
-    description: Get course modules and structure
+    description: Get course modules and their items in structured format
   - name: get_todos
-    description: Get pending to-do items
+    description: Get pending to-do items and action-required assignments
   - name: get_calendar
-    description: Get calendar events for date range
+    description: Get calendar events for a specified date range
   - name: get_discussions
-    description: Get course discussion topics
+    description: Get discussion topics and forums for a course
   - name: get_quizzes
-    description: Get quizzes for a course
+    description: Get quizzes and assessments for a course
   - name: get_profile
-    description: Get user profile information
+    description: Get user profile information and Canvas account details
+  - name: search_courses
+    description: Search across course content including assignments, pages, and modules
 
+# Integration features
+features:
+  - OAuth 2.1 with PKCE for secure authentication
+  - Multi-user support with per-user Canvas credentials
+  - Real-time SSE transport for streaming responses
+  - ChatGPT Custom GPT integration
+  - Claude Desktop native support
+  - Cloudflare Workers edge deployment
+  - Smart caching with KV storage
+  - Rate limiting for API protection
+
+# Domain configuration
+deployment:
+  domain: ariff.dev
+  endpoints:
+    mcp_server: https://canvas-mcp-sse.ariff.dev
+    api_proxy: https://canvas-mcp.ariff.dev
+    oauth_alias: https://canvas-mcp-oauth.ariff.dev

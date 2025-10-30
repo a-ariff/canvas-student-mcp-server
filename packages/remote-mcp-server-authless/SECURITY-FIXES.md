@@ -7,47 +7,57 @@ This document details the security fixes implemented for the OAuth 2.1 flow to a
 ## Vulnerabilities Fixed
 
 ### 1. ❌ Missing Client ID Validation → ✅ Client Whitelist
+
 **Before:** Any `client_id` was accepted
 **After:** Only registered clients in whitelist can obtain authorization codes
 
 **Implementation:**
+
 - Created `oauth-config.ts` with client registry
 - `validateClientId()` checks against registered clients
 - Returns 401 "Unknown client_id" for invalid clients
 
 ### 2. ❌ Missing Redirect URI Validation → ✅ Per-Client Whitelist
+
 **Before:** Any `redirect_uri` was accepted
 **After:** Exact match against client's whitelist only
 
 **Implementation:**
+
 - Each client has strict `redirect_uris[]` array
 - `validateRedirectUri()` performs exact matching (no wildcards)
 - Returns 400 "Invalid redirect_uri for this client"
 
 ### 3. ❌ No Redirect URI Binding → ✅ Strict Matching
+
 **Before:** Token endpoint didn't verify `redirect_uri` matched authorization
 **After:** Enforces exact match between authorization and token requests
 
 **Implementation:**
+
 - Authorization endpoint stores `redirect_uri` with code
 - Token endpoint validates `redirect_uri` matches stored value
 - Returns 400 "Redirect URI mismatch" if different
 
 ### 4. ❌ No Client Authentication → ✅ Client Secret Validation
+
 **Before:** No authentication of clients
 **After:** Confidential clients must provide valid `client_secret`
 
 **Implementation:**
+
 - `validateClientAuthentication()` with timing-attack protection
 - Public clients (PKCE-only) don't require secret
 - Confidential clients must provide matching secret
 - Returns 401 "Client authentication failed"
 
 ### 5. ❌ No Security Tests → ✅ Comprehensive Test Suite
+
 **Before:** Only happy-path tests
 **After:** Attack scenario and security validation tests
 
 **Implementation:**
+
 - `oauth-security.test.ts` with 5 security test cases
 - Tests for all attack vectors
 - 100% coverage of security validations
@@ -55,18 +65,21 @@ This document details the security fixes implemented for the OAuth 2.1 flow to a
 ## Attack Scenarios Prevented
 
 ### Scenario 1: Fake Client ID Attack
+
 ```
 Attacker: GET /oauth/authorize?client_id=fake&redirect_uri=http://localhost:3000/callback&...
 Server: 401 { "error": "invalid_client", "error_description": "Unknown client_id" }
 ```
 
 ### Scenario 2: Malicious Redirect URI
+
 ```
 Attacker: GET /oauth/authorize?client_id=canvas-mcp-client&redirect_uri=https://attacker.com/steal&...
 Server: 400 { "error": "invalid_request", "error_description": "Invalid redirect_uri for this client" }
 ```
 
 ### Scenario 3: Authorization Code Interception
+
 ```
 1. User: Authorizes with redirect_uri=http://localhost:3000/callback
 2. Server: Stores code with redirect_uri
@@ -75,6 +88,7 @@ Server: 400 { "error": "invalid_request", "error_description": "Invalid redirect
 ```
 
 ### Scenario 4: Refresh Token Theft
+
 ```
 1. Legitimate client obtains refresh_token
 2. Attacker tries to use refresh_token with different client_id
@@ -84,11 +98,13 @@ Server: 400 { "error": "invalid_request", "error_description": "Invalid redirect
 ## Files Modified
 
 ### New Files
+
 1. **`src/oauth-config.ts`** - Client registry and validation functions
 2. **`src/__tests__/oauth-security.test.ts`** - Security test suite
 3. **`SECURITY-FIXES.md`** - This documentation
 
 ### Updated Files
+
 1. **`src/oauth-handlers.ts`**
    - Added security validations to authorization endpoint
    - Added client authentication to token endpoint
@@ -107,17 +123,20 @@ Server: 400 { "error": "invalid_request", "error_description": "Invalid redirect
 ## Security Features Implemented
 
 ### Client Validation
+
 - ✅ Client ID whitelist
 - ✅ Redirect URI whitelist per client
 - ✅ Exact URI matching (no partial/wildcards)
 - ✅ Client authentication for confidential clients
 
 ### PKCE Protection
+
 - ✅ PKCE mandatory for all flows
 - ✅ SHA-256 required (no plain text)
 - ✅ Verifier validation
 
 ### Token Security
+
 - ✅ Short-lived access tokens (1 hour)
 - ✅ Long-lived refresh tokens (30 days)
 - ✅ One-time authorization codes
@@ -125,6 +144,7 @@ Server: 400 { "error": "invalid_request", "error_description": "Invalid redirect
 - ✅ Client ID binding
 
 ### Additional Protections
+
 - ✅ HTTPS only
 - ✅ State parameter support
 - ✅ Grant type validation
@@ -133,6 +153,7 @@ Server: 400 { "error": "invalid_request", "error_description": "Invalid redirect
 ## Configuration
 
 ### Default Client
+
 ```typescript
 {
   client_id: 'canvas-mcp-client',
@@ -148,7 +169,9 @@ Server: 400 { "error": "invalid_request", "error_description": "Invalid redirect
 ```
 
 ### Adding New Clients
+
 Edit `src/oauth-config.ts`:
+
 ```typescript
 OAUTH_CLIENTS['your-client-id'] = {
   client_id: 'your-client-id',
@@ -168,6 +191,7 @@ npm test
 ```
 
 **Test Results:**
+
 ```
 ✓ src/__tests__/oauth.test.ts (9 tests)
 ✓ src/__tests__/oauth-security.test.ts (5 tests)
@@ -179,6 +203,7 @@ Tests  14 passed (14)
 ## Compliance
 
 This implementation now complies with:
+
 - ✅ OAuth 2.1 specification
 - ✅ RFC 7636 (PKCE)
 - ✅ OWASP OAuth security guidelines
@@ -195,11 +220,13 @@ This implementation now complies with:
 ## Migration Notes
 
 **Breaking Changes:**
+
 - Existing clients must be registered in `oauth-config.ts`
 - Redirect URIs must be explicitly whitelisted
 - Token endpoint now requires `redirect_uri` parameter
 
 **For Production:**
+
 1. Add your production redirect URIs to client config
 2. Set appropriate client secrets for confidential clients
 3. Deploy with proper KV namespace configuration
@@ -208,5 +235,6 @@ This implementation now complies with:
 ## Contact
 
 For security concerns or questions:
-- GitHub Issues: https://github.com/a-ariff/canvas-student-mcp-server/issues
+
+- GitHub Issues: <https://github.com/a-ariff/canvas-student-mcp-server/issues>
 - Security: Report privately to maintainer

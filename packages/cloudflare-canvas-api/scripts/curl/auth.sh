@@ -4,7 +4,7 @@
 
 # Configuration
 API_BASE_URL="${API_BASE_URL:-https://canvas-mcp.ariff.dev}"
-CANVAS_URL="${CANVAS_URL:-https://learn.mywhitecliffe.com}"
+CANVAS_URL="${CANVAS_URL:-https://canvas.instructure.com}"
 CANVAS_API_KEY="${CANVAS_API_KEY}"
 INSTITUTION_NAME="${INSTITUTION_NAME:-My Institution}"
 

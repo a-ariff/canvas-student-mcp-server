@@ -73,8 +73,9 @@ export async function handleAuthorize(
 		});
 	}
 
-	// Validate PKCE
-	if (!authReq.code_challenge || authReq.code_challenge_method !== "S256") {
+	// Validate PKCE (optional for clients with require_pkce: false)
+	const requirePkce = client.require_pkce !== false; // Default to true
+	if (requirePkce && (!authReq.code_challenge || authReq.code_challenge_method !== "S256")) {
 		return new Response(JSON.stringify({ error: "invalid_request", error_description: "PKCE required" }), {
 			status: 400,
 			headers: { "Content-Type": "application/json" },
@@ -88,19 +89,20 @@ export async function handleAuthorize(
 		});
 	}
 
-	// Generate authorization code
+	// Generate authorization code and unique user ID for this session
 	const code = crypto.randomUUID();
+	const userId = crypto.randomUUID(); // Generate unique user ID per authorization
 
-	// Store authorization code with PKCE challenge
+	// Store authorization code with PKCE challenge (if provided)
 	await env.OAUTH_KV.put(
 		`auth_code:${code}`,
 		JSON.stringify({
 			client_id: authReq.client_id,
 			redirect_uri: authReq.redirect_uri,
-			code_challenge: authReq.code_challenge,
-			code_challenge_method: authReq.code_challenge_method,
+			code_challenge: authReq.code_challenge || null,
+			code_challenge_method: authReq.code_challenge_method || null,
 			scope: authReq.scope,
-			user_id: "authenticated_user", // Replace with actual user after login
+			user_id: userId, // Unique user ID per OAuth session
 		}),
 		{ expirationTtl: 600 } // 10 minutes
 	);
@@ -208,8 +210,17 @@ async function handleAuthorizationCodeGrant(
 	env: { OAUTH_KV: KVNamespace },
 	client: OAuthClient
 ): Promise<Response> {
-	if (!tokenReq.code || !tokenReq.code_verifier || !tokenReq.redirect_uri) {
+	const requirePkce = client.require_pkce !== false;
+	
+	if (!tokenReq.code || !tokenReq.redirect_uri) {
 		return new Response(JSON.stringify({ error: "invalid_request", error_description: "Missing required parameters" }), {
+			status: 400,
+			headers: { "Content-Type": "application/json" },
+		});
+	}
+	
+	if (requirePkce && !tokenReq.code_verifier) {
+		return new Response(JSON.stringify({ error: "invalid_request", error_description: "Missing code_verifier (PKCE required)" }), {
 			status: 400,
 			headers: { "Content-Type": "application/json" },
 		});
@@ -252,10 +263,18 @@ async function handleAuthorizationCodeGrant(
 		);
 	}
 
-	// Verify PKCE challenge
-	const isValid = await verifyPKCE(tokenReq.code_verifier, authCode.code_challenge);
-	if (!isValid) {
-		return new Response(JSON.stringify({ error: "invalid_grant", error_description: "PKCE verification failed" }), {
+	// Verify PKCE challenge (if PKCE was used)
+	if (authCode.code_challenge && tokenReq.code_verifier) {
+		const isValid = await verifyPKCE(tokenReq.code_verifier, authCode.code_challenge);
+		if (!isValid) {
+			return new Response(JSON.stringify({ error: "invalid_grant", error_description: "PKCE verification failed" }), {
+				status: 400,
+				headers: { "Content-Type": "application/json" },
+			});
+		}
+	} else if (requirePkce) {
+		// If PKCE is required but not provided, fail
+		return new Response(JSON.stringify({ error: "invalid_request", error_description: "PKCE required for this client" }), {
 			status: 400,
 			headers: { "Content-Type": "application/json" },
 		});

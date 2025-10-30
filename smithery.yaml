@@ -1,0 +1,54 @@
+# Smithery configuration for a REMOTE MCP server (SSE + OAuth 2.1)
+# Reference: smithery.yaml schema (remote servers)
+
+name: canvas-ai-assistant
+description: AI-powered Canvas LMS assistant for courses, assignments, grades, and deadlines
+version: "3.0.1"
+author: a-ariff
+homepage: https://github.com/a-ariff/canvas-student-mcp-server
+repository: https://github.com/a-ariff/canvas-student-mcp-server
+license: MIT
+
+# Publish as a local TypeScript package that bridges to the remote SSE server.
+# Smithery’s GitHub publishing requires a buildable entry point.
+runtime: typescript
+
+# Optional metadata used by Smithery UI/registry
+keywords:
+  - mcp
+  - canvas
+  - lms
+  - education
+  - sse
+  - oauth2
+
+# Public tool listing (informational)
+tools:
+  - name: get_courses
+    description: List all active Canvas courses for the authenticated user
+  - name: get_assignments
+    description: Get assignments with due dates and submission status
+  - name: get_calendar_events
+    description: Upcoming course events and deadlines
+  - name: get_grades
+    description: Current grades and assignment scores for a course
+  - name: get_announcements
+    description: Recent course announcements
+  - name: get_modules
+    description: Course modules and items (structured)
+  - name: get_todos
+    description: Pending to-do items and required actions
+  - name: get_discussions
+    description: Course discussion topics
+  - name: get_quizzes
+    description: Course quizzes and assessments
+  - name: get_profile
+    description: User profile and Canvas account details
+
+# Deployment metadata (informational only; actual connection handled by wrapper)
+deployment:
+  domain: ariff.dev
+  endpoints:
+    mcp_server: https://canvas-mcp-sse.ariff.dev
+    sse_path: /sse
+    oauth_discovery: https://canvas-mcp-sse.ariff.dev/.well-known/oauth-authorization-server
