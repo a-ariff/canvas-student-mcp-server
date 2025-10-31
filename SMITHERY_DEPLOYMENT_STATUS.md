@@ -1,7 +1,7 @@
 # Smithery Deployment Status
 
-**Last Updated:** October 31, 2025 21:44 UTC
-**Status:** ⚠️ AWAITING SMITHERY REBUILD
+**Last Updated:** October 31, 2025 21:52 UTC
+**Status:** ⚠️ AWAITING GITHUB APP INSTALLATION
 
 ---
 
@@ -61,18 +61,23 @@ npx @smithery/cli search canvas-ai-assistant
 
 ---
 
-## Why Deployment May Still Be Pending
+## Why Deployment Is Blocked
+
+**ROOT CAUSE FOUND:** Smithery GitHub App is NOT installed on the repository!
+
+**Evidence:**
+- ❌ `gh api repos/a-ariff/canvas-student-mcp-server/hooks` returns `[]` (no webhooks)
+- ❌ Smithery not receiving push notifications
+- ❌ No automatic builds triggered
 
 Smithery rebuilds happen automatically when:
 1. Push to default branch (main) - ✅ DONE
 2. smithery.yaml exists in root - ✅ EXISTS
 3. Package has correct configuration - ✅ FIXED
+4. **GitHub App installed and configured** - ❌ **MISSING!**
 
-**Possible reasons for delay:**
-1. **Build queue** - Smithery may be processing other builds
-2. **Build time** - Complex builds can take 2-5 minutes
-3. **Caching** - Smithery may need cache invalidation
-4. **Manual trigger needed** - May need to visit smithery.ai and manually trigger
+**Solution Required:**
+Install Smithery GitHub App on your repository. See `SMITHERY_GITHUB_APP_SETUP.md` for detailed instructions.
 
 ---
 
