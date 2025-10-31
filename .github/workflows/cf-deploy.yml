@@ -1,0 +1,77 @@
+name: Deploy Cloudflare Workers
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'packages/remote-mcp-server-authless/**'
+      - 'packages/cloudflare-canvas-api/**'
+      - '.github/workflows/cf-deploy.yml'
+  workflow_dispatch: {}
+
+concurrency:
+  group: cf-deploy-prod
+  cancel-in-progress: true
+
+jobs:
+  deploy-mcp-sse:
+    name: Deploy MCP SSE Worker
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: |
+            packages/remote-mcp-server-authless/package-lock.json
+
+      - name: Install deps (mcp-sse)
+        working-directory: packages/remote-mcp-server-authless
+        run: npm ci
+
+      - name: Deploy mcp-sse
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: packages/remote-mcp-server-authless
+          command: deploy
+
+  deploy-api:
+    name: Deploy Canvas API Proxy (optional)
+    needs: deploy-mcp-sse
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: |
+            packages/cloudflare-canvas-api/package-lock.json
+
+      - name: Install deps (api)
+        working-directory: packages/cloudflare-canvas-api
+        run: |
+          if [ -f package.json ]; then npm ci; else echo "No api package.json; skipping"; fi
+
+      - name: Deploy api
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: packages/cloudflare-canvas-api
+          command: deploy
+        continue-on-error: true
+
