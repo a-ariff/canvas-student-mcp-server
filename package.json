@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Production-ready Canvas LMS MCP server deployed on Cloudflare Workers with OAuth 2.1 authentication",
   "main": "./dist/index.js",
+  "module": "./src/index.ts",
   "engines": {
     "node": ">=18"
   },
