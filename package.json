@@ -2,8 +2,7 @@
   "name": "canvas-student-mcp-server",
   "version": "1.0.0",
   "description": "Production-ready Canvas LMS MCP server deployed on Cloudflare Workers with OAuth 2.1 authentication",
-  "private": true,
-  "module": "./src/index.ts",
+  "main": "./dist/index.js",
   "engines": {
     "node": ">=18"
   },
@@ -11,6 +10,7 @@
     "packages/*"
   ],
   "scripts": {
+    "build:wrapper": "tsc",
     "install:all": "npm install && cd packages/remote-mcp-server-authless && npm install && cd ../cloudflare-canvas-api && npm install",
     "start:mcp": "cd packages/remote-mcp-server-authless && npm start",
     "start:api": "cd packages/cloudflare-canvas-api && npm start",
@@ -20,10 +20,10 @@
     "lint": "cd packages/remote-mcp-server-authless && npx eslint src/ --ext .ts",
     "build:mcp": "cd packages/remote-mcp-server-authless && npx tsc",
     "build:api": "cd packages/cloudflare-canvas-api && npx tsc",
-    "build": "npm run build:mcp && npm run build:api",
+    "build": "npm run build:wrapper && npm run build:mcp && npm run build:api",
     "deploy:mcp": "cd packages/remote-mcp-server-authless && npx wrangler deploy",
     "deploy:api": "cd packages/cloudflare-canvas-api && npx wrangler deploy",
-    "clean": "rm -rf node_modules packages/*/node_modules packages/*/dist"
+    "clean": "rm -rf node_modules packages/*/node_modules packages/*/dist dist"
   },
   "keywords": [
     "canvas",
