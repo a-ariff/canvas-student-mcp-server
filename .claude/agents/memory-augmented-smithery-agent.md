@@ -53,5 +53,6 @@ Artifacts
 - Runbook: `SMITHERY_SEQUENTIAL_RUNBOOK.md`
 - Guides: `SMITHERY_GUIDE.md`, `docs/SMITHERY_SUBMISSION.md`
 
-Owner: Ariff
+Owner: Ariff Abdul Latiff
 Last Updated: 2025‑10‑31
+
