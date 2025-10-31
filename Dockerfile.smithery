@@ -1,0 +1,12 @@
+# Custom Smithery build container
+FROM node:22-slim
+WORKDIR /app
+COPY . .
+# Ensure a clean install (ignore root lockfile if any)
+RUN npm config set fund false && npm config set audit false
+RUN if [ -f package-lock.json ]; then rm -f package-lock.json; fi
+RUN npm install --no-audit --no-fund
+# Belt-and-suspenders: ensure sdk deps are present
+RUN npm install @smithery/sdk chalk --no-save || true
+# Build with Smithery CLI
+RUN npx -y @smithery/cli build -o .smithery/index.cjs

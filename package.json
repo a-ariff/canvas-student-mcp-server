@@ -23,7 +23,8 @@
     "build": "npm run build:wrapper && npm run build:mcp && npm run build:api",
     "deploy:mcp": "cd packages/remote-mcp-server-authless && npx wrangler deploy",
     "deploy:api": "cd packages/cloudflare-canvas-api && npx wrangler deploy",
-    "clean": "rm -rf node_modules packages/*/node_modules packages/*/dist dist"
+    "clean": "rm -rf node_modules packages/*/node_modules packages/*/dist dist",
+    "postinstall": "node scripts/smithery-postinstall.js"
   },
   "keywords": [
     "canvas",
