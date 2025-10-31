@@ -97,7 +97,6 @@ If you want to augment your local agent, install these MCP servers (run locally)
   - `gh pr merge <number> --squash --delete-branch`
 
 ---
-Owner: Ariff Abdul Latiff
+Owner: Ariff
 Last Updated: 2025‑10‑31
 Version: 3.0.1
-
