@@ -78,9 +78,16 @@ User reported: Smithery deployment keeps failing but documentation claims succes
 
 ## Current Blockers
 
-❌ **Smithery GitHub App not installed**
-- User must manually install via smithery.ai or github.com/apps/smithery-ai
-- See SMITHERY_GITHUB_APP_SETUP.md for instructions
+❌ **Smithery Test Profile not configured**
+- Scanner defaults to HTTP JSON, times out on SSE + OAuth server
+- User must configure test profile with SSE transport and OAuth settings
+- See SMITHERY_TEST_PROFILE_CONFIG.md for step-by-step instructions
+
+**Scanner logs showed:**
+- "No test config found, using best guess"
+- Defaulted to wrong transport
+- Timed out trying to connect
+- Could not extract tools
 
 ---
 

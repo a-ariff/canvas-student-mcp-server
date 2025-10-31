@@ -42,12 +42,16 @@
 - [x] All commits pushed to main
 - [x] No AI markers in commits
 
-### Stage 6: GitHub App Installation ⏳ PENDING (USER ACTION)
-- [ ] User visits smithery.ai
-- [ ] User logs in with GitHub
-- [ ] User installs Smithery GitHub App
-- [ ] User grants repository access
-- [ ] Webhooks configured automatically
+### Stage 6: Smithery Test Profile Configuration ⏳ PENDING (USER ACTION)
+- [ ] User visits server page on smithery.ai
+- [ ] Navigate to Test Profile → Configure
+- [ ] Set Transport to SSE
+- [ ] Enter SSE URL: https://canvas-mcp-sse.ariff.dev/sse
+- [ ] Configure OAuth 2.1 with discovery URL
+- [ ] Add environment variables
+- [ ] Click Connect and authorize
+- [ ] Save profile
+- [ ] Click Rescan
 
 ### Stage 7: Deployment Trigger ⏳ PENDING (USER ACTION)
 - [ ] User triggers deployment via Smithery dashboard
