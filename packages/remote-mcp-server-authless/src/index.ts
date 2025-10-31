@@ -564,6 +564,19 @@ export default {
 	async fetch(request: Request, env: Env, ctx: ExecutionContext) {
 		const url = new URL(request.url);
 
+		// CORS preflight support for Smithery scanner and clients
+		if (request.method === "OPTIONS") {
+			return new Response(null, {
+				status: 204,
+				headers: {
+					"Access-Control-Allow-Origin": "*",
+					"Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+					"Access-Control-Allow-Headers": "Authorization, Content-Type, X-Requested-With",
+					"Access-Control-Max-Age": "86400",
+				},
+			});
+		}
+
 		// Health check endpoint
 		if (url.pathname === "/health") {
 			return new Response(
@@ -593,55 +606,50 @@ export default {
 			);
 		}
 
-		// MCP Configuration Schema endpoint for Smithery
+		// MCP Configuration endpoint for Smithery
 		if (url.pathname === "/.well-known/mcp-config") {
-			return new Response(
-				JSON.stringify({
-					"$schema": "http://json-schema.org/draft-07/schema#",
-					"$id": `https://${url.host}/.well-known/mcp-config`,
-					"title": "Canvas Student MCP Configuration",
-					"description": "Configuration for connecting to Canvas and Gradescope MCP server",
-					"x-query-style": "dot+bracket",
-					"type": "object",
-					"properties": {
-						"canvasApiKey": {
-							"type": "string",
-							"title": "Canvas API Key",
-							"description": "Your Canvas API access token (Get from Canvas → Account → Settings → Approved Integrations)"
-						},
-						"canvasBaseUrl": {
-							"type": "string",
-							"title": "Canvas Base URL",
-							"description": "Your Canvas instance URL (e.g., https://canvas.instructure.com)",
-							"default": "https://canvas.instructure.com"
-						},
-						"debug": {
-							"type": "boolean",
-							"title": "Debug Mode",
-							"description": "Enable debug logging",
-							"default": false
-						},
-						"gradescopeEmail": {
-							"type": "string",
-							"title": "Gradescope Email",
-							"description": "Your Gradescope email address (optional)"
-						},
-						"gradescopePassword": {
-							"type": "string",
-							"title": "Gradescope Password",
-							"description": "Your Gradescope password (optional)"
-						}
+			const issuer = env.OAUTH_ISSUER || `https://${url.host}`;
+			const mcp = {
+				remote: {
+					transport: { type: "sse", url: `${issuer}/sse` },
+					authentication: {
+						type: "oauth2",
+						discovery_url: `${issuer}/.well-known/oauth-authorization-server`,
+						client_id: "canvas-mcp-client",
+						scopes: ["openid", "profile", "email"],
 					},
-					"required": ["canvasApiKey"],
-					"additionalProperties": false
-				}),
-				{
-					headers: {
-						"Content-Type": "application/json",
-						"Access-Control-Allow-Origin": "*"
-					}
-				}
-			);
+				},
+				configuration: {
+					$schema: "http://json-schema.org/draft-07/schema#",
+					$id: `https://${url.host}/.well-known/mcp-config`,
+					title: "Canvas Student MCP Configuration",
+					description: "Configuration for connecting to Canvas (optional for debugging)",
+					type: "object",
+					properties: {
+						canvasApiKey: {
+							type: "string",
+							title: "Canvas API Key",
+							description: "Optional API key (OAuth is preferred)",
+						},
+						canvasBaseUrl: {
+							type: "string",
+							title: "Canvas Base URL",
+							description: "Your Canvas instance URL (e.g., https://learn.mywhitecliffe.com)",
+							default: "https://canvas.instructure.com",
+						},
+						debug: { type: "boolean", title: "Debug Mode", default: false },
+					},
+					additionalProperties: false,
+				},
+			};
+			return new Response(JSON.stringify(mcp, null, 2), {
+				headers: {
+					"Content-Type": "application/json",
+					"Access-Control-Allow-Origin": "*",
+					"Access-Control-Allow-Methods": "GET, OPTIONS",
+					"Access-Control-Allow-Headers": "Authorization, Content-Type",
+				},
+			});
 		}
 
 		if (url.pathname.startsWith("/.well-known/")) {
